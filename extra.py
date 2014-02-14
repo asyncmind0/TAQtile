@@ -21,6 +21,20 @@ def terminal(x):
     return terminal1 % (x, x)
 
 
+class SwitchGroup(CommandObject):
+    def __init__(self, group):
+        self.group = group
+        self.prev_group = None
+
+    def __call__(self, qtile):
+        if qtile.currentGroup == qtile.groupMap[self.group]\
+           and self.prev_group:
+            qtile.currentScreen.setGroup(self.prev_group)
+        else:
+            self.prev_group = qtile.currentGroup
+            qtile.currentScreen.setGroup(qtile.groupMap[self.group])
+
+
 class SwitchToWindowGroup(object):
     def __init__(self, name, cmd=None, screen=0):
         self.name = name
@@ -41,6 +55,8 @@ class SwitchToWindowGroup(object):
     def __call__(self, qtile):
         log.debug("currentScreen:%s", qtile.currentScreen.index)
         log.debug(self.screen)
+        if self.screen > len(qtile.screens) - 1:
+            self.screen = len(qtile.screens) - 1
         if qtile.currentScreen.index != self.screen:
             qtile.cmd_to_screen(self.screen)
             return

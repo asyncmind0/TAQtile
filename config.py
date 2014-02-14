@@ -1,8 +1,8 @@
 from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
-from libqtile.command import lazy
+from libqtile.command import lazy, CommandObject
 from libqtile import layout, bar, widget
 
-from extra import SwitchToWindowGroup, check_restart, terminal
+from extra import SwitchToWindowGroup, check_restart, terminal, SwitchGroup
 from screens import get_screens
 from keys import get_keys
 import logging
@@ -14,12 +14,13 @@ mod = "mod4"
 keys = get_keys(mod)
 
 
+
 def generate_groups():
     groups = [Group(str(i)) for i in range(1, 10)]
     for i in groups:
         # mod1 + letter of group = switch to group
         keys.append(
-            Key([mod], i.name, lazy.group[i.name].toscreen())
+            Key([mod], i.name, lazy.function(SwitchGroup(i.name)))
         )
         # mod1 + shift + letter of group = switch to & move focused window to
         # group
