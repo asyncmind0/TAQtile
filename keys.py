@@ -1,7 +1,8 @@
 from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
 from libqtile.command import lazy
 from libqtile import layout, bar, widget
-from extra import SwitchToWindowGroup, check_restart, terminal
+from extra import (SwitchToWindowGroup, check_restart,
+                   terminal, MoveToOtherScreenGroup)
 
 
 def get_keys(mod):
@@ -18,6 +19,9 @@ def get_keys(mod):
 
         # Swap panes of split stack
         Key([mod, "shift"], "space", lazy.layout.rotate()),
+
+        Key([mod, "shift"], "comma", 
+            lazy.function(MoveToOtherScreenGroup())),
 
         # Toggle between split and unsplit sides of stack.
         # Split = all windows displayed
@@ -38,5 +42,9 @@ def get_keys(mod):
             SwitchToWindowGroup("left", terminal("left"), 1))),
         Key([], "F12", lazy.function(
             SwitchToWindowGroup("right", terminal("right"), 0))),
+        Key([mod, "shift"], "b", lazy.spawn("conkeror")),
+        Key([mod], "F2", lazy.spawncmd()),
+        Key([mod], "Right",lazy.screen.nextgroup()),
+        Key([mod], "Left",lazy.screen.prevgroup()),
     ]
     return keys

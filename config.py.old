@@ -15,17 +15,6 @@ import re
 import os
 log = logging.getLogger("qtile")
 
-star_trek_blue = dict(border="#42B1FF", foreground="#06B4E7",
-                      background="#010F2C", font="mono")
-matrix_green = dict(border="#00FD00", foreground="#00FD00",
-                    background="#125B29", font="mono")
-current_theme = star_trek_blue
-current_theme = matrix_green
-
-
-
-
-
 
 # The screens variable contains information about what bars are drawn where on
 # each screen. If you have multiple screens, you'll need to construct multiple
@@ -55,8 +44,7 @@ screens = [Screen(top=bar.Bar([
     # widget.sep.Sep(foreground=current_theme['foreground']),
     widget.NetGraph(),  # theme_path='/home/deewakar/.config/qtile/icons/'),
     # widget.Volume(
-    #    theme_path='/usr/share/icons/oxygen/16x16/status/',
-    #    update_interval=0.5),
+    #    theme_path='/usr/val=0.5),
     widget.CPUGraph(type='box', line_width=1, border_width=1),
     widget.MemoryGraph(type='box', line_width=1, border_width=1),
     widget.sep.Sep(foreground=current_theme['foreground']),

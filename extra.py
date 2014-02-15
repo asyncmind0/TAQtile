@@ -21,18 +21,32 @@ def terminal(x):
     return terminal1 % (x, x)
 
 
-class SwitchGroup(CommandObject):
+class SwitchGroup(object):
     def __init__(self, group):
-        self.group = group
-        self.prev_group = None
+        self.name = group
+        self.screenGroupMap = {}
 
     def __call__(self, qtile):
-        if qtile.currentGroup == qtile.groupMap[self.group]\
-           and self.prev_group:
-            qtile.currentScreen.setGroup(self.prev_group)
-        else:
-            self.prev_group = qtile.currentGroup
-            qtile.currentScreen.setGroup(qtile.groupMap[self.group])
+        log.debug("SwitchGroup:%s:%s", qtile.currentScreen.index, self.name)
+        index = int(self.name)
+        if qtile.currentScreen.index > 0:
+            index = index + 10
+
+        qtile.currentScreen.cmd_togglegroup(str(index))
+        #prev_group = self.screenGroupMap.get(qtile.currentScreen.index)
+        #if qtile.currentGroup.name == self.name and prev_group:
+        #    qtile.currentScreen.cmd_togglegroup(prev_group)
+        #else:
+        #    self.screenGroupMap[qtile.currentScreen.index] = qtile.currentGroup
+        #    qtile.currentScreen.cmd_togglegroup(qtile.groupMap[self.name])
+
+
+class MoveToOtherScreenGroup(object):
+    def __call__(self, qtile):
+        otherscreen = (qtile.screens.index(qtile.currentScreen) + 1) \
+                      % len(qtile.screens)
+        othergroup = qtile.screens[otherscreen].group.name
+        qtile.currentWindow.cmd_togroup(othergroup)
 
 
 class SwitchToWindowGroup(object):
@@ -41,15 +55,12 @@ class SwitchToWindowGroup(object):
         self.cmd = cmd
         self.screen = screen
 
-    def _switchto(self, qtile):
+    def spawn_ifnot(self, qtile):
+        log.debug(qtile.currentGroup)
         for window in qtile.windowMap.values():
             if window.group and window.match(wname=self.name):
-                if window.group == qtile.currentGroup:
-                    qtile.screens[self.screen].cmd_togglegroup()
-                else:
-                    qtile.screens[self.screen].setGroup(window.group)
-                    window.group.focus(window, False)
                 return True
+        qtile.cmd_spawn(self.cmd)
         return False
 
     def __call__(self, qtile):
@@ -60,17 +71,31 @@ class SwitchToWindowGroup(object):
         if qtile.currentScreen.index != self.screen:
             qtile.cmd_to_screen(self.screen)
             return
-        found = self._switchto(qtile)
-        if not found and self.cmd:
-            qtile.cmd_spawn(self.cmd)
-            self._switchto(qtile)
+        self.spawn_ifnot(qtile)
+        qtile.currentScreen.cmd_togglegroup(self.name)
 
 
 def check_restart(qtile):
     try:
         for pyfile in glob.glob(os.path.expanduser('~/.config/qtile/*.py')):
+            log.debug(pyfile)
             compile(pyfile, doraise=True)
     except Exception as e:
         log.exception("Syntax error")
     else:
         qtile.cmd_restart()
+
+
+def get_num_monitors():
+    #import Xlib.display
+    #display = Xlib.display.Display(':0')
+    #return display.screen_count()
+    output = subprocess.Popen('xrandr | grep "\*" | cut -d" " -f4',shell=True, stdout=subprocess.PIPE).communicate()[0]
+
+    displays = output.strip().split('\n')
+    return len(displays)
+    #for display in displays:
+    #    values = display.split('x')
+    #    width = values[0]
+    #    height = values[1]
+    #    print "Width:" + width + ",height:" + height
