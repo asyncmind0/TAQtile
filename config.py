@@ -10,7 +10,7 @@ import logging
 import re
 
 logging.basicConfig(level=logging.DEBUG)
-logging.getLogger("qtile").setLevel(logging.DEBUG)
+logging.getLogger("qtile").setLevel(logging.WARN)
 log = logging.getLogger('qtile.config')
 log.setLevel(logging.DEBUG)
 mod = "mod4"

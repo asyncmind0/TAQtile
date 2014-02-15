@@ -2,16 +2,27 @@ from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
 from libqtile.command import lazy
 from libqtile import layout, bar, widget, hook
 from themes import current_theme
+import logging
+
+log = logging.getLogger("qtile.screen")
 
 
 class MultiScreenGroupBox(widget.GroupBox):
+    def __init__(self, **config):
+        widget.GroupBox.__init__(self, **config)
+        self.namemap = config.get('namemap',{})
+
     def draw(self):
         self.drawer.clear(self.background or self.bar.background)
 
         offset = 0
         for i, g in enumerate(self.qtile.groups):
-            #if i > 8 and self.qtile.currentGroup.index == 0:
-            #    continue
+            gtext = g.name
+            log.warn(gtext)
+            if gtext in self.namemap:
+                gtext = self.namemap[gtext]
+            else:
+                continue
 
             is_block = (self.highlight_method == 'block')
 
@@ -39,17 +50,9 @@ class MultiScreenGroupBox(widget.GroupBox):
             else:
                 text = self.inactive
 
-            if text.isdigit():
-                itext = int(text)
-                if itext > 9 and self.qtile.currentScreen.index == 1:
-                    text = str(itext-10)
-                #if ig < 9 and self.qtile.currentScreen.index == 1:
-                #    continue
-                #    text = str(itext-10)
-
             self.drawbox(
                 self.margin_x + offset,
-                g.name,
+                gtext,
                 border,
                 text,
                 self.rounded,
@@ -57,10 +60,11 @@ class MultiScreenGroupBox(widget.GroupBox):
                 bw - self.margin_x * 2 - self.padding_x * 2
             )
             offset += bw
-        self.drawer.draw(self.offset, self.width)
+        self.drawer.draw(self.offset, self.width/2)
 
-GroupBox = widget.GroupBox
-#GroupBox = MultiScreenGroupBox
+#GroupBox = widget.GroupBox
+GroupBox = MultiScreenGroupBox
+
 
 def get_screens(num_screens=1):
     screens = []
@@ -94,9 +98,13 @@ def get_screens(num_screens=1):
     bitcointicker_params = default_params
     batteryicon_params = default_params
 
+    gb1 = dict([(str(i), str(i)) for i in range(1,10)])
+    gb1['right'] = "term"
+    gb2 = dict([(str(i), str(i-10)) for i in range(11,20)])
+    gb2['left'] = "term"
     screens.append(Screen(
         bar.Bar([
-            GroupBox(**groupbox_params),
+            GroupBox(namemap=gb1, **groupbox_params),
             widget.Sep(),
             widget.Prompt(**prompt_params),
             widget.WindowName(**windowname_params),
@@ -117,7 +125,7 @@ def get_screens(num_screens=1):
     if num_screens > 1:
         screens.append(Screen(
             bar.Bar([
-                GroupBox(**groupbox_params),
+                GroupBox(namemap=gb2, **groupbox_params),
                 widget.Sep(),
                 widget.WindowName(**windowname_params),
                 widget.TextBox(**layout_textbox_params),
