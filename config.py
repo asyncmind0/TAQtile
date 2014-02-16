@@ -108,6 +108,7 @@ layouts = [
 
 @hook.subscribe.screen_change
 def restart_on_randr(qtile, ev):
+    import subprocess
     commands = [
         "xset b 5 6000 600",
         "xset r rate 150 40",
@@ -123,6 +124,8 @@ def restart_on_randr(qtile, ev):
 
 @hook.subscribe.startup
 def startup():
+    import subprocess
+    from extra import execute_once
     commands = [
         "xsetroot -cursor_name left_ptr",
         'nitrogen --restore'

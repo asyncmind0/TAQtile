@@ -4,11 +4,43 @@ from libqtile import layout, bar, widget, hook
 from themes import current_theme
 import logging
 import system
+import gobject
+import threading
+import subprocess
 
 log = logging.getLogger("qtile.screen")
+log.setLevel(logging.DEBUG)
 
 PRIMARY_SCREEN = system.get_screen(0)
 SECONDARY_SCREEN = system.get_screen(1)
+
+
+class ThreadedPacman(widget.Pacman):
+    def __init__(self, *args, **kwargs):
+        super(ThreadedPacman, self).__init__(*args, **kwargs)
+        self.timeout_add(self.interval, self.wx_updater)
+        self.wx_updater()
+
+    def update(self, data=None):
+        if self.configured and data:
+            self.updates_data = str(data)
+            if self.text != self.updates_data:
+                self.text = self.updates_data
+                self.bar.draw()
+        return "N/A"
+
+    def wx_updater(self):
+        log.warn('adding WX Pacman widget timer')
+
+        def worker():
+            pacman = subprocess.Popen(['checkupdates'], stdout=subprocess.PIPE)
+            data = len(pacman.stdout.readlines())
+            gobject.idle_add(self.update, data)
+        threading.Thread(target=worker).start()
+        return True
+
+#Pacman = widget.Pacman
+Pacman = ThreadedPacman
 
 
 class MultiScreenGroupBox(widget.GroupBox):
@@ -93,7 +125,7 @@ def get_screens(num_screens=1):
     layout_textbox_params = dict(name="default", text="default config")
     layout_textbox_params.update(default_params)
     layout_textbox_params['padding'] = 2
-    windowname_params = default_params
+    #windowname_params = default_params
     systray_params = default_params
     clock_params = dict(fmt='%Y-%m-%d %a %I:%M %p')
     clock_params.update(default_params)
@@ -129,7 +161,7 @@ def get_screens(num_screens=1):
             widget.Sep(),
             widget.BitcoinTicker(**bitcointicker_params),
             widget.Sep(),
-            widget.Pacman(**pacman_params),
+            Pacman(**pacman_params),
             widget.Sep(),
             widget.Notify(**notify_params),
             widget.Sep(),
