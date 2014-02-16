@@ -139,14 +139,20 @@ def get_screens(num_screens=1):
     windowtabs_params.update(default_params)
 
     gb1 = dict([(str(i), str(i)) for i in range(1, 10)])
+
+    gb2 = dict([(str(i), str(i-10)) for i in range(11, 20)])
     if num_screens == 1:
         gb1['right'] = "term1"
         gb1['left'] = "term2"
     else:
-        gb1['right'] = "term"
+        # if primary and seconday are reversed
+        if PRIMARY_SCREEN:
+            gb1['right'] = "term"
+            gb2['left'] = "term"
+        else:
+            gb1['left'] = "term"
+            gb2['right'] = "term"
 
-    gb2 = dict([(str(i), str(i-10)) for i in range(11, 20)])
-    gb2['left'] = "term"
     screens.append(Screen(
         bar.Bar([
             GroupBox(namemap=gb1, **groupbox_params),
