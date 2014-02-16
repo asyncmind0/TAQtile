@@ -2,49 +2,56 @@ from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
 from libqtile.command import lazy
 from libqtile import layout, bar, widget
 from extra import (SwitchToWindowGroup, check_restart,
-                   terminal, MoveToOtherScreenGroup)
+                   terminal, MoveToOtherScreenGroup, SwitchGroup)
+from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 
 
 def get_keys(mod):
     keys = [
         # Switch between windows in current stack pane
-        Key([mod], "k", lazy.layout.down()),
-        Key([mod], "j", lazy.layout.up()),
+        ([mod], "k", lazy.layout.next().when('stack'),
+         lazy.layout.down()),
+        ([mod], "j", lazy.layout.previous().when('stack'),
+         lazy.layout.up()),
         # Move windows up or down in current stack
-        Key([mod, "control"], "k", lazy.layout.shuffle_down()),
-        Key([mod, "control"], "j", lazy.layout.shuffle_up()),
-
-        # Switch window focus to other pane(s) of stack
-        Key([mod], "space", lazy.layout.next()),
+        ([mod, "shift"], "k", lazy.layout.shuffle_down()),
+        ([mod, "shift"], "j", lazy.layout.shuffle_up()),
 
         # Swap panes of split stack
-        Key([mod, "shift"], "space", lazy.layout.rotate()),
-
-        Key([mod, "shift"], "comma", 
-            lazy.function(MoveToOtherScreenGroup())),
-
+        ([mod, "shift"], "space", lazy.layout.rotate()),
+        # toggle between windows just like in unity with 'alt+tab'
+        (["mod1", "shift"], "Tab", lazy.layout.down()),
+        (["mod1"], "Tab", lazy.layout.up()),
+        ([mod], "h", lazy.layout.previous().when('tile'),
+         lazy.layout.up().when('xmonad-tall')),
+        ([mod], "l", lazy.layout.next().when('tile'),
+         lazy.layout.down().when('xmonad-tall')),
+        ([mod, "shift"], "comma",
+         lazy.function(MoveToOtherScreenGroup())),
         # Toggle between split and unsplit sides of stack.
         # Split = all windows displayed
         # Unsplit = 1 window displayed, like Max layout, but still with
         # multiple stack panes
-        Key([mod, "shift"], "Return", lazy.layout.toggle_split()),
-        Key([mod], "Return", lazy.spawn("xterm")),
-        Key(["shift", mod], "q", lazy.shutdown()),
-
+        ([mod, "shift"], "Return", lazy.layout.toggle_split()),
+        ([mod], "Return", lazy.spawn("st")),
+        (["shift", mod], "q", lazy.shutdown()),
         # Toggle between different layouts as defined below
-        Key([mod], "Tab",    lazy.nextlayout()),
-        Key([mod], "w",      lazy.window.kill()),
-
+        ([mod], "space",    lazy.nextlayout()),
+        ([mod], "q",      lazy.window.kill()),
         # Key([mod, "control"], "r", lazy.restart()),
-        Key([mod, "control"], "r", lazy.function(check_restart)),
-        Key([mod], "r", lazy.spawncmd()),
-        Key([], "F11", lazy.function(
-            SwitchToWindowGroup("left", terminal("left"), 1))),
-        Key([], "F12", lazy.function(
-            SwitchToWindowGroup("right", terminal("right"), 0))),
-        Key([mod, "shift"], "b", lazy.spawn("conkeror")),
-        Key([mod], "F2", lazy.spawncmd()),
-        Key([mod], "Right",lazy.screen.nextgroup()),
-        Key([mod], "Left",lazy.screen.prevgroup()),
+        ([mod, "control"], "r", lazy.function(check_restart)),
+        ([mod], "r", lazy.spawncmd()),
+        ([], "F11", lazy.function(
+            SwitchToWindowGroup("left", terminal("left"), PRIMARY_SCREEN))),
+        ([], "F12", lazy.function(
+            SwitchToWindowGroup(
+                "right", terminal("right"), SECONDARY_SCREEN))),
+        ([mod], "F2", lazy.spawncmd()),
+        ([mod], "Right", lazy.screen.nextgroup()),
+        ([mod], "Left", lazy.screen.prevgroup()),
+        ([], "F6",      lazy.function(SwitchGroup("6", PRIMARY_SCREEN))),
+        # app launcher
+        ([mod, "shift"], "b", lazy.spawn("conkeror")),
+        ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
     ]
-    return keys
+    return [Key(*k) for k in keys]

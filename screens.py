@@ -3,14 +3,18 @@ from libqtile.command import lazy
 from libqtile import layout, bar, widget, hook
 from themes import current_theme
 import logging
+import system
 
 log = logging.getLogger("qtile.screen")
+
+PRIMARY_SCREEN = system.get_screen(0)
+SECONDARY_SCREEN = system.get_screen(1)
 
 
 class MultiScreenGroupBox(widget.GroupBox):
     def __init__(self, **config):
         widget.GroupBox.__init__(self, **config)
-        self.namemap = config.get('namemap',{})
+        self.namemap = config.get('namemap', {})
 
     def draw(self):
         self.drawer.clear(self.background or self.bar.background)
@@ -18,7 +22,7 @@ class MultiScreenGroupBox(widget.GroupBox):
         offset = 0
         for i, g in enumerate(self.qtile.groups):
             gtext = g.name
-            log.warn(gtext)
+            #log.debug(gtext)
             if gtext in self.namemap:
                 gtext = self.namemap[gtext]
             else:
@@ -60,7 +64,7 @@ class MultiScreenGroupBox(widget.GroupBox):
                 bw - self.margin_x * 2 - self.padding_x * 2
             )
             offset += bw
-        self.drawer.draw(self.offset, self.width/2)
+        self.drawer.draw(self.offset, self.width)
 
 #GroupBox = widget.GroupBox
 GroupBox = MultiScreenGroupBox
@@ -97,18 +101,31 @@ def get_screens(num_screens=1):
     notify_params = default_params
     bitcointicker_params = default_params
     batteryicon_params = default_params
+    current_layout_params = dict(foreground=current_theme['foreground'])
+    current_layout_params.update(default_params)
+    windowtabs_params = dict(selected=("[", "]"))
+    windowtabs_params.update(default_params)
 
-    gb1 = dict([(str(i), str(i)) for i in range(1,10)])
-    gb1['right'] = "term"
-    gb2 = dict([(str(i), str(i-10)) for i in range(11,20)])
+    gb1 = dict([(str(i), str(i)) for i in range(1, 10)])
+    if num_screens == 1:
+        gb1['right'] = "term1"
+        gb1['left'] = "term2"
+    else:
+        gb1['right'] = "term"
+
+    gb2 = dict([(str(i), str(i-10)) for i in range(11, 20)])
     gb2['left'] = "term"
     screens.append(Screen(
         bar.Bar([
             GroupBox(namemap=gb1, **groupbox_params),
             widget.Sep(),
             widget.Prompt(**prompt_params),
-            widget.WindowName(**windowname_params),
-            widget.TextBox(**layout_textbox_params),
+            widget.Sep(),
+            widget.WindowTabs(**windowtabs_params),
+            #widget.WindowName(**windowname_params),
+            #widget.TextBox(**layout_textbox_params),
+            widget.Sep(),
+            widget.CurrentLayout(**current_layout_params),
             widget.Sep(),
             widget.BitcoinTicker(**bitcointicker_params),
             widget.Sep(),

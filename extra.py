@@ -22,9 +22,10 @@ def terminal(x):
 
 
 class SwitchGroup(object):
-    def __init__(self, group):
+    def __init__(self, group, preferred_screen=None):
         self.name = group
         self.screenGroupMap = {}
+        self.preferred_screen = preferred_screen
 
     def __call__(self, qtile):
         log.debug("SwitchGroup:%s:%s", qtile.currentScreen.index, self.name)
@@ -32,13 +33,8 @@ class SwitchGroup(object):
         if qtile.currentScreen.index > 0:
             index = index + 10
 
-        qtile.currentScreen.cmd_togglegroup(str(index))
-        #prev_group = self.screenGroupMap.get(qtile.currentScreen.index)
-        #if qtile.currentGroup.name == self.name and prev_group:
-        #    qtile.currentScreen.cmd_togglegroup(prev_group)
-        #else:
-        #    self.screenGroupMap[qtile.currentScreen.index] = qtile.currentGroup
-        #    qtile.currentScreen.cmd_togglegroup(qtile.groupMap[self.name])
+        screen = self.preferred_screen or qtile.currentScreen
+        screen.cmd_togglegroup(str(index))
 
 
 class MoveToOtherScreenGroup(object):
@@ -78,7 +74,7 @@ class SwitchToWindowGroup(object):
 def check_restart(qtile):
     try:
         for pyfile in glob.glob(os.path.expanduser('~/.config/qtile/*.py')):
-            log.debug(pyfile)
+            #log.debug(pyfile)
             compile(pyfile, doraise=True)
     except Exception as e:
         log.exception("Syntax error")
@@ -99,3 +95,15 @@ def get_num_monitors():
     #    width = values[0]
     #    height = values[1]
     #    print "Width:" + width + ",height:" + height
+
+def is_running(process):
+    s = subprocess.Popen(["ps", "axw"], stdout=subprocess.PIPE)
+    for x in s.stdout:
+        if re.search(process, x):
+            return True
+        return False
+
+
+def execute_once(process):
+    if not is_running(process):
+        return subprocess.Popen(process.split())

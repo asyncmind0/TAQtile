@@ -7,6 +7,7 @@ import subprocess
 from py_compile import compile
 import re
 import os
+
 log = logging.getLogger("qtile.themes")
 
 star_trek_blue = dict(
