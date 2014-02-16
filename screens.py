@@ -144,8 +144,9 @@ def get_screens(num_screens=1):
             bar.Bar([
                 GroupBox(namemap=gb2, **groupbox_params),
                 widget.Sep(),
-                widget.WindowName(**windowname_params),
-                widget.TextBox(**layout_textbox_params),
+                widget.WindowTabs(**windowtabs_params),
+                widget.Sep(),
+                widget.CurrentLayout(**current_layout_params),
                 widget.Sep(),
                 widget.Clock(**clock_params),
             ], 18)))
