@@ -7,9 +7,13 @@ import system
 import gobject
 import threading
 import subprocess
-
 log = logging.getLogger("qtile.screen")
 log.setLevel(logging.DEBUG)
+try:
+    from metrics_widget import Metrics
+except Exception as e:
+    log.exception(e)
+
 
 PRIMARY_SCREEN = system.get_screen(0)
 SECONDARY_SCREEN = system.get_screen(1)
@@ -127,16 +131,35 @@ def get_screens(num_screens=1):
     layout_textbox_params['padding'] = 2
     #windowname_params = default_params
     systray_params = default_params
-    clock_params = dict(fmt='%Y-%m-%d %a %I:%M %p')
+    clock_params = dict(fmt='%Y-%m-%d %a %H:%M')
     clock_params.update(default_params)
     pacman_params = default_params
     notify_params = default_params
     bitcointicker_params = default_params
     batteryicon_params = default_params
+    batteryicon_params['battery_name'] = "BAT1"
+    batteryicon_params['format'] = "{percent:5.0%}"
     current_layout_params = dict(foreground=current_theme['foreground'])
     current_layout_params.update(default_params)
     windowtabs_params = dict(selected=("[", "]"))
     windowtabs_params.update(default_params)
+    graph_defaults = {k[0]: k[1] for k in[
+        ("graph_color", "18BAEB", "Graph color"),
+        ("fill_color", "1667EB.3", "Fill color for linefill graph"),
+        ("border_color", "215578", "Widget border color"),
+        ("border_width", 1, "Widget border width"),
+        ("margin_x", 1, "Margin X"),
+        ("margin_y", 1, "Margin Y"),
+        ("samples", 100, "Count of graph samples."),
+        ("frequency", 1, "Update frequency in seconds"),
+        ("type", "line", "'box', 'line', 'linefill'"),
+        ("line_width", 1, "Line width"),
+        ("start_pos", "bottom", "Drawer starting position ('bottom'/'top')"),
+        ("width", 50, "Width")
+    ]}
+    cpugraph_params = graph_defaults
+    memgraph_params = graph_defaults
+    netgraph_params = graph_defaults
 
     gb1 = dict([(str(i), str(i)) for i in range(1, 10)])
     gb2 = dict([(str(i), str(i-10)) for i in range(11, 20)])
@@ -166,12 +189,16 @@ def get_screens(num_screens=1):
         #widget.BitcoinTicker(**bitcointicker_params),
         #widget.Sep(),
         #Pacman(**pacman_params),
+        widget.DF(),
+        widget.CPUGraph(**cpugraph_params),
+        widget.MemoryGraph(**memgraph_params),
+        widget.NetGraph(**netgraph_params),
         widget.Sep(),
         widget.Notify(**notify_params),
         widget.Sep()
     ]
     if system.get_hostconfig('battery'):
-        w1.append(widget.BatteryIcon(**batteryicon_params))
+        w1.append(widget.Battery(**batteryicon_params))
         w1.append(widget.Sep())
     w1.append(widget.Systray(**systray_params))
     w1.append(widget.Clock(**clock_params))

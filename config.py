@@ -140,6 +140,31 @@ def startup():
     execute_once('parcellite')
     # execute_once('firefox')
 
+
+@hook.subscribe.client_new
+def on_client_new(window):
+    pass
+
+float_windows = []
+
+
+def should_be_floating(w):
+    wm_class = w.get_wm_class()
+    if isinstance(wm_class, tuple):
+        for cls in wm_class:
+            if cls.lower() in float_windows:
+                return True
+    else:
+        if wm_class.lower() in float_windows:
+            return True
+    return w.get_wm_type() == 'dialog' or bool(w.get_wm_transient_for())
+
+
+@hook.subscribe.client_new
+def dialogs(window):
+    if should_be_floating(window.window):
+        window.floating = True
+
 screens = get_screens(num_screens)
 main = None
 # follow_mouse_focus = True
