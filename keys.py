@@ -53,5 +53,6 @@ def get_keys(mod):
         # app launcher
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
+        ([mod, "shift"], "l", lazy.spawn("xscreensaver-command -lock")),
     ]
     return [Key(*k) for k in keys]

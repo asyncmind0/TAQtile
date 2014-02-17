@@ -139,7 +139,6 @@ def get_screens(num_screens=1):
     windowtabs_params.update(default_params)
 
     gb1 = dict([(str(i), str(i)) for i in range(1, 10)])
-
     gb2 = dict([(str(i), str(i-10)) for i in range(11, 20)])
     if num_screens == 1:
         gb1['right'] = "term1"
@@ -153,39 +152,41 @@ def get_screens(num_screens=1):
             gb1['left'] = "term"
             gb2['right'] = "term"
 
-    screens.append(Screen(
-        bar.Bar([
-            GroupBox(namemap=gb1, **groupbox_params),
-            widget.Sep(),
-            widget.Prompt(**prompt_params),
-            widget.Sep(),
-            widget.WindowTabs(**windowtabs_params),
-            #widget.WindowName(**windowname_params),
-            #widget.TextBox(**layout_textbox_params),
-            widget.Sep(),
-            widget.CurrentLayout(**current_layout_params),
-            widget.Sep(),
-            widget.BitcoinTicker(**bitcointicker_params),
-            widget.Sep(),
-            Pacman(**pacman_params),
-            widget.Sep(),
-            widget.Notify(**notify_params),
-            widget.Sep(),
-            widget.BatteryIcon(**batteryicon_params),
-            widget.Sep(),
-            widget.Systray(**systray_params),
-            widget.Clock(**clock_params),
+    w1 = [
+        GroupBox(namemap=gb1, **groupbox_params),
+        widget.Sep(),
+        widget.Prompt(**prompt_params),
+        widget.Sep(),
+        widget.WindowTabs(**windowtabs_params),
+        #widget.WindowName(**windowname_params),
+        #widget.TextBox(**layout_textbox_params),
+        widget.Sep(),
+        widget.CurrentLayout(**current_layout_params),
+        widget.Sep(),
+        #widget.BitcoinTicker(**bitcointicker_params),
+        #widget.Sep(),
+        #Pacman(**pacman_params),
+        widget.Sep(),
+        widget.Notify(**notify_params),
+        widget.Sep()
+    ]
+    if system.get_hostconfig('battery'):
+        w1.append(widget.BatteryIcon(**batteryicon_params))
+        w1.append(widget.Sep())
+    w1.append(widget.Systray(**systray_params))
+    w1.append(widget.Clock(**clock_params))
 
-        ], 18)))
+    w2 = [
+        GroupBox(namemap=gb2, **groupbox_params),
+        widget.Sep(),
+        widget.WindowTabs(**windowtabs_params),
+        widget.Sep(),
+        widget.CurrentLayout(**current_layout_params),
+        widget.Sep(),
+        widget.Clock(**clock_params),
+    ]
+
+    screens.append(Screen(bar.Bar(w1, 18)))
     if num_screens > 1:
-        screens.append(Screen(
-            bar.Bar([
-                GroupBox(namemap=gb2, **groupbox_params),
-                widget.Sep(),
-                widget.WindowTabs(**windowtabs_params),
-                widget.Sep(),
-                widget.CurrentLayout(**current_layout_params),
-                widget.Sep(),
-                widget.Clock(**clock_params),
-            ], 18)))
+        screens.append(Screen(bar.Bar(w2, 18)))
     return screens

@@ -30,11 +30,21 @@ class SwitchGroup(object):
     def __call__(self, qtile):
         log.debug("SwitchGroup:%s:%s", qtile.currentScreen.index, self.name)
         index = int(self.name)
-        if qtile.currentScreen.index > 0:
+        if self.preferred_screen is not None:
+            screen = qtile.screens[self.preferred_screen]
+        else:
+            screen = qtile.currentScreen
+        if screen.index > 0:
             index = index + 10
+        index = str(index)
 
-        screen = self.preferred_screen or qtile.currentScreen
-        screen.cmd_togglegroup(str(index))
+        if self.preferred_screen is not None and \
+           self.preferred_screen != qtile.currentScreen.index:
+            qtile.cmd_to_screen(self.preferred_screen)
+            if qtile.currentGroup.name == self.name:
+                return
+
+        screen.cmd_togglegroup(index)
 
 
 class MoveToOtherScreenGroup(object):

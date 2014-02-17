@@ -8,7 +8,6 @@ from screens import get_screens
 from keys import get_keys
 import logging
 import re
-import subprocess
 
 logging.basicConfig(level=logging.DEBUG)
 logging.getLogger("qtile").setLevel(logging.WARN)
@@ -39,6 +38,8 @@ def generate_groups(num_screens=1):
                 Key([mod, "shift"], str(i), lazy.window.togroup(str(i))))
     keys.append(Key([], "F1",      lazy.function(SwitchGroup("1"))))
     keys.append(Key([], "F2",      lazy.function(SwitchGroup("2"))))
+    keys.append(Key([], "F10",      lazy.function(SwitchGroup("4", 0))))
+    keys.append(Key([], "F9",      lazy.function(SwitchGroup("3", 0))))
     groups.append(
         Group('left', exclusive=True,
               spawn=terminal("left"),
@@ -66,21 +67,22 @@ dgroups_app_rules = [
          float=True, intrusive=True),
 
     # floating windows
-    Rule(Match(wm_class=["Pavucontrol", 'Wine', 'Xephyr', "Hangouts"]),
+    Rule(Match(wm_class=["Pavucontrol", 'Wine', 'Xephyr']),
          float=True),
-    Rule(Match(role=["pop-up"], title=["Hangouts"]), group="6",
-         float=True),
+    Rule(Match(title=["Hangouts"]), group="6"),
+    Rule(Match(wm_class=["Kmail"]), group="4"),
+    Rule(Match(wm_class=["Pidgin"]), group="3"),
     ]
 
 # Automatically float these types. This overrides the default behavior (which
 # is to also float utility types), but the default behavior breaks our fancy
 # gimp slice layout specified later on.
 floating_layout = layout.Floating(auto_float_types=[
-                                  "notification",
-                                  "toolbar",
-                                  "splash",
-                                  "dialog",
-                                  ])
+    "notification",
+    "toolbar",
+    "splash",
+    "dialog"
+])
 
 groups = generate_groups(num_screens)
 
@@ -101,7 +103,10 @@ layouts = [
                                        fallback=layout.Stack(
                                            stacks=1, **border_args))),
     # a layout for pidgin
-    layout.Slice('right', 256, name='pidgin', role='buddy_list',
+    layout.Slice('right', 256, role='buddy_list',
+                 fallback=layout.Stack(stacks=1, **border_args)),
+    # a layout for hangouts
+    layout.Slice('right', 256, wname="Hangouts",
                  fallback=layout.Stack(stacks=1, **border_args)),
 ]
 
