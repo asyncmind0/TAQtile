@@ -65,7 +65,7 @@ class MoveToOtherScreenGroup(object):
         self.direction = -1 if prev else 1
 
     def __call__(self, qtile):
-        otherscreen = (qtile.screens.index(qtile.currentScreen) 
+        otherscreen = (qtile.screens.index(qtile.currentScreen)
                        + self.direction) % len(qtile.screens)
         othergroup = qtile.screens[otherscreen].group.name
         qtile.currentWindow.cmd_togroup(othergroup)
@@ -112,7 +112,9 @@ def get_num_monitors():
     #import Xlib.display
     #display = Xlib.display.Display(':0')
     #return display.screen_count()
-    output = subprocess.Popen('xrandr | grep "\*" | cut -d" " -f4',shell=True, stdout=subprocess.PIPE).communicate()[0]
+    output = subprocess.Popen(
+        'xrandr | grep "\*" | cut -d" " -f4',
+        shell=True, stdout=subprocess.PIPE).communicate()[0]
 
     displays = output.strip().split('\n')
     return len(displays)
@@ -121,6 +123,7 @@ def get_num_monitors():
     #    width = values[0]
     #    height = values[1]
     #    print "Width:" + width + ",height:" + height
+
 
 def is_running(process):
     s = subprocess.Popen(["ps", "axw"], stdout=subprocess.PIPE)

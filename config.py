@@ -7,7 +7,11 @@ from extra import (SwitchToWindowGroup, check_restart, terminal,
 from screens import get_screens
 from keys import get_keys
 import logging
+import os
 import re
+# http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
+import signal
+signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 
 logging.basicConfig(level=logging.DEBUG)
 logging.getLogger("qtile").setLevel(logging.WARN)
@@ -36,18 +40,18 @@ def generate_groups(num_screens=1):
                 Key([mod], str(i), lazy.function(SwitchGroup(i))))
             keys.append(
                 Key([mod, "shift"], str(i),
-                lazy.function(MoveToGroup(i))))
+                    lazy.function(MoveToGroup(i))))
     keys.append(Key([], "F1",      lazy.function(SwitchGroup("1"))))
     keys.append(Key([], "F2",      lazy.function(SwitchGroup("2"))))
     keys.append(Key([], "F10",      lazy.function(SwitchGroup("4", 0))))
     keys.append(Key([], "F9",      lazy.function(SwitchGroup("3", 0))))
     groups.append(
-        Group('left', exclusive=True,
+        Group('left', exclusive=False,
               spawn=terminal("left"),
               matches=[Match(title=[".*left.*"],
                              wm_class=["InputOutput"])]))
     groups.append(
-        Group('right', exclusive=True,
+        Group('right', exclusive=False,
               spawn=terminal("right"),
               matches=[Match(title=[".*right.*"],
                              wm_class=["InputOutput"])]))
@@ -114,15 +118,20 @@ layouts = [
 
 @hook.subscribe.screen_change
 def restart_on_randr(qtile, ev):
+    log.debug(ev)
     import subprocess
-    commands = [
+    commands = []
+    if len(qtile.screens) > 1:
+        commands.append(os.path.expanduser("~/bin/dualmonitor"))
+    else:
+        commands.append(os.path.expanduser("~/bin/rightmonitor"))
+    commands.extend([
         "xset b 5 6000 600",
         "xset r rate 150 40",
         "xmodmap ~/.xmodmap",
         "xsetroot -cursor_name left_ptr",
         'nitrogen --restore',
-    ]
-    log.debug(ev)
+    ])
     for cmd in commands:
         subprocess.Popen(cmd.split())
     qtile.cmd_restart()
@@ -137,13 +146,15 @@ def startup():
         'nitrogen --restore'
     ]
     for cmd in commands:
-        subprocess.Popen(cmd.split())
+Q        subprocess.Popen(cmd.split())
     execute_once('parcellite')
     # execute_once('firefox')
 
 
 @hook.subscribe.client_new
 def on_client_new(window):
+    log.debug(window.group)
+    #window.togroup(qtile.currentGroup)
     pass
 
 float_windows = []
