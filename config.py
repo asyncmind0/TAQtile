@@ -146,7 +146,7 @@ def startup():
         'nitrogen --restore'
     ]
     for cmd in commands:
-Q        subprocess.Popen(cmd.split())
+        subprocess.Popen(cmd.split())
     execute_once('parcellite')
     # execute_once('firefox')
 
