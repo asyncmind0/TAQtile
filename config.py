@@ -3,7 +3,7 @@ from libqtile.command import lazy, CommandObject
 from libqtile import layout, bar, widget, hook
 
 from extra import (SwitchToWindowGroup, check_restart, terminal,
-                   SwitchGroup, get_num_monitors, execute_once)
+                   SwitchGroup, get_num_monitors, execute_once, MoveToGroup)
 from screens import get_screens
 from keys import get_keys
 import logging
@@ -33,9 +33,10 @@ def generate_groups(num_screens=1):
         #log.debug("group:%s", i)
         if i < 10:
             keys.append(
-                Key([mod], str(i), lazy.function(SwitchGroup(str(i)))))
+                Key([mod], str(i), lazy.function(SwitchGroup(i))))
             keys.append(
-                Key([mod, "shift"], str(i), lazy.window.togroup(str(i))))
+                Key([mod, "shift"], str(i),
+                lazy.function(MoveToGroup(i))))
     keys.append(Key([], "F1",      lazy.function(SwitchGroup("1"))))
     keys.append(Key([], "F2",      lazy.function(SwitchGroup("2"))))
     keys.append(Key([], "F10",      lazy.function(SwitchGroup("4", 0))))

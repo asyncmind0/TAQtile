@@ -24,7 +24,6 @@ def terminal(x):
 class SwitchGroup(object):
     def __init__(self, group, preferred_screen=None):
         self.name = group
-        self.screenGroupMap = {}
         self.preferred_screen = preferred_screen
 
     def __call__(self, qtile):
@@ -35,7 +34,7 @@ class SwitchGroup(object):
         else:
             screen = qtile.currentScreen
         if screen.index > 0:
-            index = index + 10
+            index = index + (screen.index * 10)
         index = str(index)
 
         if self.preferred_screen is not None and \
@@ -47,10 +46,27 @@ class SwitchGroup(object):
         screen.cmd_togglegroup(index)
 
 
-class MoveToOtherScreenGroup(object):
+class MoveToGroup(object):
+    def __init__(self, group):
+        self.name = group
+
     def __call__(self, qtile):
-        otherscreen = (qtile.screens.index(qtile.currentScreen) + 1) \
-                      % len(qtile.screens)
+        log.debug("MoveToGroup:%s:%s", qtile.currentScreen.index, self.name)
+        index = int(self.name)
+        screenindex = qtile.currentScreen.index
+        if screenindex > 0:
+            index = index + (screenindex * 10)
+        index = str(index)
+        qtile.currentWindow.cmd_togroup(index)
+
+
+class MoveToOtherScreenGroup(object):
+    def __init__(self, prev=False):
+        self.direction = -1 if prev else 1
+
+    def __call__(self, qtile):
+        otherscreen = (qtile.screens.index(qtile.currentScreen) 
+                       + self.direction) % len(qtile.screens)
         othergroup = qtile.screens[otherscreen].group.name
         qtile.currentWindow.cmd_togroup(othergroup)
 
