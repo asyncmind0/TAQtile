@@ -57,6 +57,6 @@ def get_keys(mod):
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "shift"], "l", lazy.spawn("xscreensaver-command -lock")),
         ([mod], "m",      lazy.group.setlayout('max')),
-        ([mod], "t", lazy.group.setlayout('xmonad-tall')),
+        ([mod], "t", lazy.group.setlayout('xmonad-tail')),
     ]
     return [Key(*k) for k in keys]
