@@ -52,16 +52,35 @@ class MultiScreenGroupBox(widget.GroupBox):
         widget.GroupBox.__init__(self, **config)
         self.namemap = config.get('namemap', {})
 
+    def calculate_width(self):
+        width = 0
+        for g in self.qtile.groups:
+            gtext = self.get_label(g.name)
+            if not gtext:
+                continue
+            width += self.label_width([gtext])
+        return width
+
+    def label_width(self, labels):
+        width, height = self.drawer.max_layout_size(
+            [i for i in labels],
+            self.font,
+            self.fontsize
+        )
+        return width + self.padding_x * 2 + self.margin_x * 2 + \
+            self.borderwidth * 2
+
+    def get_label(self, group):
+        return self.namemap.get(group)
+
     def draw(self):
         self.drawer.clear(self.background or self.bar.background)
 
         offset = 0
         for i, g in enumerate(self.qtile.groups):
-            gtext = g.name
+            gtext = self.get_label(g.name)
             #log.debug(gtext)
-            if gtext in self.namemap:
-                gtext = self.namemap[gtext]
-            else:
+            if not gtext:
                 continue
 
             is_block = (self.highlight_method == 'block')
