@@ -98,6 +98,7 @@ class SwitchToWindowGroup(object):
 
 
 def check_restart(qtile):
+    log.info("check_restart qtile ...")
     try:
         for pyfile in glob.glob(os.path.expanduser('~/.config/qtile/*.py')):
             #log.debug(pyfile)
@@ -105,6 +106,9 @@ def check_restart(qtile):
     except Exception as e:
         log.exception("Syntax error")
     else:
+        import signal
+        signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+        log.info("restarting qtile ...")
         qtile.cmd_restart()
 
 
@@ -135,4 +139,5 @@ def is_running(process):
 
 def execute_once(process):
     if not is_running(process):
-        return subprocess.Popen(process.split())
+        subprocess.Popen(process.split(), shell=True)
+

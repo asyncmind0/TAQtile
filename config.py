@@ -9,9 +9,6 @@ from keys import get_keys
 import logging
 import os
 import re
-# http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
-import signal
-signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 
 logging.basicConfig(level=logging.DEBUG)
 logging.getLogger("qtile").setLevel(logging.WARN)
@@ -134,12 +131,17 @@ def restart_on_randr(qtile, ev):
     ])
     for cmd in commands:
         subprocess.Popen(cmd.split())
+    import signal
+    signal.signal(signal.SIGCHLD, signal.SIG_DFL)
     qtile.cmd_restart()
 
 
 @hook.subscribe.startup
 def startup():
     import subprocess
+    # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
+    import signal
+    signal.signal(signal.SIGCHLD, signal.SIG_IGN)
     from extra import execute_once
     commands = [
         "xsetroot -cursor_name left_ptr",
