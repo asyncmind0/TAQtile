@@ -2,6 +2,7 @@ from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
 from libqtile.command import lazy
 from libqtile import layout, bar, widget, hook
 from themes import current_theme
+from multiscreengroupbox import MultiScreenGroupBox
 import logging
 import system
 import gobject
@@ -9,10 +10,6 @@ import threading
 import subprocess
 log = logging.getLogger("qtile.screen")
 log.setLevel(logging.DEBUG)
-try:
-    from metrics_widget import Metrics
-except Exception as e:
-    log.exception(e)
 
 
 PRIMARY_SCREEN = system.get_screen(0)
@@ -45,82 +42,6 @@ class ThreadedPacman(widget.Pacman):
 
 #Pacman = widget.Pacman
 Pacman = ThreadedPacman
-
-
-class MultiScreenGroupBox(widget.GroupBox):
-    def __init__(self, **config):
-        widget.GroupBox.__init__(self, **config)
-        self.namemap = config.get('namemap', {})
-
-    def calculate_width(self):
-        width = 0
-        for g in self.qtile.groups:
-            gtext = self.get_label(g.name)
-            if not gtext:
-                continue
-            width += self.label_width([gtext])
-        return width
-
-    def label_width(self, labels):
-        width, height = self.drawer.max_layout_size(
-            [i for i in labels],
-            self.font,
-            self.fontsize
-        )
-        return width + self.padding_x * 2 + self.margin_x * 2 + \
-            self.borderwidth * 2
-
-    def get_label(self, group):
-        return self.namemap.get(group)
-
-    def draw(self):
-        self.drawer.clear(self.background or self.bar.background)
-
-        offset = 0
-        for i, g in enumerate(self.qtile.groups):
-            gtext = self.get_label(g.name)
-            #log.debug(gtext)
-            if not gtext:
-                continue
-
-            is_block = (self.highlight_method == 'block')
-
-            bw = self.box_width([g])
-            if g.screen:
-                if self.bar.screen.group.name == g.name:
-                    if self.qtile.currentScreen == self.bar.screen:
-                        border = self.this_current_screen_border
-                    else:
-                        border = self.this_screen_border
-                else:
-                    border = self.other_screen_border
-            elif self.group_has_urgent(g) and \
-                    self.urgent_alert_method in ('border', 'block'):
-                border = self.urgent_border
-                if self.urgent_alert_method == 'block':
-                    is_block = True
-            else:
-                border = self.background or self.bar.background
-
-            if self.group_has_urgent(g) and self.urgent_alert_method == "text":
-                text = self.urgent_text
-            elif g.windows:
-                text = self.active
-            else:
-                text = self.inactive
-
-            self.drawbox(
-                self.margin_x + offset,
-                gtext,
-                border,
-                text,
-                self.rounded,
-                is_block,
-                bw - self.margin_x * 2 - self.padding_x * 2
-            )
-            offset += bw
-        self.drawer.draw(self.offset, self.width)
-
 #GroupBox = widget.GroupBox
 GroupBox = MultiScreenGroupBox
 
@@ -162,7 +83,7 @@ def get_screens(num_screens=1):
     current_layout_params = default_params(foreground=current_theme['foreground'])
     windowtabs_params = default_params(selected=("[", "]"))
     graph_defaults = {k[0]: k[1] for k in[
-        ("graph_color", "18BAEB", "Graph color"),
+        ("graph_color", "18BAEB.6", "Graph color"),
         ("fill_color", "1667EB.3", "Fill color for linefill graph"),
         ("border_color", "215578", "Widget border color"),
         ("border_width", 1, "Widget border width"),
@@ -170,15 +91,20 @@ def get_screens(num_screens=1):
         ("margin_y", 1, "Margin Y"),
         ("samples", 100, "Count of graph samples."),
         ("frequency", 1, "Update frequency in seconds"),
-        ("type", "line", "'box', 'line', 'linefill'"),
+        ("type", "linefill", "'box', 'line', 'linefill'"),
         ("line_width", 1, "Line width"),
         ("start_pos", "bottom", "Drawer starting position ('bottom'/'top')"),
         ("width", 50, "Width")
     ]}
     cpugraph_params = dict(graph_defaults)
-    cpugraph_params["fill_color"]= "1667EB.3"
+    cpugraph_params["graph_color"] = "FF3333.6"
+    cpugraph_params["fill_color"] = "FF3333.3"
     memgraph_params = dict(graph_defaults)
+    memgraph_params['graph_color'] = "80FF00.6"
+    memgraph_params['fill_color'] = "80FF00.3"
+    memgraph_params['type'] = "linefill"
     netgraph_params = dict(graph_defaults)
+    #netgraph_params['fill_color'] = "80FF00.3"
 
     gb1 = dict([(str(i), str(i)) for i in range(1, 10)])
     gb2 = dict([(str(i), str(i-10)) for i in range(11, 20)])

@@ -27,7 +27,9 @@ def get_keys(mod):
         ([mod], "l", lazy.layout.next().when('tile'),
          lazy.layout.down().when('xmonad-tall')),
         ([mod, "shift"], "comma",
-         lazy.function(MoveToOtherScreenGroup())),
+         lazy.function(MoveToOtherScreenGroup(prev=True))),
+        ([mod, "shift"], "period",
+         lazy.function(MoveToOtherScreenGroup(prev=False))),
         # Toggle between split and unsplit sides of stack.
         # Split = all windows displayed
         # Unsplit = 1 window displayed, like Max layout, but still with
