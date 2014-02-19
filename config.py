@@ -115,10 +115,12 @@ layouts = [
 
 @hook.subscribe.screen_change
 def restart_on_randr(qtile, ev):
-    log.debug(ev)
+    log.debug(dir(ev))
     import subprocess
+    from extra import get_num_monitors
     commands = []
-    if len(qtile.screens) > 1:
+    num_screens = get_num_monitors()
+    if num_screens > 1:
         commands.append(os.path.expanduser("~/bin/dualmonitor"))
     else:
         commands.append(os.path.expanduser("~/bin/rightmonitor"))
