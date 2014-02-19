@@ -44,7 +44,7 @@ class MultiScreenGroupBox(widget.GroupBox):
 
             is_block = (self.highlight_method == 'block')
 
-            bw = self.box_width([g])
+            bw = self.label_width([gtext])
             if g.screen:
                 if self.bar.screen.group.name == g.name:
                     if self.qtile.currentScreen == self.bar.screen:
