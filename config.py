@@ -74,6 +74,7 @@ dgroups_app_rules = [
     Rule(Match(title=["Hangouts"]), group="6"),
     Rule(Match(wm_class=["Kmail"]), group="4"),
     Rule(Match(wm_class=["Pidgin"]), group="3"),
+    Rule(Match(wm_class=["keepass2"]), float=True),
     ]
 
 # Automatically float these types. This overrides the default behavior (which
