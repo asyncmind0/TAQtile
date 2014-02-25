@@ -63,17 +63,20 @@ def get_keys(mod):
         ([mod], "m", lazy.group.setlayout('max')),
         ([mod], "t", lazy.group.setlayout('stack')),
         #([mod], "t", lazy.group.setlayout('xmonad-tall')),
-        ([],"3270_PrintScreen", lazy.spawn("ksnapshot")),
-        ([mod "shift"],"s", lazy.spawn("ksnapshot")),
+        #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
+        ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
     ]
     laptop_keys = [
-        #laptop keys
-        ([],"XF86MonBrightnessUp", lazy.spawn("sudo ~/bin/samctl.py -s up")),
-        ([],"XF86MonBrightnessDown", lazy.spawn("sudo ~/bin/samctl.py -s down")),
-        ([],"XF86KbdBrightnessUp", lazy.spawn("sudo ~/bin/samctl.py -k up")),
-        ([],"XF86KbdBrightnessDown", lazy.spawn("sudo ~/bin/samctl.py -k down")),
-        ([],"XF86AudioLowerVolume", lazy.spawn("sudo ~/bin/samctl.py -k up")),
-        ([],"XF86AudioRaiseVolume", lazy.spawn("sudo ~/bin/samctl.py -v down")),
+        # laptop keys
+        ([], "XF86MonBrightnessUp", lazy.spawn("sudo ~/bin/samctl.py -s up")),
+        ([], "XF86MonBrightnessDown", lazy.spawn(
+            "sudo ~/bin/samctl.py -s down")),
+        ([], "XF86KbdBrightnessUp", lazy.spawn("sudo ~/bin/samctl.py -k up")),
+        ([], "XF86KbdBrightnessDown", lazy.spawn(
+            "sudo ~/bin/samctl.py -k down")),
+        ([], "XF86AudioLowerVolume", lazy.spawn("sudo ~/bin/samctl.py -k up")),
+        ([], "XF86AudioRaiseVolume", lazy.spawn(
+            "sudo ~/bin/samctl.py -v down")),
     ]
     keys.extend(laptop_keys)
     return [Key(*k) for k in keys]

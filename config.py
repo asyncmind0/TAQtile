@@ -140,14 +140,11 @@ def startup():
     elif num_mons == 1:
         commands.append(os.path.expanduser("~/bin/rightmonitor"))
     commands.extend([
-        "xset b 5 6000 600",
-        "xset r rate 150 40",
-        "xmodmap ~/.xmodmap",
-        "xsetroot -cursor_name left_ptr",
         'nitrogen --restore',
     ])
     for cmd in commands:
-        subprocess.Popen(cmd.split())
+        os.system(cmd + ' &')
+    #    subprocess.Popen(cmd.split())
     execute_once('parcellite')
     # execute_once('firefox')
 
