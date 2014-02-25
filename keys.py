@@ -13,6 +13,14 @@ def get_keys(mod):
          lazy.layout.down()),
         ([mod], "j", lazy.layout.previous().when('stack'),
          lazy.layout.up()),
+        ([mod, "shift"], "l", lazy.layout.client_to_next().when('stack'),
+         lazy.layout.down()),
+        ([mod, "shift"], "h", lazy.layout.client_to_previous().when('stack'),
+         lazy.layout.up()),
+        ([mod], "h", lazy.layout.previous().when('tile'),
+         lazy.layout.up().when('xmonad-tall')),
+        ([mod], "l", lazy.layout.next().when('tile'),
+         lazy.layout.down().when('xmonad-tall')),
         # Move windows up or down in current stack
         ([mod, "shift"], "k", lazy.layout.shuffle_down()),
         ([mod, "shift"], "j", lazy.layout.shuffle_up()),
@@ -22,10 +30,6 @@ def get_keys(mod):
         # toggle between windows just like in unity with 'alt+tab'
         (["mod1", "shift"], "Tab", lazy.layout.down()),
         (["mod1"], "Tab", lazy.layout.up()),
-        ([mod], "h", lazy.layout.previous().when('tile'),
-         lazy.layout.up().when('xmonad-tall')),
-        ([mod], "l", lazy.layout.next().when('tile'),
-         lazy.layout.down().when('xmonad-tall')),
         ([mod, "shift"], "comma",
          lazy.function(MoveToOtherScreenGroup(prev=True))),
         ([mod, "shift"], "period",
@@ -55,8 +59,21 @@ def get_keys(mod):
         # app launcher
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
-        ([mod, "shift"], "l", lazy.spawn("xscreensaver-command -lock")),
-        ([mod], "m",      lazy.group.setlayout('max')),
-        ([mod], "t", lazy.group.setlayout('monad-tail')),
+        ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
+        ([mod], "m", lazy.group.setlayout('max')),
+        ([mod], "t", lazy.group.setlayout('stack')),
+        #([mod], "t", lazy.group.setlayout('xmonad-tall')),
+        ([],"3270_PrintScreen", lazy.spawn("ksnapshot")),
+        ([mod "shift"],"s", lazy.spawn("ksnapshot")),
     ]
+    laptop_keys = [
+        #laptop keys
+        ([],"XF86MonBrightnessUp", lazy.spawn("sudo ~/bin/samctl.py -s up")),
+        ([],"XF86MonBrightnessDown", lazy.spawn("sudo ~/bin/samctl.py -s down")),
+        ([],"XF86KbdBrightnessUp", lazy.spawn("sudo ~/bin/samctl.py -k up")),
+        ([],"XF86KbdBrightnessDown", lazy.spawn("sudo ~/bin/samctl.py -k down")),
+        ([],"XF86AudioLowerVolume", lazy.spawn("sudo ~/bin/samctl.py -k up")),
+        ([],"XF86AudioRaiseVolume", lazy.spawn("sudo ~/bin/samctl.py -v down")),
+    ]
+    keys.extend(laptop_keys)
     return [Key(*k) for k in keys]

@@ -121,6 +121,7 @@ def get_num_monitors():
         shell=True, stdout=subprocess.PIPE).communicate()[0]
 
     displays = output.strip().split('\n')
+    log.debug(displays)
     return len(displays)
     #for display in displays:
     #    values = display.split('x')

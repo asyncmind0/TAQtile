@@ -115,24 +115,7 @@ layouts = [
 
 @hook.subscribe.screen_change
 def restart_on_randr(qtile, ev):
-    log.debug(dir(ev))
-    import subprocess
-    from extra import get_num_monitors
-    commands = []
-    num_screens = get_num_monitors()
-    if num_screens > 1:
-        commands.append(os.path.expanduser("~/bin/dualmonitor"))
-    else:
-        commands.append(os.path.expanduser("~/bin/rightmonitor"))
-    commands.extend([
-        "xset b 5 6000 600",
-        "xset r rate 150 40",
-        "xmodmap ~/.xmodmap",
-        "xsetroot -cursor_name left_ptr",
-        'nitrogen --restore',
-    ])
-    for cmd in commands:
-        subprocess.Popen(cmd.split())
+    log.debug(ev.__dict__)
     import signal
     signal.signal(signal.SIGCHLD, signal.SIG_DFL)
     qtile.cmd_restart()
@@ -144,11 +127,24 @@ def startup():
     # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
     import signal
     signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+    commands = []
     from extra import execute_once
-    commands = [
+    from extra import get_num_monitors
+    num_mons = get_num_monitors()
+    #num_screens = len(qtile.screens)
+    log.debug("Num MONS:%s", num_mons)
+    #log.debug("Num DeSKTOPS:%s", len(qtile.screens))
+    if num_mons > 1 :
+        commands.append(os.path.expanduser("~/bin/dualmonitor"))
+    elif num_mons == 1:
+        commands.append(os.path.expanduser("~/bin/rightmonitor"))
+    commands.extend([
+        "xset b 5 6000 600",
+        "xset r rate 150 40",
+        "xmodmap ~/.xmodmap",
         "xsetroot -cursor_name left_ptr",
-        'nitrogen --restore'
-    ]
+        'nitrogen --restore',
+    ])
     for cmd in commands:
         subprocess.Popen(cmd.split())
     execute_once('parcellite')
