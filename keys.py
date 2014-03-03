@@ -46,13 +46,14 @@ def get_keys(mod):
         ([mod], "q",      lazy.window.kill()),
         # Key([mod, "control"], "r", lazy.restart()),
         ([mod, "control"], "r", lazy.function(check_restart)),
+        #([mod], "r", lazy.spawncmd()),
+        ([mod], "F2", lazy.spawn("dmenu_run -l 20")),
         ([mod], "r", lazy.spawncmd()),
         ([], "F11", lazy.function(
             SwitchToWindowGroup("left", terminal("left"), PRIMARY_SCREEN))),
         ([], "F12", lazy.function(
             SwitchToWindowGroup(
                 "right", terminal("right"), SECONDARY_SCREEN))),
-        ([mod], "F2", lazy.spawncmd()),
         ([mod], "Right", lazy.screen.nextgroup()),
         ([mod], "Left", lazy.screen.prevgroup()),
         ([], "F6",      lazy.function(SwitchGroup("6", PRIMARY_SCREEN))),

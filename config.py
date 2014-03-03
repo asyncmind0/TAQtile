@@ -69,7 +69,7 @@ dgroups_app_rules = [
          float=True, intrusive=True),
 
     # floating windows
-    Rule(Match(wm_class=["Pavucontrol", 'Wine', 'Xephyr']),
+    Rule(Match(wm_class=["Pavucontrol", 'Wine', 'Xephyr', "Gmrun"]),
          float=True),
     Rule(Match(title=["Hangouts"]), group="6"),
     Rule(Match(wm_class=["Kmail"]), group="4"),
