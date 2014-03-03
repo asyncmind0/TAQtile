@@ -73,7 +73,7 @@ dgroups_app_rules = [
          float=True),
     Rule(Match(title=["Hangouts"]), group="6"),
     Rule(Match(wm_class=["Kmail"]), group="4"),
-    Rule(Match(wm_class=["Pidgin"]), group="3"),
+    Rule(Match(wm_class=["Pidgin"]), group="3", float=False),
     Rule(Match(wm_class=["keepass2"]), float=True),
     ]
 
@@ -160,6 +160,9 @@ float_windows = []
 
 def should_be_floating(w):
     wm_class = w.get_wm_class()
+    wm_role = w.get_wm_window_role()
+    if wm_role in ['buddy_list']:
+        return
     if isinstance(wm_class, tuple):
         for cls in wm_class:
             if cls.lower() in float_windows:
