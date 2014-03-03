@@ -75,6 +75,8 @@ dgroups_app_rules = [
     Rule(Match(wm_class=["Kmail"]), group="4"),
     Rule(Match(wm_class=["Pidgin"]), group="3", float=False),
     Rule(Match(wm_class=["keepass2"]), float=True),
+    Rule(Match(wm_class=["rdesktop"]), group=4),
+    Rule(Match(wm_class=["VirtualBox"]), group=3),
     ]
 
 # Automatically float these types. This overrides the default behavior (which
