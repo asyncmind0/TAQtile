@@ -23,12 +23,16 @@ log.debug("Num Desktops:%s", num_screens)
 #TODO send new clients to group 1 if current group is special group
 #TODO handle MultiScreenGroupBox clicks and events
 #TODO handle screen preference for windows
-
+layout_map = {
+    3: "slice",
+    6: "slice",
+}
 
 def generate_groups(num_screens=1):
     num_groups = num_screens * 10
     log.debug("num_groups:%s", num_groups)
-    groups = [Group(str(i)) for i in range(1, num_groups)]
+    groups = [Group(str(i), layout=layout_map.get(i, "max"))
+              for i in range(1, num_groups)]
     for i, g in enumerate(groups, 1):
        # mod1 + letter of group = switch to group
         #log.debug("group:%s", i)
@@ -41,7 +45,7 @@ def generate_groups(num_screens=1):
     keys.append(Key([], "F1",      lazy.function(SwitchGroup("1"))))
     keys.append(Key([], "F2",      lazy.function(SwitchGroup("2"))))
     keys.append(Key([], "F10",      lazy.function(SwitchGroup("4", 0))))
-    keys.append(Key([], "F9",      lazy.function(SwitchGroup("3", 0))))
+    keys.append(Key([], "F9", lazy.function(SwitchGroup("3", 0))))
     groups.append(
         Group('left', exclusive=False,
               spawn=terminal("left"),
@@ -71,12 +75,12 @@ dgroups_app_rules = [
     # floating windows
     Rule(Match(wm_class=["Pavucontrol", 'Wine', 'Xephyr', "Gmrun"]),
          float=True),
-    Rule(Match(title=["Hangouts"]), group="6"),
+    Rule(Match(title=[".*Hangouts.*"]), group="6"),
     Rule(Match(wm_class=["Kmail"]), group="4"),
     Rule(Match(wm_class=["Pidgin"]), group="3", float=False),
     Rule(Match(wm_class=["keepass2"]), float=True),
-    Rule(Match(wm_class=["rdesktop"]), group=4),
-    Rule(Match(wm_class=["VirtualBox"]), group=3),
+    Rule(Match(wm_class=["rdesktop"]), group="4"),
+    Rule(Match(wm_class=[".*VirtualBox.*"]), group="13"),
     ]
 
 # Automatically float these types. This overrides the default behavior (which
@@ -111,7 +115,7 @@ layouts = [
     layout.Slice('right', 256, role='buddy_list',
                  fallback=layout.Stack(stacks=1, **border_args)),
     # a layout for hangouts
-    layout.Slice('right', 256, wname="Hangouts",
+    layout.Slice('right', 356, wname="Hangouts",
                  fallback=layout.Stack(stacks=1, **border_args)),
 ]
 
@@ -151,15 +155,6 @@ def startup():
     # execute_once('firefox')
 
 
-@hook.subscribe.client_new
-def on_client_new(window):
-    log.debug(window.group)
-    #window.togroup(qtile.currentGroup)
-    pass
-
-float_windows = []
-
-
 def should_be_floating(w):
     wm_class = w.get_wm_class()
     wm_role = w.get_wm_window_role()
@@ -180,11 +175,20 @@ def dialogs(window):
     if should_be_floating(window.window):
         window.floating = True
 
+# This allows you to drag windows around with the mouse if you want.
+mouse = [
+    Drag([mod], "Button1", lazy.window.set_position_floating(),
+         start=lazy.window.get_position()),
+    Drag([mod], "Button3", lazy.window.set_size_floating(),
+         start=lazy.window.get_size()),
+    Click([mod], "Button2", lazy.window.bring_to_front())
+]
+
+float_windows = []
 screens = get_screens(num_screens)
 main = None
 # follow_mouse_focus = True
 bring_front_click = False
 cursor_warp = False
-mouse = ()
 auto_fullscreen = True
 widget_defaults = {}

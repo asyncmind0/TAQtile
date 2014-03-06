@@ -10,7 +10,7 @@ import os
 import glob
 
 log = logging.getLogger("qtile.extra")
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.ERROR)
 
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
