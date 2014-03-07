@@ -5,11 +5,13 @@ import platform
 platform_specific = {
     'steven-series9': {
         'screens': {0: 1, 1: 0},
-        'battery': True
+        'battery': True,
+        'laptop': True
     },
     'sydsjoseph-pc1': {
         'screens': {0: 0, 1: 1},
-        'battery': False
+        'battery': False,
+        'laptop': False
     }
 }
 

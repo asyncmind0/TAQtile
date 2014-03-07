@@ -4,6 +4,7 @@ from libqtile import layout, bar, widget
 from extra import (SwitchToWindowGroup, check_restart,
                    terminal, MoveToOtherScreenGroup, SwitchGroup)
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
+from system import get_hostconfig
 
 
 def get_keys(mod):
@@ -47,7 +48,7 @@ def get_keys(mod):
         # Key([mod, "control"], "r", lazy.restart()),
         ([mod, "control"], "r", lazy.function(check_restart)),
         #([mod], "r", lazy.spawncmd()),
-        ([mod], "F2", lazy.spawn("dmenu_run -l 20")),
+        ([mod], "F2", lazy.spawn("dmenu_run -f -l 20")),
         ([mod], "r", lazy.spawncmd()),
         ([], "F11", lazy.function(
             SwitchToWindowGroup("left", terminal("left"), PRIMARY_SCREEN))),
@@ -79,5 +80,6 @@ def get_keys(mod):
         ([], "XF86AudioRaiseVolume", lazy.spawn(
             "sudo ~/bin/samctl.py -v down")),
     ]
-    keys.extend(laptop_keys)
+    if get_hostconfig('laptop'):
+        keys.extend(laptop_keys)
     return [Key(*k) for k in keys]

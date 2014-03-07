@@ -147,6 +147,7 @@ def startup():
         commands.append(os.path.expanduser("~/bin/rightmonitor"))
     commands.extend([
         'nitrogen --restore',
+        'xscreensaver'
     ])
     for cmd in commands:
         os.system(cmd + ' &')
