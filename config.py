@@ -79,7 +79,7 @@ dgroups_app_rules = [
     Rule(Match(wm_class=["Kmail"]), group="4"),
     Rule(Match(wm_class=["Pidgin"]), group="3", float=False),
     Rule(Match(wm_class=["keepass2"]), float=True),
-    Rule(Match(wm_class=["rdesktop"]), group="4"),
+    Rule(Match(wm_class=["rdesktop"]), group="14"),
     Rule(Match(wm_class=[".*VirtualBox.*"]), group="13"),
     ]
 
@@ -169,6 +169,18 @@ def should_be_floating(w):
         if wm_class.lower() in float_windows:
             return True
     return w.get_wm_type() == 'dialog' or bool(w.get_wm_transient_for())
+
+@hook.subscribe.startup
+def dbus_register():
+    x = os.environ['DESKTOP_AUTOSTART_ID']
+    subprocess.Popen(['dbus-send',
+                      '--session',
+                      '--print-reply=string',
+                      '--dest=org.gnome.SessionManager',
+                      '/org/gnome/SessionManager',
+                      'org.gnome.SessionManager.RegisterClient',
+                      'string:qtile',
+                      'string:' + x])
 
 
 @hook.subscribe.client_new

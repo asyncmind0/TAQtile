@@ -141,8 +141,8 @@ def get_screens(num_screens=1):
         widget.MemoryGraph(**memgraph_params),
         #widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/network-wired.png"),
         widget.NetGraph(**netgraph_params),
-        widget.Sep(),
-        widget.Notify(**notify_params),
+        #widget.Sep(),
+        #widget.Notify(**notify_params),
         widget.Sep()
     ]
     if system.get_hostconfig('battery'):
