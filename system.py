@@ -2,16 +2,29 @@
 """
 import platform
 
+common_autostart = [
+    'parcellite',
+    'bluetooth-applet',
+    'nitrogen --restore',
+    'xscreensaver -nosplash'
+]
+
 platform_specific = {
     'steven-series9': {
         'screens': {0: 1, 1: 0},
         'battery': True,
-        'laptop': True
+        'laptop': True,
+        'autostart-once': common_autostart + [
+            'batterymon -t 16x16',
+            'nm-applet',
+        ]
     },
     'sydsjoseph-pc1': {
         'screens': {0: 0, 1: 1},
         'battery': False,
-        'laptop': False
+        'laptop': False,
+        'autostart-once': common_autostart + [
+        ]
     }
 }
 

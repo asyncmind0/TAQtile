@@ -4,6 +4,7 @@ from libqtile import layout, bar, widget, hook
 
 from extra import (SwitchToWindowGroup, check_restart, terminal,
                    SwitchGroup, get_num_monitors, execute_once, MoveToGroup)
+from system import get_hostconfig
 from screens import get_screens
 from keys import get_keys
 import logging
@@ -134,31 +135,24 @@ def startup():
     # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
     import signal
     signal.signal(signal.SIGCHLD, signal.SIG_IGN)
-    commands = []
-    from extra import execute_once
-    from extra import get_num_monitors
+    commands = get_hostconfig('autostart-once')
     num_mons = get_num_monitors()
-    #num_screens = len(qtile.screens)
     log.debug("Num MONS:%s", num_mons)
     #log.debug("Num DeSKTOPS:%s", len(qtile.screens))
     if num_mons > 1 :
         commands.append(os.path.expanduser("~/bin/dualmonitor"))
     elif num_mons == 1:
         commands.append(os.path.expanduser("~/bin/rightmonitor"))
-    commands.extend([
-        'nitrogen --restore',
-        'xscreensaver'
-    ])
-    for cmd in commands:
-        os.system(cmd + ' &')
-    #    subprocess.Popen(cmd.split())
-    execute_once('parcellite')
-    # execute_once('firefox')
+
+    for command in commands:
+        execute_once(command)
 
 
 def should_be_floating(w):
     wm_class = w.get_wm_class()
     wm_role = w.get_wm_window_role()
+    if wm_class:
+        return False
     if wm_role in ['buddy_list']:
         return
     if isinstance(wm_class, tuple):
@@ -172,7 +166,9 @@ def should_be_floating(w):
 
 @hook.subscribe.startup
 def dbus_register():
-    x = os.environ['DESKTOP_AUTOSTART_ID']
+    x = os.environ.get('DESKTOP_AUTOSTART_ID')
+    if not x:
+        return
     subprocess.Popen(['dbus-send',
                       '--session',
                       '--print-reply=string',
