@@ -6,7 +6,8 @@ common_autostart = [
     'parcellite',
     'bluetooth-applet',
     'nitrogen --restore',
-    'xscreensaver -nosplash'
+    'xscreensaver -nosplash',
+    "dropboxd"
 ]
 
 platform_specific = {
@@ -17,14 +18,19 @@ platform_specific = {
         'autostart-once': common_autostart + [
             'batterymon -t 16x16',
             'nm-applet',
-        ]
+        ],
+        'screen_preferences':{
+            2:[{'wmclass': "google-chrome-stable"}, {"wmclass": "Navigator"}],
+            1:[]
+        }
     },
     'sydsjoseph-pc1': {
         'screens': {0: 0, 1: 1},
         'battery': False,
         'laptop': False,
         'autostart-once': common_autostart + [
-        ]
+        ],
+        'screen_preferences':[]
     }
 }
 

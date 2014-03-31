@@ -121,12 +121,21 @@ layouts = [
 ]
 
 
+event_cntr = 2
+prev_timestamp = 0
 @hook.subscribe.screen_change
 def restart_on_randr(qtile, ev):
     log.debug(ev.__dict__)
-    import signal
-    signal.signal(signal.SIGCHLD, signal.SIG_DFL)
-    qtile.cmd_restart()
+    global event_cntr, prev_timestamp
+    cur_timestamp = ev.timestamp
+    if abs(prev_timestamp - cur_timestamp) > 1000:
+        #if num_screens != get_num_monitors():
+        import signal
+        signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+        log.debug("RESTART screen change")
+        qtile.cmd_restart()
+    else:
+        prev_timestamp = cur_timestamp
 
 
 @hook.subscribe.startup
@@ -178,11 +187,24 @@ def dbus_register():
                       'string:qtile',
                       'string:' + x])
 
+@hook.subscribe.client_managed
+def move_windows_multimonitor(window):
+    screen_preferences = get_hostconfig('screen_preferences')
+    for screenno, pref in screen_preferences.iteritems():
+        for rule in pref:
+            if window.match(**rule):
+                log.debug(window.group)
+                win_group = int(window.group.name)
+                # TODO handle cases for more than 2 monitors
+                if win_group < 10 and num_screens > 1 and screenno > 1:
+                    window.togroup(str(win_group+10))
 
 @hook.subscribe.client_new
 def dialogs(window):
+
     if should_be_floating(window.window):
         window.floating = True
+    
 
 # This allows you to drag windows around with the mouse if you want.
 mouse = [
