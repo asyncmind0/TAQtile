@@ -64,9 +64,11 @@ def get_keys(mod):
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
         ([mod], "m", lazy.group.setlayout('max')),
         ([mod], "t", lazy.group.setlayout('stack')),
+        ([mod], "f", lazy.group.setlayout('float')),
         #([mod], "t", lazy.group.setlayout('xmonad-tall')),
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
+        ([mod, "shift"], "k", lazy.spawn("xkill")),
     ]
     laptop_keys = [
         # laptop keys
