@@ -10,7 +10,7 @@ import os
 import glob
 
 log = logging.getLogger("qtile.extra")
-log.setLevel(logging.ERROR)
+log.setLevel(logging.DEBUG)
 
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
@@ -130,15 +130,13 @@ def get_num_monitors():
     #    print "Width:" + width + ",height:" + height
 
 
-def is_running(process):
-    s = subprocess.Popen(["ps", "axw"], stdout=subprocess.PIPE)
-    for x in s.stdout:
-        if re.search(process, x):
-            return True
-        return False
-
-
 def execute_once(process):
-    if not is_running(process):
-        subprocess.Popen(process.split(), shell=True)
-
+    cmd = process.split()
+    try:
+        pid = subprocess.check_output(["pidof", "-s", "-x", cmd[0]])
+    except subprocess.CalledProcessError:
+        log.exception("CalledProcessError")
+    if not pid:
+        # spawn the process using a shell command with subprocess.Popen
+        log.debug("Starting: %s", cmd)
+        subprocess.Popen(process, shell=True)

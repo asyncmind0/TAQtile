@@ -2,16 +2,35 @@
 """
 import platform
 
+common_autostart = [
+    'parcellite',
+    'bluetooth-applet',
+    'nitrogen --restore',
+    'xscreensaver -nosplash',
+    "dropboxd"
+]
+
 platform_specific = {
     'steven-series9': {
         'screens': {0: 1, 1: 0},
         'battery': True,
-        'laptop': True
+        'laptop': True,
+        'autostart-once': common_autostart + [
+            'batterymon -t 16x16',
+            'nm-applet',
+        ],
+        'screen_preferences':{
+            2:[{'wmclass': "google-chrome-stable"}, {"wmclass": "Navigator"}],
+            1:[]
+        }
     },
     'sydsjoseph-pc1': {
         'screens': {0: 0, 1: 1},
         'battery': False,
-        'laptop': False
+        'laptop': False,
+        'autostart-once': common_autostart + [
+        ],
+        'screen_preferences':[]
     }
 }
 
