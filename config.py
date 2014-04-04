@@ -123,6 +123,8 @@ layouts = [
 
 event_cntr = 2
 prev_timestamp = 0
+
+
 @hook.subscribe.screen_change
 def restart_on_randr(qtile, ev):
     log.debug(ev.__dict__)
@@ -140,7 +142,6 @@ def restart_on_randr(qtile, ev):
 
 @hook.subscribe.startup
 def startup():
-    import subprocess
     # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
     import signal
     signal.signal(signal.SIGCHLD, signal.SIG_IGN)
@@ -173,8 +174,10 @@ def should_be_floating(w):
             return True
     return w.get_wm_type() == 'dialog' or bool(w.get_wm_transient_for())
 
+
 @hook.subscribe.startup
 def dbus_register():
+    import subprocess
     x = os.environ.get('DESKTOP_AUTOSTART_ID')
     if not x:
         return
@@ -186,6 +189,7 @@ def dbus_register():
                       'org.gnome.SessionManager.RegisterClient',
                       'string:qtile',
                       'string:' + x])
+
 
 @hook.subscribe.client_managed
 def move_windows_multimonitor(window):
@@ -199,12 +203,18 @@ def move_windows_multimonitor(window):
                 if win_group < 10 and num_screens > 1 and screenno > 1:
                     window.togroup(str(win_group+10))
 
+
 @hook.subscribe.client_new
 def dialogs(window):
+    wmclass = "Google-chrome-stable"
+    wmrole = "pop-up"
+    if wmclass in window.window.get_wm_class() \
+       and wmrole == window.window.get_wm_window_role():
+        window.togroup("6")
 
     if should_be_floating(window.window):
         window.floating = True
-    
+
 
 # This allows you to drag windows around with the mouse if you want.
 mouse = [
