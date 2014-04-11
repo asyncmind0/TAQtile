@@ -206,11 +206,26 @@ def move_windows_multimonitor(window):
 
 @hook.subscribe.client_new
 def dialogs(window):
-    wmclass = "Google-chrome-stable"
-    wmrole = "pop-up"
-    if wmclass in window.window.get_wm_class() \
-       and wmrole == window.window.get_wm_window_role():
-        window.togroup("6")
+    window_rules = [
+        {
+            'wmclass': "Google-chrome-stable",
+            'wmrole': "pop-up",
+            'wmname': "^(?!Developer).*",
+            'action': ['togroup', '6']
+        },
+        {
+            'wmclass': "Google-chrome-stable",
+            'wmrole': "pop-up",
+            'wmname': "^Developer.*",
+            'action': ['togroup', '16']
+        },
+    ]
+    for rule in window_rules:
+        if rule['wmclass'] in window.window.get_wm_class() \
+           and rule['wmrole'] == window.window.get_wm_window_role()\
+           and re.match(rule['wmname'], window.name):
+            action = rule['action']
+            getattr(window, action.pop())(*action)
 
     if should_be_floating(window.window):
         window.floating = True
