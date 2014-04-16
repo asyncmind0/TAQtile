@@ -225,7 +225,7 @@ def dialogs(window):
            and rule['wmrole'] == window.window.get_wm_window_role()\
            and re.match(rule['wmname'], window.name):
             action = rule['action']
-            getattr(window, action.pop())(*action)
+            getattr(window, action.pop(0))(*action)
 
     if should_be_floating(window.window):
         window.floating = True
