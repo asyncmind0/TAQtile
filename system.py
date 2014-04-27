@@ -30,7 +30,7 @@ platform_specific = {
         'laptop': False,
         'autostart-once': common_autostart + [
         ],
-        'screen_preferences':[]
+        'screen_preferences':{}
     }
 }
 

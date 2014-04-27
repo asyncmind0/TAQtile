@@ -68,6 +68,7 @@ def get_keys(mod):
         #([mod], "t", lazy.group.setlayout('xmonad-tall')),
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
+        ([mod, "shift"], "k", lazy.spawn("xkill")),
     ]
     laptop_keys = [
         # laptop keys
