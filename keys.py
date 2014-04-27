@@ -64,6 +64,7 @@ def get_keys(mod):
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
         ([mod], "m", lazy.group.setlayout('max')),
         ([mod], "t", lazy.group.setlayout('stack')),
+        ([mod], "f", lazy.window.toggle_floating()),
         #([mod], "t", lazy.group.setlayout('xmonad-tall')),
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),

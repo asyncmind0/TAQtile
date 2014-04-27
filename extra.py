@@ -14,7 +14,7 @@ log.setLevel(logging.DEBUG)
 
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
-terminal1 = "st -t %s -e /home/steven/bin/tmx_outer %s"
+terminal1 = "st -t %s -e tmx_outer %s"
 
 
 def terminal(x):
