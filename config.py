@@ -150,9 +150,9 @@ def startup():
     log.debug("Num MONS:%s", num_mons)
     #log.debug("Num DeSKTOPS:%s", len(qtile.screens))
     if num_mons > 1 :
-        commands.append(os.path.expanduser("~/bin/dualmonitor"))
+        commands.append(os.path.expanduser("dualmonitor"))
     elif num_mons == 1:
-        commands.append(os.path.expanduser("~/bin/rightmonitor"))
+        commands.append(os.path.expanduser("rightmonitor"))
 
     for command in commands:
         execute_once(command)

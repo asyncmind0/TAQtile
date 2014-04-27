@@ -72,15 +72,15 @@ def get_keys(mod):
     ]
     laptop_keys = [
         # laptop keys
-        ([], "XF86MonBrightnessUp", lazy.spawn("sudo ~/bin/samctl.py -s up")),
+        ([], "XF86MonBrightnessUp", lazy.spawn("sudo samctl.py -s up")),
         ([], "XF86MonBrightnessDown", lazy.spawn(
-            "sudo ~/bin/samctl.py -s down")),
-        ([], "XF86KbdBrightnessUp", lazy.spawn("sudo ~/bin/samctl.py -k up")),
+            "sudo samctl.py -s down")),
+        ([], "XF86KbdBrightnessUp", lazy.spawn("sudo samctl.py -k up")),
         ([], "XF86KbdBrightnessDown", lazy.spawn(
-            "sudo ~/bin/samctl.py -k down")),
-        ([], "XF86AudioLowerVolume", lazy.spawn("sudo ~/bin/samctl.py -k up")),
+            "sudo samctl.py -k down")),
+        ([], "XF86AudioLowerVolume", lazy.spawn("sudo samctl.py -k up")),
         ([], "XF86AudioRaiseVolume", lazy.spawn(
-            "sudo ~/bin/samctl.py -v down")),
+            "sudo samctl.py -v down")),
     ]
     if get_hostconfig('laptop'):
         keys.extend(laptop_keys)
