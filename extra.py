@@ -24,22 +24,24 @@ def terminal(x):
 class SwitchGroup(object):
     def __init__(self, group, preferred_screen=None):
         self.name = group
-        self.preferred_screen = preferred_screen
+        self.preferred_screen = preferred_screen or 0
 
     def __call__(self, qtile):
         log.debug("SwitchGroup:%s:%s", qtile.currentScreen.index, self.name)
         index = int(self.name)
-        if self.preferred_screen is not None:
-            screen = qtile.screens[self.preferred_screen]
-        else:
-            screen = qtile.currentScreen
+        max_screen = len(qtile.screens) - 1
+        preferred_screen = (
+            self.preferred_screen
+            if max_screen >= self.preferred_screen else max_screen)
+        log.debug(
+            "num_screens %s: preferred_screen%s", num_screens, preferred_screen)
+        screen = qtile.screens[preferred_screen]
         if screen.index > 0:
             index = index + (screen.index * 10)
         index = str(index)
 
-        if self.preferred_screen is not None and \
-           self.preferred_screen != qtile.currentScreen.index:
-            qtile.cmd_to_screen(self.preferred_screen)
+        if preferred_screen != qtile.currentScreen.index:
+            qtile.cmd_to_screen(preferred_screen)
             if qtile.currentGroup.name == self.name:
                 return
 
@@ -134,9 +136,10 @@ def execute_once(process):
     cmd = process.split()
     try:
         pid = subprocess.check_output(["pidof", "-s", "-x", cmd[0]])
-    except subprocess.CalledProcessError:
+    except Exception as e:
         log.exception("CalledProcessError")
     if not pid:
         # spawn the process using a shell command with subprocess.Popen
         log.debug("Starting: %s", cmd)
-        subprocess.Popen(process, shell=True)
+        pid = subprocess.Popen(process, shell=True, close_fds=True, stdin=subprocess.PIPE).pid
+        log.debug("Started: %s: %s", cmd, pid)
