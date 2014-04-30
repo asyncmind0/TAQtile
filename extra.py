@@ -24,26 +24,25 @@ def terminal(x):
 class SwitchGroup(object):
     def __init__(self, group, preferred_screen=None):
         self.name = group
-        self.preferred_screen = preferred_screen or 0
+        self.preferred_screen = preferred_screen
 
     def __call__(self, qtile):
         log.debug("SwitchGroup:%s:%s", qtile.currentScreen.index, self.name)
-        index = int(self.name)
         max_screen = len(qtile.screens) - 1
-        preferred_screen = (
-            self.preferred_screen
-            if max_screen >= self.preferred_screen else max_screen)
-        log.debug(
-            "num_screens %s: preferred_screen%s", num_screens, preferred_screen)
-        screen = qtile.screens[preferred_screen]
+        if (self.preferred_screen is not None and
+            self.preferred_screen <= max_screen):
+            screen = qtile.screens[self.preferred_screen]
+            if self.preferred_screen != qtile.currentScreen.index:
+                qtile.cmd_to_screen(self.preferred_screen)
+                if qtile.currentGroup.name == self.name:
+                    return
+        else:
+            screen = qtile.currentScreen
+
+        index = int(self.name)
         if screen.index > 0:
             index = index + (screen.index * 10)
         index = str(index)
-
-        if preferred_screen != qtile.currentScreen.index:
-            qtile.cmd_to_screen(preferred_screen)
-            if qtile.currentGroup.name == self.name:
-                return
 
         screen.cmd_togglegroup(index)
 
