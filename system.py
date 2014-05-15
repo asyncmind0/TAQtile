@@ -7,7 +7,7 @@ common_autostart = [
     'bluetooth-applet',
     'nitrogen --restore',
     'xscreensaver -nosplash',
-    "dropboxd"
+    'dropboxd',
 ]
 
 platform_specific = {

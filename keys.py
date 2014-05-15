@@ -81,6 +81,8 @@ def get_keys(mod):
         ([], "XF86AudioLowerVolume", lazy.spawn("sudo samctl.py -k up")),
         ([], "XF86AudioRaiseVolume", lazy.spawn(
             "sudo samctl.py -v down")),
+        ([], "XF86Launch1", lazy.spawn(
+            "nmcli con up id Xperia\ Z1\ Network")),
     ]
     if get_hostconfig('laptop'):
         keys.extend(laptop_keys)

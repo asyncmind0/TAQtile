@@ -161,10 +161,10 @@ def startup():
 def should_be_floating(w):
     wm_class = w.get_wm_class()
     wm_role = w.get_wm_window_role()
-    if wm_class:
-        return False
     if wm_role in ['buddy_list']:
         return
+    if not wm_class:
+        return False
     if isinstance(wm_class, tuple):
         for cls in wm_class:
             if cls.lower() in float_windows:
@@ -220,12 +220,15 @@ def dialogs(window):
             'action': ['togroup', '16']
         },
     ]
-    for rule in window_rules:
-        if rule['wmclass'] in window.window.get_wm_class() \
-           and rule['wmrole'] == window.window.get_wm_window_role()\
-           and re.match(rule['wmname'], window.name):
-            action = rule['action']
-            getattr(window, action.pop(0))(*action)
+    try:
+        for rule in window_rules:
+            if rule['wmclass'] in window.window.get_wm_class() \
+               and rule['wmrole'] == window.window.get_wm_window_role()\
+               and re.match(rule['wmname'], window.name):
+                action = rule['action']
+                getattr(window, action.pop(0))(*action)
+    except Exception as e:
+        log.exception("Error rule matching.")
 
     if should_be_floating(window.window):
         window.floating = True
