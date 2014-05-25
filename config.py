@@ -150,12 +150,12 @@ def startup():
     log.debug("Num MONS:%s", num_mons)
     #log.debug("Num DeSKTOPS:%s", len(qtile.screens))
     if num_mons > 1 :
-        commands.append(os.path.expanduser("dualmonitor"))
+        commands[os.path.expanduser("dualmonitor")] = None
     elif num_mons == 1:
-        commands.append(os.path.expanduser("rightmonitor"))
+        commands[os.path.expanduser("rightmonitor")] = None
 
-    for command in commands:
-        execute_once(command)
+    for command, process_filter in commands.iteritems():
+        execute_once(command, process_filter)
 
 
 def should_be_floating(w):
