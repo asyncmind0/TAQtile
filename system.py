@@ -8,6 +8,7 @@ common_autostart = {
     'nitrogen --restore': None,
     'xscreensaver -nosplash': None,
     'dropboxd': 'dropbox',
+    'insync start': 'insync',
 }
 
 laptop_autostart = dict(common_autostart)
