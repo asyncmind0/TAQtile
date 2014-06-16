@@ -8,6 +8,9 @@ from system import get_hostconfig
 
 
 def get_keys(mod):
+    is_laptop = get_hostconfig('laptop')
+    left_termkey = "F11"if is_laptop else "F12"
+    right_termkey = "F12" if is_laptop else "XF86Eject"
     keys = [
         # Switch between windows in current stack pane
         ([mod], "k", lazy.layout.next().when('stack'),
@@ -50,11 +53,6 @@ def get_keys(mod):
         #([mod], "r", lazy.spawncmd()),
         ([mod], "F2", lazy.spawn("dmenu_run -f -l 20")),
         ([mod], "r", lazy.spawncmd()),
-        ([], "F11", lazy.function(
-            SwitchToWindowGroup("left", terminal("left"), PRIMARY_SCREEN))),
-        ([], "F12", lazy.function(
-            SwitchToWindowGroup(
-                "right", terminal("right"), SECONDARY_SCREEN))),
         ([mod], "Right", lazy.screen.nextgroup()),
         ([mod], "Left", lazy.screen.prevgroup()),
         ([], "F6",      lazy.function(SwitchGroup("6", PRIMARY_SCREEN))),
@@ -69,6 +67,11 @@ def get_keys(mod):
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "k", lazy.spawn("xkill")),
+        ([], left_termkey, lazy.function(
+            SwitchToWindowGroup("left", terminal("left"), PRIMARY_SCREEN))),
+        ([], right_termkey, lazy.function(
+            SwitchToWindowGroup(
+                "right", terminal("right"), SECONDARY_SCREEN))),
     ]
     laptop_keys = [
         # laptop keys
@@ -82,6 +85,6 @@ def get_keys(mod):
         ([], "XF86AudioRaiseVolume", lazy.spawn(
             "sudo samctl.py -v down")),
     ]
-    if get_hostconfig('laptop'):
+    if is_laptop:
         keys.extend(laptop_keys)
     return [Key(*k) for k in keys]
