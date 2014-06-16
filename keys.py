@@ -5,6 +5,7 @@ from extra import (SwitchToWindowGroup, check_restart,
                    terminal, MoveToOtherScreenGroup, SwitchGroup)
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
+from subprocess import check_call
 
 
 def get_keys(mod):
@@ -84,6 +85,8 @@ def get_keys(mod):
         ([], "XF86AudioLowerVolume", lazy.spawn("sudo samctl.py -k up")),
         ([], "XF86AudioRaiseVolume", lazy.spawn(
             "sudo samctl.py -v down")),
+        ([], "XF86WLAN", lazy.spawn(
+            "nmcli con up id Xperia\ Z1\ Network --nowait")),
     ]
     if is_laptop:
         keys.extend(laptop_keys)

@@ -2,23 +2,24 @@
 """
 import platform
 
-common_autostart = [
-    'parcellite',
-    'bluetooth-applet',
-    'nitrogen --restore',
-    'xscreensaver -nosplash',
-    "dropboxd"
-]
+common_autostart = {
+    'parcellite': None,
+    'bluetooth-applet': None,
+    'nitrogen --restore': None,
+    'xscreensaver -nosplash': None,
+    'dropboxd': 'dropbox',
+}
+
+laptop_autostart = dict(common_autostart)
+laptop_autostart.update({
+    'nm-applet': None})
 
 platform_specific = {
     'steven-series9': {
         'screens': {0: 1, 1: 0},
         'battery': True,
         'laptop': True,
-        'autostart-once': common_autostart + [
-            'batterymon -t 16x16',
-            'nm-applet',
-        ],
+        'autostart-once': laptop_autostart,
         'screen_preferences':{
             2:[{'wmclass': "google-chrome-stable"}, {"wmclass": "Navigator"}],
             1:[]
@@ -28,8 +29,7 @@ platform_specific = {
         'screens': {0: 0, 1: 1},
         'battery': False,
         'laptop': False,
-        'autostart-once': common_autostart + [
-        ],
+        'autostart-once': common_autostart,
         'screen_preferences':{}
     }
 }

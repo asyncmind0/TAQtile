@@ -131,10 +131,11 @@ def get_num_monitors():
     #    print "Width:" + width + ",height:" + height
 
 
-def execute_once(process):
+def execute_once(process, process_filter=None):
     cmd = process.split()
+    process_filter = process_filter or cmd[0]
     try:
-        pid = subprocess.check_output(["pidof", "-s", "-x", cmd[0]])
+        pid = subprocess.check_output(["pidof", "-s", "-x", process_filter])
     except Exception as e:
         log.exception("CalledProcessError")
     if not pid:
