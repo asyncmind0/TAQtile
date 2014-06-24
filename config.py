@@ -204,30 +204,51 @@ def move_windows_multimonitor(window):
                     window.togroup(str(win_group+10))
 
 
-@hook.subscribe.client_new
+@hook.subscribe.client_managed
 def dialogs(window):
     window_rules = [
         {
             'wmclass': "Google-chrome-stable",
             'wmrole': "pop-up",
-            'wmname': "^(?!Developer).*",
-            'action': ['togroup', '6']
+            'wmname': r"^Developer.*",
+            'wm_icon_name': r"^Developer.*",
+            'action': ['togroup', '16'],
+            'exclusive': True
+        },
+        {
+            'wmclass': "google-chrome-stable",
+            'wmrole': "pop-up",
+            'wmname': r"^(?!Developer).*",
+            'action': [],
+            'exclusive': True
         },
         {
             'wmclass': "Google-chrome-stable",
             'wmrole': "pop-up",
-            'wmname': "^Developer.*",
-            'action': ['togroup', '16']
+            'wmname': r"^(?!Developer).*",
+            'action': ['togroup', '6'],
+            'exclusive': False
         },
     ]
     try:
         for rule in window_rules:
+            #log.debug("'%s':'%s'", rule['wmname'], window.cmd_inspect())
             if rule['wmclass'] in window.window.get_wm_class() \
                and rule['wmrole'] == window.window.get_wm_window_role()\
                and re.match(rule['wmname'], window.name):
+                if 'wm_icon_name' in rule:
+                    if not re.match(rule['wm_icon_name'],
+                                    window.get_wm_icon_name()):
+                        continue
                 action = rule['action']
-                getattr(window, action.pop(0))(*action)
-    except Exception as e:
+                try:
+                    getattr(window, action.pop(0))(*action)
+                except Exception as e:
+                    log.exception("Action failed, %s", rule)
+                if rule.get('exclusive', False):
+                    #log.debug("%s matched exclusive %s", window.name, rule)
+                    break
+    except:
         log.exception("Error rule matching.")
 
     if should_be_floating(window.window):
