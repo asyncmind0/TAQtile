@@ -103,7 +103,7 @@ border_args = dict(
 )
 layouts = [
     layout.Max(),
-    layout.Stack(stacks=2),
+    layout.Stack(),
     layout.xmonad.MonadTall(ratio=0.50),
     layout.TreeTab(),
     layout.Zoomy(),
@@ -111,13 +111,13 @@ layouts = [
     layout.Slice('left', 192, name='gimp', role='gimp-toolbox',
                  fallback=layout.Slice('right', 256, role='gimp-dock',
                                        fallback=layout.Stack(
-                                           stacks=1, **border_args))),
+                                           num_stacks=1, **border_args))),
     # a layout for pidgin
     layout.Slice('right', 256, role='buddy_list',
-                 fallback=layout.Stack(stacks=1, **border_args)),
+                 fallback=layout.Stack(num_stacks=1, **border_args)),
     # a layout for hangouts
     layout.Slice('right', 356, wname="Hangouts",
-                 fallback=layout.Stack(stacks=1, **border_args)),
+                 fallback=layout.Stack(num_stacks=1, **border_args)),
 ]
 
 
@@ -149,7 +149,7 @@ def startup():
     num_mons = get_num_monitors()
     log.debug("Num MONS:%s", num_mons)
     #log.debug("Num DeSKTOPS:%s", len(qtile.screens))
-    if num_mons > 1 :
+    if num_mons > 1:
         commands[os.path.expanduser("dualmonitor")] = None
     elif num_mons == 1:
         commands[os.path.expanduser("rightmonitor")] = None
@@ -162,7 +162,7 @@ def should_be_floating(w):
     wm_class = w.get_wm_class()
     wm_role = w.get_wm_window_role()
     if wm_role in ['buddy_list']:
-        return
+        return False
     if not wm_class:
         return False
     if isinstance(wm_class, tuple):
