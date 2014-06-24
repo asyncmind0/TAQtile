@@ -59,7 +59,8 @@ def get_keys(mod):
         ([], "F6",      lazy.function(SwitchGroup("6", PRIMARY_SCREEN))),
 
         ([mod], "m", lazy.group.setlayout('max')),
-        ([mod], "t", lazy.group.setlayout('stack')),
+        ([mod], "t", lazy.group.setlayout('tile')),
+        ([mod], "s", lazy.group.setlayout('stack')),
         ([mod], "x", lazy.group.setlayout('monadtall')),
         ([mod], "f", lazy.window.toggle_floating()),
         #([mod], "t", lazy.group.setlayout('xmonad-tall')),
