@@ -13,21 +13,17 @@ def get_keys(mod):
     right_termkey = "F12" if is_laptop else "XF86Eject"
     keys = [
         # Switch between windows in current stack pane
-        ([mod], "k", lazy.layout.next().when('stack'),
-         lazy.layout.down()),
-        ([mod], "j", lazy.layout.previous().when('stack'),
-         lazy.layout.up()),
-        ([mod, "shift"], "l", lazy.layout.client_to_next().when('stack'),
-         lazy.layout.down()),
-        ([mod, "shift"], "h", lazy.layout.client_to_previous().when('stack'),
-         lazy.layout.up()),
-        ([mod], "h", lazy.layout.previous().when('tile'),
+        ([mod], "k", lazy.layout.down()),
+        ([mod], "j", lazy.layout.up()),
+        ([mod], "h", lazy.layout.previous().when('stack'),
          lazy.layout.up().when('xmonad-tall')),
-        ([mod], "l", lazy.layout.next().when('tile'),
+        ([mod], "l", lazy.layout.next().when('stack'),
          lazy.layout.down().when('xmonad-tall')),
+        ([mod, "shift"], "l", lazy.layout.client_to_next().when('stack')),
+        ([mod, "shift"], "h", lazy.layout.client_to_previous().when('stack')),
         # Move windows up or down in current stack
-        ([mod, "shift"], "k", lazy.layout.shuffle_down()),
-        ([mod, "shift"], "j", lazy.layout.shuffle_up()),
+        #([mod, "shift"], "k", lazy.layout.shuffle_down().when('stack')),
+        #([mod, "shift"], "j", lazy.layout.shuffle_up().when('stack')),
 
         # Swap panes of split stack
         ([mod, "shift"], "space", lazy.layout.rotate()),
