@@ -32,13 +32,14 @@ layouts = [
     layout.Max(),
     layout.Stack(),
     layout.xmonad.MonadTall(ratio=0.50),
-    layout.TreeTab(),
-    layout.Zoomy(),
+    layout.Tile(),
+    #layout.TreeTab(),
+    #layout.Zoomy(),
     # a layout just for gimp
-    layout.Slice('left', 192, name='gimp', role='gimp-toolbox',
-                 fallback=layout.Slice('right', 256, role='gimp-dock',
-                                       fallback=layout.Stack(
-                                           num_stacks=1, **border_args))),
+    #layout.Slice('left', 192, name='gimp', role='gimp-toolbox',
+    #             fallback=layout.Slice('right', 256, role='gimp-dock',
+    #                                   fallback=layout.Stack(
+    #                                       num_stacks=1, **border_args))),
 ]
 
 # layout map to restrict availiable layouts for a group
@@ -50,8 +51,8 @@ layout_map = {
     6: {'name':"slice", 'layouts': [
     # a layout for hangouts
         layout.Slice('right', 356, wname="Hangouts", 
-                     wmclass="Google-chrome-stable",
-                 fallback=layout.Stack(num_stacks=1, **border_args))]},
+                 fallback=layout.Tile( **border_args))]},
+                 #fallback=layout.Stack(num_stacks=2, **border_args))]},
     -1: {'name':"max", 'layouts': layouts}
 }
 

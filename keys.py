@@ -13,20 +13,29 @@ def get_keys(mod):
     right_termkey = "F12" if is_laptop else "XF86Eject"
     keys = [
         # Switch between windows in current stack pane
-        ([mod], "k", lazy.layout.down()),
-        ([mod], "j", lazy.layout.up()),
-        ([mod], "h", lazy.layout.previous().when('stack'),
-         lazy.layout.up().when('xmonad-tall')),
-        ([mod], "l", lazy.layout.next().when('stack'),
-         lazy.layout.down().when('xmonad-tall')),
-        ([mod, "shift"], "l", lazy.layout.client_to_next().when('stack')),
-        ([mod, "shift"], "h", lazy.layout.client_to_previous().when('stack')),
+        ([mod], "k", lazy.layout.down().when('stack'),
+         lazy.layout.next().when('monadtall')),
+        ([mod], "j", lazy.layout.up().when('stack'),
+         lazy.layout.previous().when('monadtall')),
+
         # Move windows up or down in current stack
-        #([mod, "shift"], "k", lazy.layout.shuffle_down().when('stack')),
-        #([mod, "shift"], "j", lazy.layout.shuffle_up().when('stack')),
+        ([mod, "shift"], "k", lazy.layout.shuffle_up()),
+        ([mod, "shift"], "j", lazy.layout.shuffle_down()),
+
+        ([mod], "h", lazy.layout.previous().when('stack'),
+         lazy.layout.up().when('monadtall')),
+        ([mod], "l", lazy.layout.next().when('stack'),
+         lazy.layout.down().when('monadtall')),
+
+        ([mod, "shift"], "l", 
+         lazy.layout.client_to_next().when('stack')),
+        ([mod, "shift"], "h", 
+         lazy.layout.client_to_previous().when('stack')),
+
+        ([mod, "shift"], "space", lazy.layout.flip().when('monadtall'),
+         lazy.layout.rotate().when('tile')),
 
         # Swap panes of split stack
-        ([mod, "shift"], "space", lazy.layout.rotate()),
         # toggle between windows just like in unity with 'alt+tab'
         (["mod1", "shift"], "Tab", lazy.layout.down()),
         (["mod1"], "Tab", lazy.layout.up()),
@@ -48,9 +57,10 @@ def get_keys(mod):
         ([mod], "Right", lazy.screen.nextgroup()),
         ([mod], "Left", lazy.screen.prevgroup()),
         ([], "F6",      lazy.function(SwitchGroup("6", PRIMARY_SCREEN))),
+
         ([mod], "m", lazy.group.setlayout('max')),
         ([mod], "t", lazy.group.setlayout('stack')),
-        ([mod], "x", lazy.group.setlayout('xmonad-tall')),
+        ([mod], "x", lazy.group.setlayout('monadtall')),
         ([mod], "f", lazy.window.toggle_floating()),
         #([mod], "t", lazy.group.setlayout('xmonad-tall')),
 
