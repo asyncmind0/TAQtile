@@ -40,6 +40,13 @@ class ThreadedPacman(widget.Pacman):
         threading.Thread(target=worker).start()
         return True
 
+
+class CalClock(widget.Clock):
+    #def button_release(self, x, y, button):
+    def button_press(self, x, y, button):
+        self.qtile.cmd_spawn("calendar_applet.py")
+
+
 #Pacman = widget.Pacman
 Pacman = ThreadedPacman
 #GroupBox = widget.GroupBox
@@ -149,7 +156,7 @@ def get_screens(num_screens=1):
         w1.append(widget.Battery(**batteryicon_params))
         w1.append(widget.Sep())
     w1.append(widget.Systray(**systray_params))
-    w1.append(widget.Clock(**clock_params))
+    w1.append(CalClock(**clock_params))
 
     w2 = [
         GroupBox(namemap=gb2, **groupbox_params),
@@ -158,7 +165,7 @@ def get_screens(num_screens=1):
         widget.Sep(),
         widget.CurrentLayout(**current_layout_params),
         widget.Sep(),
-        widget.Clock(**clock_params),
+        CalClock(**clock_params),
     ]
 
     screens.append(Screen(bar.Bar(w1, 18)))
