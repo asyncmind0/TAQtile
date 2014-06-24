@@ -191,6 +191,13 @@ def dbus_register():
                       'string:' + x])
 
 
+@hook.subscribe.client_new
+def new_client(client):
+    if client.window.get_wm_class()[0] in [
+            "screenkey", "kruler"]:
+        client.static(0)
+
+
 @hook.subscribe.client_managed
 def move_windows_multimonitor(window):
     screen_preferences = get_hostconfig('screen_preferences')
