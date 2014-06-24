@@ -13,10 +13,10 @@ def get_keys(mod):
     right_termkey = "F12" if is_laptop else "XF86Eject"
     keys = [
         # Switch between windows in current stack pane
-        ([mod], "k", lazy.layout.down().when('stack'),
-         lazy.layout.next().when('monadtall')),
-        ([mod], "j", lazy.layout.up().when('stack'),
+        ([mod], "k", lazy.layout.up().when('stack'),
          lazy.layout.previous().when('monadtall')),
+        ([mod], "j", lazy.layout.down().when('stack'),
+         lazy.layout.next().when('monadtall')),
 
         # Move windows up or down in current stack
         ([mod, "shift"], "k", lazy.layout.shuffle_up()),
@@ -74,7 +74,7 @@ def get_keys(mod):
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
-        ([mod, "shift"], "k", lazy.spawn("xkill")),
+        ([mod, "control"], "Escape", lazy.spawn("xkill")),
         ([], left_termkey, lazy.function(
             SwitchToWindowGroup("left", terminal("left"), PRIMARY_SCREEN))),
         ([], right_termkey, lazy.function(
