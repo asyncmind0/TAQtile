@@ -1,3 +1,6 @@
+#TODO send new clients to group 1 if current group is special group
+#TODO handle MultiScreenGroupBox clicks and events
+#TODO handle screen preference for windows
 from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
 from libqtile.command import lazy, CommandObject
 from libqtile import layout, bar, widget, hook
@@ -21,20 +24,47 @@ keys = get_keys(mod)
 num_screens = get_num_monitors()
 log.debug("Num Desktops:%s", num_screens)
 
-#TODO send new clients to group 1 if current group is special group
-#TODO handle MultiScreenGroupBox clicks and events
-#TODO handle screen preference for windows
+border_args = dict(
+    border_width=1,
+)
+
+layouts = [
+    layout.Max(),
+    layout.Stack(),
+    layout.xmonad.MonadTall(ratio=0.50),
+    layout.TreeTab(),
+    layout.Zoomy(),
+    # a layout just for gimp
+    layout.Slice('left', 192, name='gimp', role='gimp-toolbox',
+                 fallback=layout.Slice('right', 256, role='gimp-dock',
+                                       fallback=layout.Stack(
+                                           num_stacks=1, **border_args))),
+]
+
+# layout map to restrict availiable layouts for a group
 layout_map = {
-    3: "slice",
-    6: "slice",
+    3: {'name':"slice", 'layouts': [
+        # a layout for pidgin
+        layout.Slice('right', 256, role='buddy_list',
+                     fallback=layout.Stack(num_stacks=1, **border_args))]},
+    6: {'name':"slice", 'layouts': [
+    # a layout for hangouts
+        layout.Slice('right', 356, wname="Hangouts", 
+                     wmclass="Google-chrome-stable",
+                 fallback=layout.Stack(num_stacks=1, **border_args))]},
+    -1: {'name':"max", 'layouts': layouts}
 }
 
 
 def generate_groups(num_screens=1):
     num_groups = num_screens * 10
     log.debug("num_groups:%s", num_groups)
-    groups = [Group(str(i), layout=layout_map.get(i, "max"))
-              for i in range(1, num_groups)]
+    groups = []
+    for i in range(1, num_groups):
+        layout_config = layout_map.get(i, layout_map[-1])
+        groups.append(Group(
+            str(i), layout=layout_config['name'],
+            layouts=layout_config['layouts']))
     for i, g in enumerate(groups, 1):
        # mod1 + letter of group = switch to group
         #log.debug("group:%s", i)
@@ -101,27 +131,6 @@ groups = generate_groups(num_screens)
 
 dgroups_key_binder = None
 
-border_args = dict(
-    border_width=1,
-)
-layouts = [
-    layout.Max(),
-    layout.Stack(),
-    layout.xmonad.MonadTall(ratio=0.50),
-    layout.TreeTab(),
-    layout.Zoomy(),
-    # a layout just for gimp
-    layout.Slice('left', 192, name='gimp', role='gimp-toolbox',
-                 fallback=layout.Slice('right', 256, role='gimp-dock',
-                                       fallback=layout.Stack(
-                                           num_stacks=1, **border_args))),
-    # a layout for pidgin
-    layout.Slice('right', 256, role='buddy_list',
-                 fallback=layout.Stack(num_stacks=1, **border_args)),
-    # a layout for hangouts
-    layout.Slice('right', 356, wname="Hangouts",
-                 fallback=layout.Stack(num_stacks=1, **border_args)),
-]
 
 
 event_cntr = 2

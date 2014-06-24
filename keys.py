@@ -39,27 +39,29 @@ def get_keys(mod):
         # Unsplit = 1 window displayed, like Max layout, but still with
         # multiple stack panes
         ([mod, "shift"], "Return", lazy.layout.toggle_split()),
-        ([mod], "Return", lazy.spawn("st")),
         (["shift", mod], "q", lazy.shutdown()),
         # Toggle between different layouts as defined below
         ([mod], "space",    lazy.nextlayout()),
         ([mod], "q",      lazy.window.kill()),
         # Key([mod, "control"], "r", lazy.restart()),
         ([mod, "control"], "r", lazy.function(check_restart)),
-        #([mod], "r", lazy.spawncmd()),
-        ([mod], "F2", lazy.spawn("dmenu_run -f -l 20")),
-        ([mod], "r", lazy.spawncmd()),
         ([mod], "Right", lazy.screen.nextgroup()),
         ([mod], "Left", lazy.screen.prevgroup()),
         ([], "F6",      lazy.function(SwitchGroup("6", PRIMARY_SCREEN))),
-        # app launcher
+        ([mod], "m", lazy.group.setlayout('max')),
+        ([mod], "t", lazy.group.setlayout('stack')),
+        ([mod], "x", lazy.group.setlayout('xmonad-tall')),
+        ([mod], "f", lazy.window.toggle_floating()),
+        #([mod], "t", lazy.group.setlayout('xmonad-tall')),
+
+        # APP LAUNCHERS
+        #([mod], "r", lazy.spawncmd()),
+        ([mod], "F2", lazy.spawn("dmenu_run -f -l 20")),
+        ([mod], "r", lazy.spawncmd()),
+        ([mod], "Return", lazy.spawn("st")),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
-        ([mod], "m", lazy.group.setlayout('max')),
-        ([mod], "t", lazy.group.setlayout('stack')),
-        ([mod], "f", lazy.window.toggle_floating()),
-        #([mod], "t", lazy.group.setlayout('xmonad-tall')),
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "k", lazy.spawn("xkill")),
