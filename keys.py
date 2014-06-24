@@ -5,7 +5,6 @@ from extra import (SwitchToWindowGroup, check_restart,
                    terminal, MoveToOtherScreenGroup, SwitchGroup)
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
-from subprocess import check_call
 
 
 def get_keys(mod):

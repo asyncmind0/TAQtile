@@ -29,6 +29,7 @@ layout_map = {
     6: "slice",
 }
 
+
 def generate_groups(num_screens=1):
     num_groups = num_screens * 10
     log.debug("num_groups:%s", num_groups)
@@ -79,7 +80,9 @@ dgroups_app_rules = [
     Rule(Match(title=[".*Hangouts.*"]), group="6"),
     Rule(Match(wm_class=["Kmail"]), group="4"),
     Rule(Match(wm_class=["Pidgin"]), group="3", float=False),
-    Rule(Match(wm_class=["keepass2"]), float=True),
+    Rule(Match(wm_class=["KeePass2"]), float=True),
+    Rule(Match(wm_class=["Kruler"]), float=True),
+    Rule(Match(wm_class=["Screenkey"]), float=True, intrusive=True),
     Rule(Match(wm_class=["rdesktop"]), group="14"),
     Rule(Match(wm_class=[".*VirtualBox.*"]), group="13"),
     ]
@@ -91,7 +94,7 @@ floating_layout = layout.Floating(auto_float_types=[
     "notification",
     "toolbar",
     "splash",
-    "dialog"
+    "Screenkey",
 ])
 
 groups = generate_groups(num_screens)
