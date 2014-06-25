@@ -13,24 +13,30 @@ def get_keys(mod):
     right_termkey = "F12" if is_laptop else "XF86Eject"
     keys = [
         # Switch between windows in current stack pane
-        ([mod], "k", lazy.layout.up().when('stack'),
-         lazy.layout.previous().when('monadtall')),
-        ([mod], "j", lazy.layout.down().when('stack'),
-         lazy.layout.next().when('monadtall')),
+        ([mod], "k", 
+         lazy.layout.previous().when('monadtall'),
+         lazy.layout.up()),
+        ([mod], "j",
+         lazy.layout.next().when('monadtall'),
+         lazy.layout.down()),
 
         # Move windows up or down in current stack
         ([mod, "shift"], "k", lazy.layout.shuffle_up()),
         ([mod, "shift"], "j", lazy.layout.shuffle_down()),
 
-        ([mod], "h", lazy.layout.previous().when('stack'),
-         lazy.layout.up().when('monadtall')),
-        ([mod], "l", lazy.layout.next().when('stack'),
-         lazy.layout.down().when('monadtall')),
+        ([mod], "h", 
+         lazy.layout.up().when('monadtall'),
+         lazy.layout.previous()),
+        ([mod], "l", 
+         lazy.layout.down().when('monadtall'),
+         lazy.layout.next()),
 
         ([mod, "shift"], "l", 
-         lazy.layout.client_to_next().when('stack')),
+         lazy.layout.client_to_next().when('stack'),
+         lazy.layout.increase_ratio().when('tile')),
         ([mod, "shift"], "h", 
-         lazy.layout.client_to_previous().when('stack')),
+         lazy.layout.client_to_previous().when('stack'),
+         lazy.layout.decrease_ratio().when('tile')),
 
         ([mod, "shift"], "space", lazy.layout.flip().when('monadtall'),
          lazy.layout.rotate().when('tile')),

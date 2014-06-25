@@ -79,4 +79,3 @@ class MultiScreenGroupBox(widget.GroupBox):
             )
             offset += bw
         self.drawer.draw(self.offset, self.width)
-

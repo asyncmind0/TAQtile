@@ -1,6 +1,4 @@
-#TODO send new clients to group 1 if current group is special group
 #TODO handle MultiScreenGroupBox clicks and events
-#TODO handle screen preference for windows
 from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
 from libqtile.command import lazy, CommandObject
 from libqtile import layout, bar, widget, hook
@@ -33,8 +31,8 @@ layouts = [
     layout.Stack(),
     layout.xmonad.MonadTall(ratio=0.50),
     layout.Tile(),
+    layout.Zoomy(),
     #layout.TreeTab(),
-    #layout.Zoomy(),
     # a layout just for gimp
     #layout.Slice('left', 192, name='gimp', role='gimp-toolbox',
     #             fallback=layout.Slice('right', 256, role='gimp-dock',
@@ -125,6 +123,7 @@ floating_layout = layout.Floating(auto_float_types=[
     "notification",
     "toolbar",
     "splash",
+    'dialog', # this has to be here else dialogs go to new group
     "Screenkey",
 ])
 
