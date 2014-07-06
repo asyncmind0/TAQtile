@@ -11,11 +11,15 @@ def get_keys(mod):
     is_laptop = get_hostconfig('laptop')
     left_termkey = "F11"if is_laptop else "F12"
     right_termkey = "F12" if is_laptop else "XF86Eject"
+    left_remote_termkey = "F11"if is_laptop else "F12"
+    right_remote_termkey = "F12" if is_laptop else "XF86Eject"
     keys = [
         # Switch between windows in current stack pane
-        ([mod], "k", lazy.layout.up().when('stack'),
+        ([mod], "k",
+         lazy.layout.up(),
          lazy.layout.previous().when('monadtall')),
-        ([mod], "j", lazy.layout.down().when('stack'),
+        ([mod], "j", 
+         lazy.layout.down(),
          lazy.layout.next().when('monadtall')),
 
         # Move windows up or down in current stack
@@ -79,8 +83,11 @@ def get_keys(mod):
         ([], left_termkey, lazy.function(
             SwitchToWindowGroup("left", terminal("left"), PRIMARY_SCREEN))),
         ([], right_termkey, lazy.function(
-            SwitchToWindowGroup(
-                "right", terminal("right"), SECONDARY_SCREEN))),
+            SwitchToWindowGroup("right", terminal("right"), SECONDARY_SCREEN))),
+        ([mod], left_remote_termkey, lazy.function(
+            SwitchToWindowGroup("remote_left", "st -t remote_left ", PRIMARY_SCREEN))),
+        ([mod], right_remote_termkey, lazy.function(
+            SwitchToWindowGroup("remote_right", "st -t remote_right", SECONDARY_SCREEN))),
     ]
     laptop_keys = [
         # laptop keys

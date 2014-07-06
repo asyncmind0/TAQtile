@@ -79,16 +79,18 @@ def generate_groups(num_screens=1):
     keys.append(Key([], "F2",      lazy.function(SwitchGroup("2"))))
     keys.append(Key([], "F10",      lazy.function(SwitchGroup("4", 0))))
     keys.append(Key([], "F9", lazy.function(SwitchGroup("3", 0))))
-    groups.append(
-        Group('left', exclusive=False,
-              spawn=terminal("left"),
-              matches=[Match(title=[".*left.*"],
-                             wm_class=["InputOutput"])]))
-    groups.append(
-        Group('right', exclusive=False,
-              spawn=terminal("right"),
-              matches=[Match(title=[".*right.*"],
-                             wm_class=["InputOutput"])]))
+    groups.append(Group('left', exclusive=False, spawn=terminal("left"),
+                        matches=[Match(title=[".*left.*"],
+                                       wm_class=["InputOutput"])]))
+    groups.append(Group('right', exclusive=False, spawn=terminal("right"),
+                        matches=[Match(title=[".*right.*"],
+                                       wm_class=["InputOutput"])]))
+    groups.append(Group('remote_left', exclusive=False, spawn=terminal("remote_left"),
+                        matches=[Match(title=[".*remote_left.*"],
+                                       wm_class=["InputOutput"])]))
+    groups.append(Group('remote_right', exclusive=False, spawn=terminal("remote_right"),
+                        matches=[Match(title=[".*remote_right.*"],
+                                       wm_class=["InputOutput"])]))
     return groups
 
 
@@ -97,6 +99,8 @@ dgroups_app_rules = [
     # Everything i want to be float, but don't want to change group
     Rule(Match(title=["right"]), group="right"),
     Rule(Match(title=["left"]), group="left"),
+    Rule(Match(title=["remote_right"]), group="remote_right"),
+    Rule(Match(title=["remote_left"]), group="remote_left"),
     Rule(Match(title=['nested', 'gscreenshot'],
                wm_class=['Guake.py', 'Exe', 'Onboard', 'Florence',
                          'Terminal', 'Gpaint', 'Kolourpaint', 'Wrapper',

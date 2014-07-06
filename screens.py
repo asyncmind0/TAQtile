@@ -118,14 +118,20 @@ def get_screens(num_screens=1):
     if num_screens == 1:
         gb1['right'] = "term1"
         gb1['left'] = "term2"
+        gb1['remote_right'] = "remote_term1"
+        gb1['remote_left'] = "remote_term2"
     else:
         # if primary and seconday are reversed
         if PRIMARY_SCREEN:
             gb1['right'] = "term"
             gb2['left'] = "term"
+            gb1['remote_right'] = "remote_term"
+            gb2['remote_left'] = "remote_term"
         else:
             gb1['left'] = "term"
             gb2['right'] = "term"
+            gb1['remote_left'] = "remote_term"
+            gb2['remote_right'] = "remote_term"
 
     w1 = [
         GroupBox(namemap=gb1, **groupbox_params),
