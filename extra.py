@@ -135,11 +135,14 @@ def execute_once(process, process_filter=None):
     cmd = process.split()
     process_filter = process_filter or cmd[0]
     try:
-        pid = subprocess.check_output(["pidof", "-s", "-x", process_filter])
+        pid = subprocess.check_output(
+            ["pidof", "-s", "-x", process_filter])
     except Exception as e:
         log.exception("CalledProcessError")
     if not pid:
         # spawn the process using a shell command with subprocess.Popen
         log.debug("Starting: %s", cmd)
-        pid = subprocess.Popen(process, shell=True, close_fds=True, stdin=subprocess.PIPE).pid
+        pid = subprocess.Popen(
+            process, shell=True, close_fds=True,
+            stdin=subprocess.PIPE).pid
         log.debug("Started: %s: %s", cmd, pid)
