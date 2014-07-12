@@ -9,10 +9,11 @@ from system import get_hostconfig
 
 def get_keys(mod, groups):
     is_laptop = get_hostconfig('laptop')
-    left_termkey = "F11"if is_laptop else "F12"
-    right_termkey = "F12" if is_laptop else "XF86Eject"
-    left_remote_termkey = "F11"if is_laptop else "F12"
-    right_remote_termkey = "F12" if is_laptop else "XF86Eject"
+    left_termkey = get_hostconfig('left_termkey')
+    right_termkey = get_hostconfig('right_termkey')
+    left_remote_termkey = get_hostconfig('left_remote_termkey')
+    right_remote_termkey = get_hostconfig('right_remote_termkey')
+    monitor_key = get_hostconfig('monitor_key')
     keys = [
         # Switch between windows in current stack pane
         ([mod], "k",
@@ -104,12 +105,18 @@ def get_keys(mod, groups):
                 groups, "remote_left", cmd="st -t remote_left ",
                 screen=PRIMARY_SCREEN, title=[".*remote_left.*"],
                 wm_class=["InputOutput"]))),
+
         ([mod], right_remote_termkey, lazy.function(
             SwitchToWindowGroup(
                 groups, "remote_right", cmd="st -t remote_right ",
                 screen=SECONDARY_SCREEN, title=[".*remote_right.*"],
                 wm_class=["InputOutput"]))),
 
+        ([], monitor_key, lazy.function(
+            SwitchToWindowGroup(
+                groups, "monitor", cmd=terminal("monitor"),
+                title=[".*monitor.*"], SECONDARY_SCREEN,
+                wm_class=["InputOutput"]))),
     ]
     laptop_keys = [
         # laptop keys

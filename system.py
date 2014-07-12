@@ -35,7 +35,11 @@ platform_specific = {
         'battery': False,
         'laptop': False,
         'autostart-once': common_autostart,
-        'screen_preferences': {}
+        'screen_preferences': {},
+        'left_termkey': "XF86Launch5",
+        'right_termkey': "XF86Launch6",
+        'left_remotetermkey': "XF86Launch5",
+        'right_remotetermkey': "XF86Launch6",
     }
 }
 
