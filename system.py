@@ -28,7 +28,12 @@ platform_specific = {
             2: [{'wmclass': "google-chrome-stable"},
                 {"wmclass": "Navigator"}],
             1: []
-        }
+        },
+        'left_termkey': "F11",
+        'right_termkey': "F12",
+        'left_remote_termkey': "F11",
+        'right_remote_termkey': "F12",
+        'monitor_key': "XF86Eject",
     },
     'sydsjoseph-pc1': {
         'screens': {0: 0, 1: 1},
@@ -38,8 +43,9 @@ platform_specific = {
         'screen_preferences': {},
         'left_termkey': "XF86Launch5",
         'right_termkey': "XF86Launch6",
-        'left_remotetermkey': "XF86Launch5",
-        'right_remotetermkey': "XF86Launch6",
+        'left_remote_termkey': "XF86Launch5",
+        'right_remote_termkey': "XF86Launch6",
+        'monitor_key': "XF86Eject",
     }
 }
 

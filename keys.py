@@ -115,7 +115,7 @@ def get_keys(mod, groups):
         ([], monitor_key, lazy.function(
             SwitchToWindowGroup(
                 groups, "monitor", cmd=terminal("monitor"),
-                title=[".*monitor.*"], SECONDARY_SCREEN,
+                title=[".*monitor.*"], screen=SECONDARY_SCREEN,
                 wm_class=["InputOutput"]))),
     ]
     laptop_keys = [
