@@ -7,7 +7,7 @@ from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 
 
-def get_keys(mod):
+def get_keys(mod, groups):
     is_laptop = get_hostconfig('laptop')
     left_termkey = "F11"if is_laptop else "F12"
     right_termkey = "F12" if is_laptop else "XF86Eject"
@@ -84,14 +84,32 @@ def get_keys(mod):
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
+        ([], "F1",      lazy.function(SwitchGroup("1"))),
+        ([], "F2",      lazy.function(SwitchGroup("2"))),
+        ([], "F10",      lazy.function(SwitchGroup("4", 0))),
+        ([], "F9", lazy.function(SwitchGroup("3", 0))),
+
         ([], left_termkey, lazy.function(
-            SwitchToWindowGroup("left", terminal("left"), PRIMARY_SCREEN))),
+            SwitchToWindowGroup(
+                groups, "left", title=[".*left.*"], cmd=terminal("left"),
+                wm_class=["InputOutput"], screen=PRIMARY_SCREEN))),
+
         ([], right_termkey, lazy.function(
-            SwitchToWindowGroup("right", terminal("right"), SECONDARY_SCREEN))),
+            SwitchToWindowGroup(
+                groups, "right", cmd=terminal("right"), title=[".*right.*"],
+                wm_class=["InputOutput"], screen=SECONDARY_SCREEN))),
+
         ([mod], left_remote_termkey, lazy.function(
-            SwitchToWindowGroup("remote_left", "st -t remote_left ", PRIMARY_SCREEN))),
+            SwitchToWindowGroup(
+                groups, "remote_left", cmd="st -t remote_left ",
+                screen=PRIMARY_SCREEN, title=[".*remote_left.*"],
+                wm_class=["InputOutput"]))),
         ([mod], right_remote_termkey, lazy.function(
-            SwitchToWindowGroup("remote_right", "st -t remote_right", SECONDARY_SCREEN))),
+            SwitchToWindowGroup(
+                groups, "remote_right", cmd="st -t remote_right ",
+                screen=SECONDARY_SCREEN, title=[".*remote_right.*"],
+                wm_class=["InputOutput"]))),
+
     ]
     laptop_keys = [
         # laptop keys

@@ -53,7 +53,8 @@ Pacman = ThreadedPacman
 GroupBox = MultiScreenGroupBox
 
 
-def get_screens(num_screens=1):
+def get_screens(num_monitors=1):
+
     screens = []
 
     def default_params(**kwargs):
@@ -115,7 +116,7 @@ def get_screens(num_screens=1):
 
     gb1 = dict([(str(i), str(i)) for i in range(1, 10)])
     gb2 = dict([(str(i), str(i-10)) for i in range(11, 20)])
-    if num_screens == 1:
+    if num_monitors == 1:
         gb1['right'] = "term1"
         gb1['left'] = "term2"
         gb1['remote_right'] = "remote_term1"
@@ -158,7 +159,7 @@ def get_screens(num_screens=1):
         widget.TextBox("n:", padding=1 ),
         widget.NetGraph(**netgraph_params),
         #widget.Sep(),
-        #widget.Notify(**notify_params),
+        #widget.Notify(width=30, **notify_params),
         widget.Sep()
     ]
     if system.get_hostconfig('battery'):
@@ -178,6 +179,6 @@ def get_screens(num_screens=1):
     ]
 
     screens.append(Screen(bar.Bar(w1, 18)))
-    if num_screens > 1:
+    if num_monitors > 1:
         screens.append(Screen(bar.Bar(w2, 18)))
     return screens

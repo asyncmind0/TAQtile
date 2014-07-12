@@ -1,11 +1,7 @@
-from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
-from libqtile.command import lazy
-from libqtile import layout, bar, widget, hook
-from libqtile.dgroups import simple_key_binder
+from libqtile.config import Group, Match
 import logging
 import subprocess
 from py_compile import compile
-import re
 import os
 import glob
 
@@ -73,10 +69,14 @@ class MoveToOtherScreenGroup(object):
 
 
 class SwitchToWindowGroup(object):
-    def __init__(self, name, cmd=None, screen=0):
+    def __init__(
+            self, groups, name, title=None, cmd=None, screen=0, wm_class=None,
+            exclusive=False):
         self.name = name
         self.cmd = cmd
         self.screen = screen
+        groups.append(Group(name, exclusive=exclusive, spawn=cmd,
+                            matches=[Match(title=title, wm_class=wm_class)]))
 
     def spawn_ifnot(self, qtile):
         log.debug(qtile.currentGroup)
@@ -102,7 +102,7 @@ def check_restart(qtile):
     log.info("check_restart qtile ...")
     try:
         for pyfile in glob.glob(os.path.expanduser('~/.config/qtile/*.py')):
-            #log.debug(pyfile)
+            # log.debug(pyfile)
             compile(pyfile, doraise=True)
     except Exception as e:
         log.exception("Syntax error")
@@ -113,36 +113,3 @@ def check_restart(qtile):
         qtile.cmd_restart()
 
 
-def get_num_monitors():
-    #import Xlib.display
-    #display = Xlib.display.Display(':0')
-    #return display.screen_count()
-    output = subprocess.Popen(
-        'xrandr | grep -e "\ connected" | cut -d" " -f1',
-        shell=True, stdout=subprocess.PIPE).communicate()[0]
-
-    displays = output.strip().split('\n')
-    log.debug(displays)
-    return len(displays)
-    #for display in displays:
-    #    values = display.split('x')
-    #    width = values[0]
-    #    height = values[1]
-    #    print "Width:" + width + ",height:" + height
-
-
-def execute_once(process, process_filter=None):
-    cmd = process.split()
-    process_filter = process_filter or cmd[0]
-    try:
-        pid = subprocess.check_output(
-            ["pidof", "-s", "-x", process_filter])
-    except Exception as e:
-        log.exception("CalledProcessError")
-    if not pid:
-        # spawn the process using a shell command with subprocess.Popen
-        log.debug("Starting: %s", cmd)
-        pid = subprocess.Popen(
-            process, shell=True, close_fds=True,
-            stdin=subprocess.PIPE).pid
-        log.debug("Started: %s: %s", cmd, pid)
