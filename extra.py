@@ -1,4 +1,4 @@
-from libqtile.config import Group, Match
+from libqtile.config import Group, Match, Rule
 import logging
 import subprocess
 from py_compile import compile
@@ -71,12 +71,14 @@ class MoveToOtherScreenGroup(object):
 class SwitchToWindowGroup(object):
     def __init__(
             self, groups, name, title=None, cmd=None, screen=0, wm_class=None,
-            exclusive=False):
+            exclusive=False, dynamic_groups_rules=None):
         self.name = name
         self.cmd = cmd
         self.screen = screen
         groups.append(Group(name, exclusive=exclusive, spawn=cmd,
                             matches=[Match(title=title, wm_class=wm_class)]))
+        if dynamic_groups_rules:
+            dynamic_groups_rules.append(Rule(Match(title=title), group=name))
 
     def spawn_ifnot(self, qtile):
         log.debug(qtile.currentGroup)
@@ -111,5 +113,3 @@ def check_restart(qtile):
         signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         log.info("restarting qtile ...")
         qtile.cmd_restart()
-
-

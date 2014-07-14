@@ -7,7 +7,7 @@ from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 
 
-def get_keys(mod, groups):
+def get_keys(mod, groups, dgroups_app_rules):
     is_laptop = get_hostconfig('laptop')
     left_termkey = get_hostconfig('left_termkey')
     right_termkey = get_hostconfig('right_termkey')
@@ -65,7 +65,8 @@ def get_keys(mod, groups):
         ([mod, "control"], "r", lazy.function(check_restart)),
         ([mod], "Right", lazy.screen.nextgroup()),
         ([mod], "Left", lazy.screen.prevgroup()),
-        ([], "F6",      lazy.function(SwitchGroup("6", PRIMARY_SCREEN))),
+        ([], "F6",      lazy.function(SwitchGroup(
+            "6", SECONDARY_SCREEN if is_laptop else PRIMARY_SCREEN))),
 
         ([mod], "m", lazy.group.setlayout('max')),
         ([mod], "t", lazy.group.setlayout('tile')),
@@ -93,30 +94,35 @@ def get_keys(mod, groups):
         ([], left_termkey, lazy.function(
             SwitchToWindowGroup(
                 groups, "left", title=[".*left.*"], cmd=terminal("left"),
-                wm_class=["InputOutput"], screen=PRIMARY_SCREEN))),
+                wm_class=["InputOutput"], screen=PRIMARY_SCREEN,
+                dynamic_groups_rules=dgroups_app_rules))),
 
         ([], right_termkey, lazy.function(
             SwitchToWindowGroup(
                 groups, "right", cmd=terminal("right"), title=[".*right.*"],
-                wm_class=["InputOutput"], screen=SECONDARY_SCREEN))),
+                wm_class=["InputOutput"], screen=SECONDARY_SCREEN,
+                dynamic_groups_rules=dgroups_app_rules))),
 
         ([mod], left_remote_termkey, lazy.function(
             SwitchToWindowGroup(
                 groups, "remote_left", cmd="st -t remote_left ",
                 screen=PRIMARY_SCREEN, title=[".*remote_left.*"],
-                wm_class=["InputOutput"]))),
+                wm_class=["InputOutput"],
+                dynamic_groups_rules=dgroups_app_rules))),
 
         ([mod], right_remote_termkey, lazy.function(
             SwitchToWindowGroup(
                 groups, "remote_right", cmd="st -t remote_right ",
                 screen=SECONDARY_SCREEN, title=[".*remote_right.*"],
-                wm_class=["InputOutput"]))),
+                wm_class=["InputOutput"],
+                dynamic_groups_rules=dgroups_app_rules))),
 
         ([], monitor_key, lazy.function(
             SwitchToWindowGroup(
                 groups, "monitor", cmd=terminal("monitor"),
                 title=[".*monitor.*"], screen=SECONDARY_SCREEN,
-                wm_class=["InputOutput"]))),
+                wm_class=["InputOutput"],
+                dynamic_groups_rules=dgroups_app_rules))),
     ]
     laptop_keys = [
         # laptop keys
