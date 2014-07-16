@@ -9,7 +9,7 @@ log = logging.getLogger('qtile.config')
 common_autostart = {
     'parcellite': None,
     'bluetooth-applet': None,
-    'nitrogen --restore': None,
+    #'nitrogen --restore': None,
     'xscreensaver -nosplash': None,
     'dropboxd': 'dropbox',
     'insync start': 'insync',

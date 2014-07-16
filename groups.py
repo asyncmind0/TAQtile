@@ -10,7 +10,7 @@ from keys import get_keys
 import logging
 import os
 import re
-from config import layouts, mod
+from config import layouts, mod, dgroups_app_rules
 
 log = logging.getLogger('qtile.config')
 
@@ -34,12 +34,8 @@ layout_map = {
 }
 
 # dgroup rules that not belongs to any group
-dgroups_app_rules = [
+dgroups_app_rules.extend([
     # Everything i want to be float, but don't want to change group
-    Rule(Match(title=["right"]), group="right"),
-    Rule(Match(title=["left"]), group="left"),
-    Rule(Match(title=["remote_right"]), group="remote_right"),
-    Rule(Match(title=["remote_left"]), group="remote_left"),
     Rule(Match(title=['nested', 'gscreenshot'],
                wm_class=['Guake.py', 'Exe', 'Onboard', 'Florence',
                          'Terminal', 'Gpaint', 'Kolourpaint', 'Wrapper',
@@ -59,7 +55,7 @@ dgroups_app_rules = [
     Rule(Match(wm_class=["Screenkey"]), float=True, intrusive=True),
     Rule(Match(wm_class=["rdesktop"]), group="14"),
     Rule(Match(wm_class=[".*VirtualBox.*"]), group="13"),
-]
+])
 
 
 def generate_groups(num_screens, keys):

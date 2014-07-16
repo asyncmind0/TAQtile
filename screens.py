@@ -3,6 +3,7 @@ from libqtile.command import lazy
 from libqtile import layout, bar, widget, hook
 from themes import current_theme
 from multiscreengroupbox import MultiScreenGroupBox
+from priority_notify import PriorityNotify
 import logging
 import system
 import gobject
@@ -121,6 +122,7 @@ def get_screens(num_monitors=1):
         gb1['left'] = "term2"
         gb1['remote_right'] = "remote_term1"
         gb1['remote_left'] = "remote_term2"
+        gb1['monitor'] = "monitor"
     else:
         # if primary and seconday are reversed
         if PRIMARY_SCREEN:
@@ -128,6 +130,7 @@ def get_screens(num_monitors=1):
             gb2['left'] = "term"
             gb1['remote_right'] = "remote_term"
             gb2['remote_left'] = "remote_term"
+            gb1['monitor'] = "monitor"
         else:
             gb1['left'] = "term"
             gb2['right'] = "term"
@@ -149,6 +152,7 @@ def get_screens(num_monitors=1):
         #widget.Sep(),
         #Pacman(**pacman_params),
         widget.DF(),
+        PriorityNotify(),
         #widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
         widget.TextBox("c:", padding=1 ),
         widget.CPUGraph(**cpugraph_params),

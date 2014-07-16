@@ -1,6 +1,4 @@
-from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
-from libqtile.command import lazy
-from libqtile import layout, bar, widget, hook
+from libqtile import widget
 import logging
 log = logging.getLogger("qtile.multiscreengroupbox")
 log.setLevel(logging.DEBUG)
