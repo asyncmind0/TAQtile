@@ -104,33 +104,33 @@ def get_keys(mod, groups, dgroups_app_rules):
         ([], "F10", lazy.function(SwitchGroup("4", 0))),
         ([], "F9", lazy.function(SwitchGroup("3", 0))),
 
-        ([], left_termkey, lazy.function(
+        (left_termkey[0], left_termkey[1], lazy.function(
             SwitchToWindowGroup(
                 groups, "left", title=[".*left.*"], cmd=terminal("left"),
                 wm_class=["InputOutput"], screen=PRIMARY_SCREEN,
                 dynamic_groups_rules=dgroups_app_rules))),
 
-        ([], right_termkey, lazy.function(
+        (right_termkey[0], right_termkey[0], lazy.function(
             SwitchToWindowGroup(
                 groups, "right", cmd=terminal("right"), title=[".*right.*"],
                 wm_class=["InputOutput"], screen=SECONDARY_SCREEN,
                 dynamic_groups_rules=dgroups_app_rules))),
 
-        ([mod], left_remote_termkey, lazy.function(
+        (left_remote_termkey[0], left_remote_termkey[1], lazy.function(
             SwitchToWindowGroup(
                 groups, "remote_left", cmd="st -t remote_left ",
                 screen=PRIMARY_SCREEN, title=[".*remote_left.*"],
                 wm_class=["InputOutput"],
                 dynamic_groups_rules=dgroups_app_rules))),
 
-        ([mod], right_remote_termkey, lazy.function(
+        (right_remote_termkey[0], right_remote_termkey[1], lazy.function(
             SwitchToWindowGroup(
                 groups, "remote_right", cmd="st -t remote_right ",
                 screen=SECONDARY_SCREEN, title=[".*remote_right.*"],
                 wm_class=["InputOutput"],
                 dynamic_groups_rules=dgroups_app_rules))),
 
-        ([], monitor_key, lazy.function(
+        (monitor_key[0], monitor_key[1] lazy.function(
             SwitchToWindowGroup(
                 groups, "monitor", cmd=terminal("monitor"),
                 title=[".*monitor.*"], screen=SECONDARY_SCREEN,
