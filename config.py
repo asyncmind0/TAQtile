@@ -3,11 +3,9 @@ from libqtile.config import Click, Drag
 from libqtile.command import lazy
 from libqtile import layout
 import logging
+import os
 
-logging.basicConfig(level=logging.DEBUG)
-logging.getLogger("qtile").setLevel(logging.WARN)
 log = logging.getLogger('qtile.config')
-log.setLevel(logging.DEBUG)
 
 from system import get_num_monitors
 num_monitors = get_num_monitors()
@@ -52,7 +50,6 @@ mouse = [
 
 groups = []
 float_windows = []
-main = None
 # follow_mouse_focus = True
 bring_front_click = False
 cursor_warp = False
@@ -69,3 +66,11 @@ groups = generate_groups(num_monitors, keys) + groups
 screens = get_screens(num_monitors)
 
 import hooks
+
+
+def main(self):
+    logging.basicConfig(
+        level=logging.DEBUG, filename=os.path.expanduser("~/.qtile.log"))
+    logging.getLogger("qtile").setLevel(logging.DEBUG)
+    logging.getLogger("qtile.themes").setLevel(logging.DEBUG)
+    logging.getLogger("qtile.config").setLevel(logging.DEBUG)
