@@ -1,7 +1,7 @@
 from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
 from libqtile.command import lazy
 from libqtile import layout, bar, widget, hook
-from themes import current_theme
+import themes
 from multiscreengroupbox import MultiScreenGroupBox
 from priority_notify import PriorityNotify
 import logging
@@ -48,6 +48,14 @@ class CalClock(widget.Clock):
         self.qtile.cmd_spawn("calendar_applet.py")
 
 
+class GraphHistory(widget.NetGraph):
+    default_store=None
+    def __init__(self, *args, **kwargs):
+        super(widget.NetGraph, self).__init__(*args, **kwargs)
+
+    def push(self, value):
+        return super(widget.NetGraph, self).push(value)
+
 #Pacman = widget.Pacman
 Pacman = ThreadedPacman
 #GroupBox = widget.GroupBox
@@ -59,37 +67,30 @@ def get_screens(num_monitors=1):
     screens = []
 
     def default_params(**kwargs):
-        de = dict(
-            font=current_theme['font'],
-            fontsize=10,
-            padding=1,
-            borderwidth=1,
-        )
+        de = dict(themes.current_theme)
         de.update(kwargs)
         return de
 
     groupbox_params = default_params(
         urgent_alert_method='text',
-        padding=1,
-        borderwidth=1,
+        #borderwidth=1,
         rounded=False,
         highlight_method='block',
-        this_current_screen_border=current_theme['border'])
+        this_current_screen_border=themes.current_theme['border'])
 
     prompt_params = default_params()
     systray_params = default_params()
-    layout_textbox_params = default_params(name="default", text="default config")
-    layout_textbox_params['padding'] = 2
+    current_layout_params= default_params(
+        name="default", padding=2)
     #windowname_params = default_params
     systray_params = default_params()
-    clock_params = default_params(fmt='%Y-%m-%d %a %H:%M')
+    clock_params = default_params(padding=2, fmt='%Y-%m-%d %a %H:%M')
     pacman_params = default_params()
     notify_params = default_params()
     bitcointicker_params = default_params()
     batteryicon_params = default_params()
     batteryicon_params['battery_name'] = "BAT1"
     batteryicon_params['format'] = "{percent:5.0%}"
-    current_layout_params = default_params(foreground=current_theme['foreground'])
     windowtabs_params = default_params(selected=("[", "]"))
     graph_defaults = {k[0]: k[1] for k in[
         ("graph_color", "18BAEB.6", "Graph color"),
@@ -113,6 +114,7 @@ def get_screens(num_monitors=1):
     memgraph_params['fill_color'] = "80FF00.3"
     memgraph_params['type'] = "linefill"
     netgraph_params = dict(graph_defaults)
+    sep_params = default_params(padding=2, fontsize=9, height_percent=60)
     #netgraph_params['fill_color'] = "80FF00.3"
 
     gb1 = dict([(str(i), str(i)) for i in range(1, 10)])
@@ -139,50 +141,50 @@ def get_screens(num_monitors=1):
 
     w1 = [
         GroupBox(namemap=gb1, **groupbox_params),
-        widget.Sep(),
+        widget.Sep(**sep_params),
         widget.Prompt(**prompt_params),
-        widget.Sep(),
+        widget.Sep(**sep_params),
         widget.WindowTabs(**windowtabs_params),
         #widget.WindowName(**windowname_params),
         #widget.TextBox(**layout_textbox_params),
-        widget.Sep(),
+        widget.Sep(**sep_params),
         widget.CurrentLayout(**current_layout_params),
-        widget.Sep(),
+        widget.Sep(**sep_params),
         #widget.BitcoinTicker(**bitcointicker_params),
-        #widget.Sep(),
+        #widget.Sep(**sep_params),
         #Pacman(**pacman_params),
-        widget.DF(),
-        PriorityNotify(),
+        widget.DF(**default_params()),
+        PriorityNotify(**default_params()),
         #widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
-        widget.TextBox("c:", padding=1 ),
+        widget.TextBox("c:", **default_params()),
         widget.CPUGraph(**cpugraph_params),
         #widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/media-flash-memory-stick.png"),
-        widget.TextBox("m:", padding=1 ),
+        widget.TextBox("m:", **default_params()),
         widget.MemoryGraph(**memgraph_params),
         #widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/network-wired.png"),
-        widget.TextBox("n:", padding=1 ),
+        widget.TextBox("n:", **default_params()),
         widget.NetGraph(**netgraph_params),
-        #widget.Sep(),
+        #widget.Sep(**sep_params),
         #widget.Notify(width=30, **notify_params),
-        widget.Sep()
+        widget.Sep(**sep_params)
     ]
     if system.get_hostconfig('battery'):
         w1.append(widget.Battery(**batteryicon_params))
-        w1.append(widget.Sep())
+        w1.append(widget.Sep(**sep_params))
     w1.append(widget.Systray(**systray_params))
     w1.append(CalClock(**clock_params))
 
     w2 = [
         GroupBox(namemap=gb2, **groupbox_params),
-        widget.Sep(),
+        widget.Sep(**sep_params),
         widget.WindowTabs(**windowtabs_params),
-        widget.Sep(),
+        widget.Sep(**sep_params),
         widget.CurrentLayout(**current_layout_params),
-        widget.Sep(),
+        widget.Sep(**sep_params),
         CalClock(**clock_params),
     ]
-
-    screens.append(Screen(bar.Bar(w1, 18)))
+    bar_height = 20
+    screens.append(Screen(bar.Bar(w1, bar_height)))
     if num_monitors > 1:
-        screens.append(Screen(bar.Bar(w2, 18)))
+        screens.append(Screen(bar.Bar(w2, bar_height)))
     return screens

@@ -1,13 +1,25 @@
-from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
+import logging
 from libqtile.command import lazy
-from libqtile import layout, bar, widget
+from libqtile.config import Key
 from extra import (SwitchToWindowGroup, check_restart,
                    terminal, MoveToOtherScreenGroup, SwitchGroup)
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
+from themes import current_theme
+
+
+log = logging.getLogger("qtile.themes")
 
 
 def get_keys(mod, groups, dgroups_app_rules):
+    dmenu_defaults = (
+        "-w -f -l 40 "
+        "-nb black -nf white "
+        "-sb '%(background)s' -sf '%(foreground)s' "
+        "-fn %(font)s"
+    ) % current_theme
+    #dmenu_defaults = dmenu_defaults.replace('#', '#')
+    log.debug(dmenu_defaults)
     is_laptop = get_hostconfig('laptop')
     left_termkey = get_hostconfig('left_termkey')
     right_termkey = get_hostconfig('right_termkey')
@@ -19,7 +31,7 @@ def get_keys(mod, groups, dgroups_app_rules):
         ([mod], "k",
          lazy.layout.up(),
          lazy.layout.previous().when('monadtall')),
-        ([mod], "j", 
+        ([mod], "j",
          lazy.layout.down(),
          lazy.layout.next().when('monadtall')),
 
@@ -27,17 +39,17 @@ def get_keys(mod, groups, dgroups_app_rules):
         ([mod, "shift"], "k", lazy.layout.shuffle_up()),
         ([mod, "shift"], "j", lazy.layout.shuffle_down()),
 
-        ([mod], "h", 
+        ([mod], "h",
          lazy.layout.up().when('monadtall'),
          lazy.layout.previous()),
-        ([mod], "l", 
+        ([mod], "l",
          lazy.layout.down().when('monadtall'),
          lazy.layout.next()),
 
-        ([mod, "shift"], "l", 
+        ([mod, "shift"], "l",
          lazy.layout.client_to_next().when('stack'),
          lazy.layout.increase_ratio().when('tile')),
-        ([mod, "shift"], "h", 
+        ([mod, "shift"], "h",
          lazy.layout.client_to_previous().when('stack'),
          lazy.layout.decrease_ratio().when('tile')),
 
@@ -77,7 +89,7 @@ def get_keys(mod, groups, dgroups_app_rules):
 
         # APP LAUNCHERS
         #([mod], "r", lazy.spawncmd()),
-        ([mod], "F2", lazy.spawn("dmenu_run -f -l 20")),
+        ([mod], "F2", lazy.spawn("dmenu_run %s" % dmenu_defaults)),
         ([mod], "r", lazy.spawncmd()),
         ([mod], "Return", lazy.spawn("st")),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
@@ -86,9 +98,10 @@ def get_keys(mod, groups, dgroups_app_rules):
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
-        ([], "F1",      lazy.function(SwitchGroup("1"))),
-        ([], "F2",      lazy.function(SwitchGroup("2"))),
-        ([], "F10",      lazy.function(SwitchGroup("4", 0))),
+        ([mod, "shift"], "F2", lazy.spawn("dmenu_xclip %s" % dmenu_defaults)),
+        ([], "F1", lazy.function(SwitchGroup("1"))),
+        ([], "F2", lazy.function(SwitchGroup("2"))),
+        ([], "F10", lazy.function(SwitchGroup("4", 0))),
         ([], "F9", lazy.function(SwitchGroup("3", 0))),
 
         ([], left_termkey, lazy.function(

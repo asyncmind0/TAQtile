@@ -10,19 +10,26 @@ import os
 
 log = logging.getLogger("qtile.themes")
 
+default_theme = dict(
+    fontsize=14,
+    padding=0,
+    borderwidth=1,
+    font="Inconsolata"
+)
+
 star_trek_blue = dict(
     border="#42B1FF",
     foreground="#06B4E7",
     background="#010F2C",
-    font="terminus"
 )
 
 matrix_green = dict(
     border="#00FD00",
     foreground="#00FD00",
     background="#125B29",
-    font="terminus"
 )
 
-current_theme = star_trek_blue
-current_theme = matrix_green
+current_theme = dict(default_theme)
+current_theme.update(star_trek_blue)
+log.debug("Current theme:%s", current_theme)
+#current_theme = matrix_green
