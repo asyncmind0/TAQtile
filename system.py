@@ -3,7 +3,7 @@
 import platform
 import subprocess
 import logging
-from config import mod
+mod= "mod4"
 
 log = logging.getLogger('qtile.config')
 common_autostart = {
@@ -40,7 +40,7 @@ platform_specific = {
         'screens': {0: 0, 1: 1},
         'battery': False,
         'laptop': False,
-        'autostart-once': common_autostart,
+        'autostart-once': {}, # common_autostart,
         'screen_preferences': {},
         'left_termkey': ([], "XF86Launch5"),
         'right_termkey': ([], "XF86Launch6"),

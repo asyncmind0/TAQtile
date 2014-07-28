@@ -21,10 +21,10 @@ border_args = dict(
 
 # layout map to restrict availiable layouts for a group
 layout_map = {
-    3: {'name': "slice", 'layouts': [
-        # a layout for pidgin
-        layout.Slice('right', 256, role='buddy_list',
-                     fallback=layout.Stack(num_stacks=1, **border_args))]},
+    #3: {'name': "slice", 'layouts': [
+    #    # a layout for pidgin
+    #    layout.Slice('right', 256, role='buddy_list',
+    #                 fallback=layout.Stack(num_stacks=1, **border_args))]},
     6: {'name': "slice", 'layouts': [
         # a layout for hangouts
         layout.Slice('right', 356, wname="Hangouts",

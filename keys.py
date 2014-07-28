@@ -110,7 +110,7 @@ def get_keys(mod, groups, dgroups_app_rules):
                 wm_class=["InputOutput"], screen=PRIMARY_SCREEN,
                 dynamic_groups_rules=dgroups_app_rules))),
 
-        (right_termkey[0], right_termkey[0], lazy.function(
+        (right_termkey[0], right_termkey[1], lazy.function(
             SwitchToWindowGroup(
                 groups, "right", cmd=terminal("right"), title=[".*right.*"],
                 wm_class=["InputOutput"], screen=SECONDARY_SCREEN,
@@ -130,7 +130,7 @@ def get_keys(mod, groups, dgroups_app_rules):
                 wm_class=["InputOutput"],
                 dynamic_groups_rules=dgroups_app_rules))),
 
-        (monitor_key[0], monitor_key[1] lazy.function(
+        (monitor_key[0], monitor_key[1], lazy.function(
             SwitchToWindowGroup(
                 groups, "monitor", cmd=terminal("monitor"),
                 title=[".*monitor.*"], screen=SECONDARY_SCREEN,

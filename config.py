@@ -7,6 +7,7 @@ import os
 
 log = logging.getLogger('qtile.config')
 
+mod = "mod4"
 from system import get_num_monitors
 num_monitors = get_num_monitors()
 log.debug("Num Desktops:%s", num_monitors)
@@ -37,7 +38,6 @@ floating_layout = layout.Floating(auto_float_types=[
     "Screenkey",
 ])
 
-mod = "mod4"
 
 # This allows you to drag windows around with the mouse if you want.
 mouse = [
@@ -71,6 +71,6 @@ import hooks
 def main(self):
     logging.basicConfig(
         level=logging.DEBUG, filename=os.path.expanduser("~/.qtile.log"))
-    logging.getLogger("qtile").setLevel(logging.DEBUG)
+    #logging.getLogger("qtile").setLevel(logging.DEBUG)
     logging.getLogger("qtile.themes").setLevel(logging.DEBUG)
     logging.getLogger("qtile.config").setLevel(logging.DEBUG)
