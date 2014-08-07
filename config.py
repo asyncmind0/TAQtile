@@ -62,7 +62,7 @@ from groups import generate_groups
 from keys import get_keys
 
 keys = get_keys(mod, groups, dgroups_app_rules)
-groups = generate_groups(num_monitors, keys) + groups
+groups = generate_groups(num_monitors, keys, dgroups_app_rules) + groups
 screens = get_screens(num_monitors)
 
 import hooks
