@@ -2,24 +2,16 @@ import logging
 from libqtile.command import lazy
 from libqtile.config import Key
 from extra import (SwitchToWindowGroup, check_restart,
-                   terminal, MoveToOtherScreenGroup, SwitchGroup)
+                   terminal, MoveToOtherScreenGroup, SwitchGroup,
+                   RaiseWindowOrSpawn, list_windows)
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
-from themes import current_theme
-
-
-log = logging.getLogger("qtile.themes")
+from themes import current_theme, dmenu_defaults
 
 
 def get_keys(mod, groups, dgroups_app_rules):
-    dmenu_defaults = (
-        "-w -f -l 40 "
-        "-nb black -nf white "
-        "-sb '%(background)s' -sf '%(foreground)s' "
-        "-fn %(font)s"
-    ) % current_theme
     #dmenu_defaults = dmenu_defaults.replace('#', '#')
-    log.debug(dmenu_defaults)
+    logging.debug(dmenu_defaults)
     is_laptop = get_hostconfig('laptop')
     left_termkey = get_hostconfig('left_termkey')
     right_termkey = get_hostconfig('right_termkey')
@@ -28,13 +20,27 @@ def get_keys(mod, groups, dgroups_app_rules):
     monitor_key = get_hostconfig('monitor_key')
     keys = [
         # Switch between windows in current stack pane
-        ([mod], "k",
-         lazy.layout.up(),
-         lazy.layout.previous().when('monadtall')),
-        ([mod], "j",
-         lazy.layout.down(),
-         lazy.layout.next().when('monadtall')),
+        (
+            [mod], "k",
+            lazy.layout.up().when('stack'),
+            lazy.layout.up().when('max'),
+            lazy.layout.up().when('tile'),
+            lazy.layout.up().when('slice'),
+            lazy.layout.previous().when('monadtall'),
+            #lazy.layout.previous().when(when_floating=True)
+        ),
+        (
+            [mod], "j",
+            lazy.layout.down().when('stack'),
+            lazy.layout.down().when('max'),
+            lazy.layout.down().when('tile'),
+            lazy.layout.down().when('slice'),
+            lazy.layout.next().when('monadtall'),
+            #lazy.layout.next().when(when_floating=True)
+        ),
 
+        #([mod], "k", lazy.layout.up()),
+        #([mod], "j", lazy.layout.down()),
         # Move windows up or down in current stack
         ([mod, "shift"], "k", lazy.layout.shuffle_up()),
         ([mod, "shift"], "j", lazy.layout.shuffle_down()),
@@ -55,6 +61,10 @@ def get_keys(mod, groups, dgroups_app_rules):
 
         ([mod, "shift"], "space", lazy.layout.flip().when('monadtall'),
          lazy.layout.rotate().when('tile')),
+        ([mod, "shift"], "Left", lazy.window.move_floating(-5, 0, 0, 0)),
+        ([mod, "shift"], "Right", lazy.window.move_floating(5, 0, 0, 0)),
+        ([mod, "shift"], "Up", lazy.window.move_floating(0, -5, 0, 0)),
+        ([mod, "shift"], "Down", lazy.window.move_floating(0, 5, 0, 0)),
 
         # Swap panes of split stack
         # toggle between windows just like in unity with 'alt+tab'
@@ -70,6 +80,7 @@ def get_keys(mod, groups, dgroups_app_rules):
         # multiple stack panes
         ([mod, "shift"], "Return", lazy.layout.toggle_split()),
         (["shift", mod], "q", lazy.shutdown()),
+        ([mod, 'control'], 'q', lazy.spawn('dmenu-session')),
         # Toggle between different layouts as defined below
         ([mod], "space",    lazy.nextlayout()),
         ([mod], "q",      lazy.window.kill()),
@@ -90,6 +101,7 @@ def get_keys(mod, groups, dgroups_app_rules):
         # APP LAUNCHERS
         #([mod], "r", lazy.spawncmd()),
         ([mod], "F2", lazy.spawn("dmenu_run %s" % dmenu_defaults)),
+        ([mod], "F3", lazy.function(list_windows)),
         ([mod], "r", lazy.spawncmd()),
         ([mod], "Return", lazy.spawn("st")),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
@@ -99,6 +111,8 @@ def get_keys(mod, groups, dgroups_app_rules):
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
         ([mod, "shift"], "F2", lazy.spawn("dmenu_xclip %s" % dmenu_defaults)),
+        
+        # Switch groups
         ([], "F1", lazy.function(SwitchGroup("1"))),
         ([], "F2", lazy.function(SwitchGroup("2"))),
         ([], "F10", lazy.function(SwitchGroup("4", 0))),
@@ -136,7 +150,14 @@ def get_keys(mod, groups, dgroups_app_rules):
                 title=[".*monitor.*"], screen=SECONDARY_SCREEN,
                 wm_class=["InputOutput"],
                 dynamic_groups_rules=dgroups_app_rules))),
+        ([], "XF86LaunchA", lazy.function(
+            RaiseWindowOrSpawn(
+                wmname='tail', cmd='st -t tail -e sudo journalctl -xf',
+                cmd_match="st -t tail", floating=True,
+                toggle=True,
+                static=[0, 100, 100, 500, 200]))),
     ]
+
     laptop_keys = [
         # laptop keys
         ([], "XF86MonBrightnessUp", lazy.spawn("sudo samctl.py -s up")),
@@ -145,6 +166,9 @@ def get_keys(mod, groups, dgroups_app_rules):
         ([], "XF86KbdBrightnessUp", lazy.spawn("sudo samctl.py -k up")),
         ([], "XF86KbdBrightnessDown", lazy.spawn(
             "sudo samctl.py -k down")),
+        # Media controls
+        ([], "XF86AudioMute", lazy.function(RaiseWindowOrSpawn(wmclass='Pavucontrol', cmd='pavucontrol'))),
+        #([], "XF86AudioMute", lazy.spawn("pavucontrol")),
         ([], "XF86AudioLowerVolume", lazy.spawn("sudo samctl.py -k up")),
         ([], "XF86AudioRaiseVolume", lazy.spawn(
             "sudo samctl.py -v down")),

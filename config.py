@@ -2,23 +2,24 @@
 from libqtile.config import Click, Drag
 from libqtile.command import lazy
 from libqtile import layout
-import logging
 import os
-
-log = logging.getLogger('qtile.config')
+import logging
+logging.basicConfig(
+    level=logging.DEBUG, filename=os.path.expanduser("~/.qtile.log"))
 
 mod = "mod4"
 from system import get_num_monitors
 num_monitors = get_num_monitors()
-log.debug("Num Desktops:%s", num_monitors)
+logging.debug("Num Desktops:%s", num_monitors)
 
+from themes import current_theme
 
 layouts = [
-    layout.Max(),
-    layout.Stack(),
-    layout.xmonad.MonadTall(ratio=0.50),
-    layout.Tile(),
-    layout.Zoomy(),
+    layout.Max(**current_theme),
+    layout.Stack(**current_theme),
+    layout.xmonad.MonadTall(ratio=0.50, **current_theme),
+    layout.Tile(**current_theme),
+    layout.Zoomy(**current_theme),
     # layout.TreeTab(),
     # a layout just for gimp
     # layout.Slice('left', 192, name='gimp', role='gimp-toolbox',
@@ -36,7 +37,7 @@ floating_layout = layout.Floating(auto_float_types=[
     "splash",
     'dialog',  # this has to be here else dialogs go to new group
     "Screenkey",
-])
+], **current_theme)
 
 
 # This allows you to drag windows around with the mouse if you want.
@@ -49,7 +50,7 @@ mouse = [
 ]
 
 groups = []
-float_windows = []
+float_windows = ['buddy_list', ]
 # follow_mouse_focus = True
 bring_front_click = False
 cursor_warp = False
@@ -69,8 +70,4 @@ import hooks
 
 
 def main(self):
-    logging.basicConfig(
-        level=logging.DEBUG, filename=os.path.expanduser("~/.qtile.log"))
-    #logging.getLogger("qtile").setLevel(logging.DEBUG)
-    logging.getLogger("qtile.themes").setLevel(logging.DEBUG)
-    logging.getLogger("qtile.config").setLevel(logging.DEBUG)
+    pass

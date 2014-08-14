@@ -2,10 +2,9 @@
 """
 import platform
 import subprocess
-import logging
+import logging as log
 mod= "mod4"
 
-log = logging.getLogger('qtile.config')
 common_autostart = {
     'parcellite': None,
     'bluetooth-applet': None,
@@ -80,18 +79,22 @@ def get_num_monitors():
     #    height = values[1]
     #    print "Width:" + width + ",height:" + height
 
-def execute_once(process, process_filter=None):
+def execute_once(process, process_filter=None, qtile=None):
     cmd = process.split()
     process_filter = process_filter or cmd[0]
+    pid = None
     try:
         pid = subprocess.check_output(
-            ["pidof", "-s", "-x", process_filter])
+            ["pgrep", "-f", process_filter])
     except Exception as e:
         log.exception("CalledProcessError")
     if not pid:
         # spawn the process using a shell command with subprocess.Popen
         log.debug("Starting: %s", cmd)
-        pid = subprocess.Popen(
-            process, shell=True, close_fds=True,
-            stdin=subprocess.PIPE).pid
+        if qtile:
+            qtile.cmd_spawn(process)
+        else:
+            pid = subprocess.Popen(
+                process, shell=True, close_fds=True,
+                stdin=subprocess.PIPE).pid
         log.debug("Started: %s: %s", cmd, pid)

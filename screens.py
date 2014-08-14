@@ -4,13 +4,11 @@ from libqtile import layout, bar, widget, hook
 import themes
 from multiscreengroupbox import MultiScreenGroupBox
 from priority_notify import PriorityNotify
-import logging
+import logging as log
 import system
 import gobject
 import threading
 import subprocess
-log = logging.getLogger("qtile.screen")
-log.setLevel(logging.DEBUG)
 
 
 PRIMARY_SCREEN = system.get_screen(0)

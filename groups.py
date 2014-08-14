@@ -11,24 +11,23 @@ import logging
 import os
 import re
 from config import layouts, mod, dgroups_app_rules
+from themes import current_theme
 
 log = logging.getLogger('qtile.config')
 
 dgroups_key_binder = None
 
-border_args = dict(
-    border_width=1,)
 
 # layout map to restrict availiable layouts for a group
 layout_map = {
-    #3: {'name': "slice", 'layouts': [
-    #    # a layout for pidgin
-    #    layout.Slice('right', 256, role='buddy_list',
-    #                 fallback=layout.Stack(num_stacks=1, **border_args))]},
+    3: {'name': "slice", 'layouts': [
+        # a layout for pidgin
+        layout.Slice('right', 256, role='buddy_list',
+                     fallback=layout.Tile(**current_theme))]},
     6: {'name': "slice", 'layouts': [
         # a layout for hangouts
         layout.Slice('right', 356, wname="Hangouts",
-                     fallback=layout.Tile(**border_args))]},
+                     fallback=layout.Tile(**current_theme))]},
     # fallback=layout.Stack(num_stacks=2, **border_args))]},
     -1: {'name': "max", 'layouts': layouts}
 }
