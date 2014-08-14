@@ -1,6 +1,6 @@
 from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
 from libqtile.command import lazy, CommandObject
-from libqtile import layout, bar, widget, hook
+from libqtile import layout, bar, widget, hook, window
 
 from system import get_hostconfig, get_num_monitors, execute_once
 from screens import get_screens, PRIMARY_SCREEN, SECONDARY_SCREEN
@@ -104,56 +104,14 @@ def move_windows_multimonitor(window):
                     window.togroup(str(win_group+10))
 
 
-@hook.subscribe.client_managed
-def dialogs(window):
-    window_rules = [
-        {
-            'wmclass': "Google-chrome-stable",
-            'wmrole': "pop-up",
-            'wmname': r"^Developer.*",
-            'wm_icon_name': r"^Developer.*",
-            'action': ['togroup', '16'],
-            'exclusive': True
-        },
-        {
-            'wmclass': "google-chrome-stable",
-            'wmrole': "pop-up",
-            'wmname': r"^(?!Developer).*",
-            'action': [],
-            'exclusive': True
-        },
-        {
-            'wmclass': "Google-chrome-stable",
-            'wmrole': "pop-up",
-            'wmname': r"^(?!Developer).*",
-            'action': ['togroup', '6'],
-            'exclusive': False
-        },
-    ]
+@hook.subscribe.window_name_change
+def change_name():
     try:
-        window_icon_name = window.get_wm_icon_name() if hasattr(window, 'get_wm_icon_name') else ''
-        window_class = window.get_wm_class() if hasattr(window, 'get_wm_class') else ''
-        window_class = window_class[0] if window_class else ''
-        window_role = window.get_wm_role() if hasattr(window, 'get_wm_role') else ''
-        for rule in window_rules:
-            #log.debug("'%s':'%s'", rule['wmname'], window.cmd_inspect())
-            if rule['wmclass'] in window_class \
-               and rule['wmrole'] == window_role\
-               and re.match(rule['wmname'], window.name):
-                if 'wm_icon_name' in rule:
-                    if not re.match(rule['wm_icon_name'],
-                                    window_icon_name):
-                        continue
-                action = rule['action']
-                try:
-                    getattr(window, action.pop(0))(*action)
-                except Exception as e:
-                    log.exception("Action failed, %s", rule)
-                if rule.get('exclusive', False):
-                    #log.debug("%s matched exclusive %s", window.name, rule)
-                    break
-    except:
-        log.exception("Error rule matching.")
-
-    if should_be_floating(window):
-        window.floating = True
+        windows = [
+            i for i in hook.qtile.windowMap.values()
+            if not isinstance(i, window.Internal)]
+        for win in windows:
+            if hasattr(win, 'defunct'):
+                hook.qtile.dgroups._add(win)
+    except Exception as e:
+        log.exception("change_name")
