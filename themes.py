@@ -28,6 +28,7 @@ matrix_green = dict(
     foreground="#00FD00",
     background="#125B29",
     borderwidth=2,
+    bar_height=18
 )
 
 current_theme = dict(default_theme)

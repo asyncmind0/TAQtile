@@ -71,9 +71,9 @@ def get_screens(num_monitors=1):
 
     groupbox_params = default_params(
         urgent_alert_method='text',
-        #borderwidth=1,
         rounded=False,
         highlight_method='block',
+        padding=-1,
         this_current_screen_border=themes.current_theme['border'])
 
     prompt_params = default_params()
@@ -130,12 +130,13 @@ def get_screens(num_monitors=1):
             gb2['left'] = "term"
             gb1['remote_right'] = "remote_term"
             gb2['remote_left'] = "remote_term"
-            gb1['monitor'] = "monitor"
         else:
             gb1['left'] = "term"
             gb2['right'] = "term"
             gb1['remote_left'] = "remote_term"
+            gb2['monitor'] = "monitor"
             gb2['remote_right'] = "remote_term"
+    gb1['comm'] = "comm"
 
     w1 = [
         GroupBox(namemap=gb1, **groupbox_params),
@@ -181,7 +182,7 @@ def get_screens(num_monitors=1):
         widget.Sep(**sep_params),
         CalClock(**clock_params),
     ]
-    bar_height = 20
+    bar_height = groupbox_params.get('bar_height', 10)
     screens.append(Screen(bar.Bar(w1, bar_height)))
     if num_monitors > 1:
         screens.append(Screen(bar.Bar(w2, bar_height)))
