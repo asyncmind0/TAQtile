@@ -6,12 +6,11 @@ import logging as log
 mod= "mod4"
 
 common_autostart = {
-    'parcellite': None,
-    'bluetooth-applet': None,
-    #'nitrogen --restore': None,
+    'klipper': None,
     'xscreensaver -nosplash': None,
-    'dropboxd': 'dropbox',
+    'dropbox start': 'dropbox',
     'insync start': 'insync',
+    'bluedevil-monolithic': 'bluedevil-monol'
 }
 
 laptop_autostart = dict(common_autostart)
@@ -39,7 +38,7 @@ platform_specific = {
         'screens': {0: 0, 1: 1},
         'battery': False,
         'laptop': False,
-        'autostart-once': {}, # common_autostart,
+        'autostart-once': common_autostart,
         'screen_preferences': {},
         'left_termkey': ([], "XF86Launch5"),
         'right_termkey': ([], "XF86Launch6"),
