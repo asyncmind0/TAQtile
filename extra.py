@@ -101,7 +101,7 @@ class SwitchToWindowGroup(object):
 class RaiseWindowOrSpawn(object):
     def __init__(
             self, wmclass=None, wmname=None, cmd=None, cmd_match=None,
-            floating=False, static=False, toggle=False):
+            floating=False, static=False, toggle=False, alpha=0.7):
         self.wmname = wmname
         self.cmd = cmd
         self.cmd_match = cmd_match
@@ -109,27 +109,38 @@ class RaiseWindowOrSpawn(object):
         self.floating = floating
         self.static = static
         self.toggle = toggle
+        self.window = None
+        self.alpha = 0.7
         if wmname:
             from config import float_windows
             float_windows.append(wmname)
 
-
     def __call__(self, qtile):
-        logging.error(qtile.currentGroup.name)
-        for i in range(2):
-            for window in qtile.windowMap.values():
-                if window.group and window.match(
-                        wname=self.wmname, wmclass=self.wmclass):
-                    #window.cmd_to_screen(qtile.currentScreen.index)
-                    window.cmd_togroup(qtile.currentGroup.name)
-                    window.floating = self.floating
-                    if self.static and isinstance(self.static, list):
-                        window.cmd_static(*self.static)
-                    if self.toggle:
-                        window.kill()
-                    return True
-            #qtile.cmd_spawn(self.cmd)
-            execute_once(self.cmd, self.cmd_match, qtile=qtile)
+
+        for window in qtile.windowMap.values():
+            if window.group and window.match(
+                    wname=self.wmname, wmclass=self.wmclass):
+                #window.cmd_to_screen(qtile.currentScreen.index)
+                logging.debug("Match: %s", self.wmname)
+                #window.cmd_togroup(qtile.currentGroup.name)
+                self.window = window
+                break
+        
+        if self.window:
+            window = self.window
+            if self.static and isinstance(self.static, list):
+                window.cmd_static(*self.static)
+            elif self.floating:
+                window.floating = self.floating
+            if self.toggle or True:
+                if window.hidden:
+                    window.unhide()
+                else:
+                    window.hide()
+            logging.error("Hidden: %s %s", window.hidden, window.window.wid)
+            execute_once("transet-df %s -i %s" % (self.alpha, window.window.wid))
+        logging.error("Current group: %s",qtile.currentGroup.name)
+        execute_once(self.cmd, self.cmd_match, qtile=qtile)
 
 
 def check_restart(qtile):
