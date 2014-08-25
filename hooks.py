@@ -61,7 +61,8 @@ def should_be_floating(w):
     for floating in float_windows:
         if w.match(wname=floating, wmclass=floating, role=floating):
             return True
-    return w.window.get_wm_type() == 'dialog' or bool(w.window.get_wm_transient_for())
+    return w.window.get_wm_type() == 'dialog' or bool(
+        w.window.get_wm_transient_for())
 
 
 @hook.subscribe.startup
@@ -98,10 +99,13 @@ def move_windows_multimonitor(window):
         for rule in pref:
             if hasattr(window, 'match') and window.match(**rule):
                 log.debug(window.group)
-                win_group = int(window.group.name)
-                # TODO handle cases for more than 2 monitors
-                if win_group < 10 and num_monitors > 1 and screenno > 1:
-                    window.togroup(str(win_group+10))
+                try:
+                    win_group = int(window.group.name)
+                    # TODO handle cases for more than 2 monitors
+                    if win_group < 10 and num_monitors > 1 and screenno > 1:
+                        window.togroup(str(win_group+10))
+                except ValueError as e:
+                    log.debug("not an integer group")
 
 
 @hook.subscribe.window_name_change
