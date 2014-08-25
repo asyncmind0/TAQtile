@@ -53,15 +53,20 @@ def generate_groups(num_screens, keys, dgroups_app_rules):
         # floating windows
         Rule(Match(wm_class=["Pavucontrol", 'Wine', 'Xephyr', "Gmrun"]),
              float=True),
-        Rule(Match(wm_class=["Kmail"]), group="4"),
+        Rule(Match(role=[re.compile("^kmail-mainwindow.*")]), group="mail",
+             break_on_match=True),
+        Rule(Match(wm_class=["Kmail"]), group="mail", float=False,
+             break_on_match=True),
         Rule(Match(wm_class=["Pidgin"]), group="3", float=False),
         Rule(Match(wm_class=["KeePass2"]), float=True),
         Rule(Match(wm_class=["Kruler"]), float=True),
         Rule(Match(wm_class=["Screenkey"]), float=True, intrusive=True),
         Rule(Match(wm_class=["rdesktop"]), group="14"),
         Rule(Match(wm_class=[re.compile(r".*VirtualBox.*")]), group="13"),
-        Rule(Match(title=[re.compile(
-            r".*wealth management support.*", re.I)]), group="11"),
+        Rule(Match(title=[
+            re.compile(r".*iress development.*conkeror$", re.I),
+            re.compile(r".*wealth management support.*conkeror$", re.I),
+        ]), group="11"),
         #Rule(Match(wm_class=["Conkeror"]), group="2"),
     ])
 
