@@ -169,9 +169,8 @@ def get_keys(mod, groups, dgroups_app_rules):
         # Media controls
         ([], "XF86AudioMute", lazy.function(RaiseWindowOrSpawn(wmclass='Pavucontrol', cmd='pavucontrol'))),
         #([], "XF86AudioMute", lazy.spawn("pavucontrol")),
-        ([], "XF86AudioLowerVolume", lazy.spawn("sudo samctl.py -k up")),
-        ([], "XF86AudioRaiseVolume", lazy.spawn(
-            "sudo samctl.py -v down")),
+        ([], "XF86AudioLowerVolume", lazy.spawn("samctl.py -k up")),
+        ([], "XF86AudioRaiseVolume", lazy.spawn("samctl.py -v down")),
         ([], "XF86WLAN", lazy.spawn(
             "nmcli con up id Xperia\ Z1\ Network --nowait")),
     ]
