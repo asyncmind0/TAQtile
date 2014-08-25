@@ -18,10 +18,11 @@ all_desktops = ['tail',]
 @hook.subscribe.setgroup
 def move_special_windows():
     for name in all_desktops:
-        for window in hook.qtile.windowMap.values():
-            if window.group and (window.match(
-                    wname=name) or window.name == name):
-                window.cmd_togroup(hook.qtile.currentGroup.name)
+        for w in hook.qtile.windowMap.values():
+            if w.group and (
+                    w.match(wname=name)
+                    or (hasattr(window,'name') and window.name == name)):
+                w.cmd_togroup(hook.qtile.currentGroup.name)
 
 
 @hook.subscribe.screen_change
@@ -82,13 +83,18 @@ def dbus_register():
 
 @hook.subscribe.client_new
 def new_client(client):
-    window_class = client.window.get_wm_class()[0]
-    window_type = client.get_wm_type() if hasattr(client, 'get_wm_type') else ''
-    if window_class in [
-            "screenkey", "kruler"]:
-        client.static(0)
-    if window_class == "screenkey" and window_type != 'dialog':
-        client.place(100, 100, 800, 50, 2, 2, 'green')
+    try:
+        window_class = client.window.get_wm_class()[0]
+        window_type = client.get_wm_type() if hasattr(client, 'get_wm_type') else ''
+        if window_class in [
+                "screenkey", "kruler"]:
+            client.static(0)
+        if window_class == "screenkey" and window_type != 'dialog':
+            client.place(100, 100, 800, 50, 2, 2, 'green')
+        log.debug(window_class)
+        log.debug(window_type)
+    except Exception as e:
+        log.exception("client_new hook")
 
 
 @hook.subscribe.client_managed
@@ -102,6 +108,9 @@ def move_windows_multimonitor(window):
                 # TODO handle cases for more than 2 monitors
                 if win_group < 10 and num_monitors > 1 and screenno > 1:
                     window.togroup(str(win_group+10))
+    #if should_be_floating(window.window):
+    #    window.window.floating = True
+
 
 
 @hook.subscribe.window_name_change
