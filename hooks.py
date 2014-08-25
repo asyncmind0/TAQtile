@@ -9,11 +9,13 @@ from config import float_windows, num_monitors
 import logging as log
 import os
 import re
+import signal
 
 event_cntr = 2
 prev_timestamp = 0
-
+initial_num_mons = get_num_monitors()
 all_desktops = ['tail',]
+
 
 @hook.subscribe.setgroup
 def move_special_windows():
@@ -26,15 +28,17 @@ def move_special_windows():
 
 @hook.subscribe.screen_change
 def restart_on_randr(qtile, ev):
-    log.debug(ev.__dict__)
+    log.debug("Screen change: %s", ev.__dict__)
     global event_cntr, prev_timestamp
     cur_timestamp = ev.timestamp
-    if abs(prev_timestamp - cur_timestamp) > 1000:
-        #if num_screens != get_num_monitors():
-        import signal
+    num_mons = get_num_monitors()
+    if abs(prev_timestamp - cur_timestamp) > 1000 \
+       and num_mons != initial_num_mons:
+        # if num_screens != get_num_monitors():
         signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         log.debug("RESTART screen change")
-        #qtile.cmd_restart()
+        prev_num_mons = num_mons
+        qtile.cmd_restart()
     else:
         prev_timestamp = cur_timestamp
 
@@ -42,12 +46,11 @@ def restart_on_randr(qtile, ev):
 @hook.subscribe.startup
 def startup():
     # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
-    import signal
     signal.signal(signal.SIGCHLD, signal.SIG_IGN)
     commands = get_hostconfig('autostart-once')
     num_mons = get_num_monitors()
     log.debug("Num MONS:%s", num_mons)
-    #log.debug("Num DeSKTOPS:%s", len(qtile.screens))
+    # log.debug("Num DeSKTOPS:%s", len(qtile.screens))
     if num_mons > 1:
         commands[os.path.expanduser("dualmonitor")] = None
     elif num_mons == 1:
