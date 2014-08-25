@@ -137,6 +137,7 @@ def get_screens(num_monitors=1):
             gb2['monitor'] = "monitor"
             gb2['remote_right'] = "remote_term"
     gb1['comm'] = "comm"
+    gb1['mail'] = "mail"
 
     w1 = [
         GroupBox(namemap=gb1, **groupbox_params),

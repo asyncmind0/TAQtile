@@ -2,10 +2,10 @@
 from libqtile.config import Click, Drag
 from libqtile.command import lazy
 from libqtile import layout
+from libqtile.log_utils import init_log
 import os
 import logging
-logging.basicConfig(
-    level=logging.DEBUG, filename=os.path.expanduser("~/.qtile.log"))
+init_log(log_level=logging.DEBUG, log_path=os.path.expanduser("~/.qtile.log"))
 
 mod = "mod4"
 from system import get_num_monitors
