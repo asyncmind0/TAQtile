@@ -28,11 +28,11 @@ platform_specific = {
                 {"wmclass": "Navigator"}],
             1: []
         },
-        'left_termkey': ([], "F11"),
-        'right_termkey': ([], "F12"),
-        'left_remote_termkey': ([mod], "F11"),
-        'right_remote_termkey': ([mod], "F12"),
-        'monitor_key': ([], "XF86Eject"),
+        'left_termkey': [([], "F11")],
+        'right_termkey': [([], "F12")],
+        'left_remote_termkey': [([mod], "F11")],
+        'right_remote_termkey': [([mod], "F12")],
+        'monitor_key': [([], "XF86Eject"), ([], 'Menu')],
     },
     'sydsjoseph-pc1': {
         'screens': {0: 0, 1: 1},
@@ -40,11 +40,11 @@ platform_specific = {
         'laptop': False,
         'autostart-once': common_autostart,
         'screen_preferences': {},
-        'left_termkey': ([], "XF86Launch5"),
-        'right_termkey': ([], "XF86Launch6"),
-        'left_remote_termkey': ([], "XF86Launch9"),
-        'right_remote_termkey': ([], "F19"),
-        'monitor_key': ([], "XF86Eject"),
+        'left_termkey': [([], "XF86Launch5")],
+        'right_termkey': [([], "XF86Launch6")],
+        'left_remote_termkey': [([], "XF86Launch9")],
+        'right_remote_termkey': [([], "F19")],
+        'monitor_key': [([], "XF86Eject")],
     }
 }
 

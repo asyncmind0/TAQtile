@@ -5,7 +5,6 @@ from libqtile import layout
 from libqtile.log_utils import init_log
 import os
 import logging
-init_log(log_level=logging.DEBUG, log_path=os.path.expanduser("~/.qtile.log"))
 
 mod = "mod4"
 from system import get_num_monitors
