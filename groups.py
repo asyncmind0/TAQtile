@@ -50,9 +50,10 @@ def generate_groups(num_screens, keys, dgroups_app_rules, mod, layouts):
         # floating windows
         Rule(Match(wm_class=["Pavucontrol", 'Wine', 'Xephyr', "Gmrun"]),
              float=True),
-        Rule(Match(role=[re.compile("^kmail-mainwindow.*")]), group="mail",
+        Rule(Match(role=[re.compile("^kmail-mainwindow.*"),
+                         re.compile("^kontact-mainwindow.*")]), group="mail",
              break_on_match=True),
-        Rule(Match(wm_class=["Kmail"]), group="mail", float=False,
+        Rule(Match(wm_class=["Kmail", "Kontact"]), group="mail", float=False,
              break_on_match=True),
         Rule(Match(wm_class=["Pidgin"]), group="3", float=False),
         Rule(Match(wm_class=["KeePass2"]), float=True),

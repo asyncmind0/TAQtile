@@ -122,8 +122,8 @@ def get_keys(mod, groups, dgroups_app_rules):
         #([], "F10", lazy.function(SwitchGroup("4", 0))),
         ([], "F10", lazy.function(
             SwitchToWindowGroup(
-                groups, "mail", title=[".*mail.*"], cmd="kmail",
-                wm_class=["kmail"], screen=PRIMARY_SCREEN,
+                groups, "mail", title=[".*mail.*"], cmd="kontact",
+                wm_class=["kontact"], screen=PRIMARY_SCREEN,
                 dynamic_groups_rules=dgroups_app_rules))),
         ([], "F9", lazy.function(
             SwitchToWindowGroup(
