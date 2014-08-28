@@ -1,9 +1,10 @@
-from libqtile.config import Group, Match, Rule
-import logging
-import subprocess
-from py_compile import compile
-import os
 import glob
+import logging
+import os
+from py_compile import compile
+
+from libqtile.config import Group, Match, Rule
+
 from system import execute_once
 
 

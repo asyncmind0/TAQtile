@@ -1,39 +1,36 @@
-from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
-from libqtile.command import lazy, CommandObject
-from libqtile import layout, bar, widget, hook
-
-from extra import (SwitchToWindowGroup, check_restart, terminal,
-                   SwitchGroup, MoveToGroup)
-from system import get_hostconfig, execute_once
-from screens import get_screens, PRIMARY_SCREEN, SECONDARY_SCREEN
-from keys import get_keys
 import logging
-import os
 import re
-from config import layouts, mod
+
+from libqtile import layout
+from libqtile.command import lazy
+from libqtile.config import Key, Group, Match, Rule
+
+from extra import SwitchGroup, MoveToGroup
+from system import get_num_monitors
 from themes import current_theme
+
 
 log = logging.getLogger('qtile.config')
 
 dgroups_key_binder = None
 
-
-# layout map to restrict availiable layouts for a group
-layout_map = {
-    3: {'name': "slice", 'layouts': [
-        # a layout for pidgin
-        layout.Slice('right', 256, role='buddy_list',
-                     fallback=layout.Tile(**current_theme))]},
-    6: {'name': "slice", 'layouts': [
-        # a layout for hangouts
-        layout.Slice('right', 356, wname="Hangouts",
-                     fallback=layout.Tile(**current_theme))]},
-    # fallback=layout.Stack(num_stacks=2, **border_args))]},
-    -1: {'name': "max", 'layouts': layouts}
-}
+multi_monitor = get_num_monitors() > 1
 
 
-def generate_groups(num_screens, keys, dgroups_app_rules):
+def generate_groups(num_screens, keys, dgroups_app_rules, mod, layouts):
+    # layout map to restrict availiable layouts for a group
+    layout_map = {
+        3: {'name': "slice", 'layouts': [
+            # a layout for pidgin
+            layout.Slice('right', 256, role='buddy_list',
+                         fallback=layout.Tile(**current_theme))]},
+        6: {'name': "slice", 'layouts': [
+            # a layout for hangouts
+            layout.Slice('right', 356, wname="Hangouts",
+                         fallback=layout.Tile(**current_theme))]},
+        # fallback=layout.Stack(num_stacks=2, **border_args))]},
+        -1: {'name': "max", 'layouts': layouts}
+    }
     # dgroup rules that not belongs to any group
     dgroups_app_rules.extend([
         Rule(Match(title=[re.compile(r"^Developer.*")]), group="12",
@@ -62,12 +59,13 @@ def generate_groups(num_screens, keys, dgroups_app_rules):
         Rule(Match(wm_class=["Kruler"]), float=True),
         Rule(Match(wm_class=["Screenkey"]), float=True, intrusive=True),
         Rule(Match(wm_class=["rdesktop"]), group="14"),
-        Rule(Match(wm_class=[re.compile(r".*VirtualBox.*")]), group="13"),
+        Rule(Match(wm_class=[re.compile(r".*VirtualBox.*")]),
+             group="13" if multi_monitor else "3"),
         Rule(Match(title=[
             re.compile(r".*iress development.*conkeror$", re.I),
             re.compile(r".*wealth management support.*conkeror$", re.I),
         ]), group="11"),
-        #Rule(Match(wm_class=["Conkeror"]), group="2"),
+        # Rule(Match(wm_class=["Conkeror"]), group="2"),
     ])
 
     num_groups = num_screens * 10
@@ -79,8 +77,8 @@ def generate_groups(num_screens, keys, dgroups_app_rules):
             str(i), layout=layout_config['name'],
             layouts=layout_config['layouts']))
     for i, g in enumerate(groups, 1):
-       # mod1 + letter of group = switch to group
-        #log.debug("group:%s", i)
+        # mod1 + letter of group = switch to group
+        # log.debug("group:%s", i)
         if i < 10:
             keys.append(
                 Key([mod], str(i), lazy.function(SwitchGroup(i))))

@@ -1,20 +1,19 @@
-from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
-from libqtile.command import lazy, CommandObject
-from libqtile import layout, bar, widget, hook, window
-
-from system import get_hostconfig, get_num_monitors, execute_once
-from screens import get_screens, PRIMARY_SCREEN, SECONDARY_SCREEN
-from keys import get_keys
-from config import float_windows, num_monitors
 import logging as log
 import os
-import re
 import signal
+
+from libqtile import hook, window
+
+from config import float_windows
+from system import get_hostconfig, get_num_monitors, execute_once
+
+
+num_monitors = get_num_monitors()
 
 event_cntr = 2
 prev_timestamp = 0
 initial_num_mons = get_num_monitors()
-all_desktops = ['tail',]
+all_desktops = ['tail']
 
 
 @hook.subscribe.setgroup
@@ -23,7 +22,7 @@ def move_special_windows():
         for w in hook.qtile.windowMap.values():
             if w.group and (
                     w.match(wname=name)
-                    or (hasattr(window,'name') and window.name == name)):
+                    or (hasattr(window, 'name') and window.name == name)):
                 w.cmd_togroup(hook.qtile.currentGroup.name)
 
 
@@ -38,7 +37,6 @@ def restart_on_randr(qtile, ev):
         # if num_screens != get_num_monitors():
         signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         log.debug("RESTART screen change")
-        prev_num_mons = num_mons
         qtile.cmd_restart()
     else:
         prev_timestamp = cur_timestamp
@@ -89,7 +87,8 @@ def dbus_register():
 def new_client(client):
     try:
         window_class = client.window.get_wm_class()[0]
-        window_type = client.get_wm_type() if hasattr(client, 'get_wm_type') else ''
+        window_type = client.get_wm_type() if hasattr(
+            client, 'get_wm_type') else ''
         if window_class in [
                 "screenkey", "kruler"]:
             client.static(0)
@@ -112,12 +111,11 @@ def move_windows_multimonitor(window):
                     win_group = int(window.group.name)
                     # TODO handle cases for more than 2 monitors
                     if win_group < 10 and num_monitors > 1 and screenno > 1:
-                        window.togroup(str(win_group+10))
+                        window.togroup(str(win_group + 10))
                 except ValueError as e:
                     log.debug("not an integer group")
-    #if should_be_floating(window.window):
+    # if should_be_floating(window.window):
     #    window.window.floating = True
-
 
 
 @hook.subscribe.window_name_change

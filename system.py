@@ -1,8 +1,10 @@
 """Platform specific configurtation options
 """
+import logging as log
 import platform
 import subprocess
-import logging as log
+
+
 mod= "mod4"
 
 common_autostart = {

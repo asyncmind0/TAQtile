@@ -1,17 +1,21 @@
 # TODO handle MultiScreenGroupBox clicks and events
-from libqtile.config import Click, Drag
-from libqtile.command import lazy
-from libqtile import layout
-from libqtile.log_utils import init_log
-import os
 import logging
 
-mod = "mod4"
+from libqtile import layout
+from libqtile.command import lazy
+from libqtile.config import Click, Drag
+
+from groups import generate_groups
+from keys import get_keys
+from screens import get_screens
 from system import get_num_monitors
+from themes import current_theme
+
+
+mod = "mod4"
 num_monitors = get_num_monitors()
 logging.debug("Num Desktops:%s", num_monitors)
 
-from themes import current_theme
 
 layouts = [
     layout.Max(**current_theme),
@@ -57,15 +61,12 @@ auto_fullscreen = True
 widget_defaults = {}
 dgroups_app_rules = []
 
-from screens import get_screens
-from groups import generate_groups
-from keys import get_keys
 
 keys = get_keys(mod, groups, dgroups_app_rules)
-groups = generate_groups(num_monitors, keys, dgroups_app_rules) + groups
+groups = generate_groups(
+    num_monitors, keys, dgroups_app_rules, mod,
+    layouts) + groups
 screens = get_screens(num_monitors)
-
-import hooks
 
 
 def main(self):

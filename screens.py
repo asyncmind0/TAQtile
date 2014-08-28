@@ -1,14 +1,15 @@
-from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
-from libqtile.command import lazy
-from libqtile import layout, bar, widget, hook
+import logging as log
+import subprocess
+import threading
+
+import gobject
+from libqtile import bar, widget
+from libqtile.config import Screen
+
+import system
 import themes
 from multiscreengroupbox import MultiScreenGroupBox
 from priority_notify import PriorityNotify
-import logging as log
-import system
-import gobject
-import threading
-import subprocess
 
 
 PRIMARY_SCREEN = system.get_screen(0)
@@ -16,6 +17,7 @@ SECONDARY_SCREEN = system.get_screen(1)
 
 
 class ThreadedPacman(widget.Pacman):
+
     def __init__(self, *args, **kwargs):
         super(ThreadedPacman, self).__init__(*args, **kwargs)
         self.timeout_add(self.interval, self.wx_updater)
@@ -41,13 +43,15 @@ class ThreadedPacman(widget.Pacman):
 
 
 class CalClock(widget.Clock):
-    #def button_release(self, x, y, button):
+    # def button_release(self, x, y, button):
+
     def button_press(self, x, y, button):
         self.qtile.cmd_spawn("calendar_applet.py")
 
 
 class GraphHistory(widget.NetGraph):
-    default_store=None
+    default_store = None
+
     def __init__(self, *args, **kwargs):
         super(widget.NetGraph, self).__init__(*args, **kwargs)
 
@@ -78,7 +82,7 @@ def get_screens(num_monitors=1):
 
     prompt_params = default_params()
     systray_params = default_params()
-    current_layout_params= default_params(
+    current_layout_params = default_params(
         name="default", padding=2)
     #windowname_params = default_params
     systray_params = default_params()
@@ -116,7 +120,7 @@ def get_screens(num_monitors=1):
     #netgraph_params['fill_color'] = "80FF00.3"
 
     gb1 = dict([(str(i), str(i)) for i in range(1, 10)])
-    gb2 = dict([(str(i), str(i-10)) for i in range(11, 20)])
+    gb2 = dict([(str(i), str(i - 10)) for i in range(11, 20)])
     if num_monitors == 1:
         gb1['right'] = "term1"
         gb1['left'] = "term2"
@@ -145,26 +149,26 @@ def get_screens(num_monitors=1):
         widget.Prompt(**prompt_params),
         widget.Sep(**sep_params),
         widget.WindowTabs(**windowtabs_params),
-        #widget.WindowName(**windowname_params),
-        #widget.TextBox(**layout_textbox_params),
+        # widget.WindowName(**windowname_params),
+        # widget.TextBox(**layout_textbox_params),
         widget.Sep(**sep_params),
         widget.CurrentLayout(**current_layout_params),
         widget.Sep(**sep_params),
-        #widget.BitcoinTicker(**bitcointicker_params),
-        #widget.Sep(**sep_params),
-        #Pacman(**pacman_params),
+        # widget.BitcoinTicker(**bitcointicker_params),
+        # widget.Sep(**sep_params),
+        # Pacman(**pacman_params),
         widget.DF(**default_params()),
         PriorityNotify(**default_params()),
-        #widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
+        # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
         widget.TextBox("c:", **default_params()),
         widget.CPUGraph(**cpugraph_params),
-        #widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/media-flash-memory-stick.png"),
+        # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/media-flash-memory-stick.png"),
         widget.TextBox("m:", **default_params()),
         widget.MemoryGraph(**memgraph_params),
-        #widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/network-wired.png"),
+        # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/network-wired.png"),
         widget.TextBox("n:", **default_params()),
         widget.NetGraph(**netgraph_params),
-        #widget.Sep(**sep_params),
+        # widget.Sep(**sep_params),
         #widget.Notify(width=30, **notify_params),
         widget.Sep(**sep_params)
     ]

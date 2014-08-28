@@ -1,5 +1,4 @@
 from libqtile import widget
-import logging
 
 
 class MultiScreenGroupBox(widget.GroupBox):
