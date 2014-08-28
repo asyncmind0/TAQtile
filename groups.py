@@ -10,7 +10,7 @@ from keys import get_keys
 import logging
 import os
 import re
-from config import layouts, mod, dgroups_app_rules
+from config import layouts, mod
 from themes import current_theme
 
 log = logging.getLogger('qtile.config')

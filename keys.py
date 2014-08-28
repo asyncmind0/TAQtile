@@ -9,15 +9,16 @@ from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
 
 
+def set_hostconfig_keys(keys, name, binding):
+    nkeys = get_hostconfig(name)
+    for key in nkeys:
+        keys.append((key[0], key[1], binding))
+
+
 def get_keys(mod, groups, dgroups_app_rules):
     #dmenu_defaults = dmenu_defaults.replace('#', '#')
     logging.debug(dmenu_defaults)
     is_laptop = get_hostconfig('laptop')
-    left_termkey = get_hostconfig('left_termkey')
-    right_termkey = get_hostconfig('right_termkey')
-    left_remote_termkey = get_hostconfig('left_remote_termkey')
-    right_remote_termkey = get_hostconfig('right_remote_termkey')
-    monitor_key = get_hostconfig('monitor_key')
     keys = [
         # Switch between windows in current stack pane
         (
@@ -106,6 +107,7 @@ def get_keys(mod, groups, dgroups_app_rules):
         ([mod], "Return", lazy.spawn("st")),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         ([mod, "shift"], "p", lazy.spawn("passmenu")),
+        ([mod, "control"], "s", lazy.spawn("pybrowse")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "control"], "s", lazy.spawn("surf")),
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
@@ -128,46 +130,47 @@ def get_keys(mod, groups, dgroups_app_rules):
                 groups, "comm", title=[".*comm.*"], cmd=terminal("comm"),
                 wm_class=["InputOutput"], screen=PRIMARY_SCREEN,
                 dynamic_groups_rules=dgroups_app_rules))),
-
-        (left_termkey[0], left_termkey[1], lazy.function(
-            SwitchToWindowGroup(
-                groups, "left", title=[".*left.*"], cmd=terminal("left"),
-                wm_class=["InputOutput"], screen=PRIMARY_SCREEN,
-                dynamic_groups_rules=dgroups_app_rules))),
-
-        (right_termkey[0], right_termkey[1], lazy.function(
-            SwitchToWindowGroup(
-                groups, "right", cmd=terminal("right"), title=[".*right.*"],
-                wm_class=["InputOutput"], screen=SECONDARY_SCREEN,
-                dynamic_groups_rules=dgroups_app_rules))),
-
-        (left_remote_termkey[0], left_remote_termkey[1], lazy.function(
-            SwitchToWindowGroup(
-                groups, "remote_left", cmd="st -t remote_left ",
-                screen=PRIMARY_SCREEN, title=[".*remote_left.*"],
-                wm_class=["InputOutput"],
-                dynamic_groups_rules=dgroups_app_rules))),
-
-        (right_remote_termkey[0], right_remote_termkey[1], lazy.function(
-            SwitchToWindowGroup(
-                groups, "remote_right", cmd="st -t remote_right ",
-                screen=SECONDARY_SCREEN, title=[".*remote_right.*"],
-                wm_class=["InputOutput"],
-                dynamic_groups_rules=dgroups_app_rules))),
-
-        (monitor_key[0], monitor_key[1], lazy.function(
-            SwitchToWindowGroup(
-                groups, "monitor", cmd=terminal("monitor"),
-                title=[".*monitor.*"], screen=SECONDARY_SCREEN,
-                wm_class=["InputOutput"],
-                dynamic_groups_rules=dgroups_app_rules))),
-        ([], "XF86LaunchA", lazy.function(
+        ([], "XF86Launch1", lazy.function(
             RaiseWindowOrSpawn(
                 wmname='tail', cmd='st -t tail -e sudo journalctl -xf',
                 cmd_match="st -t tail", floating=True,
                 toggle=True,
-                static=[0, 100, 100, 500, 200]))),
+                static=[0, 100, 100, 1024, 200]))),
     ]
+    set_hostconfig_keys(
+        keys, 'left_termkey', lazy.function(
+            SwitchToWindowGroup(
+                groups, "left", title=[".*left.*"], cmd=terminal("left"),
+                wm_class=["InputOutput"], screen=PRIMARY_SCREEN,
+                dynamic_groups_rules=dgroups_app_rules)))
+
+    set_hostconfig_keys(
+        keys, 'right_termkey', lazy.function(
+            SwitchToWindowGroup(
+                groups, "right", cmd=terminal("right"), title=[".*right.*"],
+                wm_class=["InputOutput"], screen=SECONDARY_SCREEN,
+                dynamic_groups_rules=dgroups_app_rules)))
+    set_hostconfig_keys(
+        keys, 'left_remote_termkey', lazy.function(
+            SwitchToWindowGroup(
+                groups, "remote_left", cmd="st -t remote_left ",
+                screen=PRIMARY_SCREEN, title=[".*remote_left.*"],
+                wm_class=["InputOutput"],
+                dynamic_groups_rules=dgroups_app_rules)))
+    set_hostconfig_keys(
+        keys, 'right_remote_termkey', lazy.function(
+            SwitchToWindowGroup(
+                groups, "remote_right", cmd="st -t remote_right ",
+                screen=SECONDARY_SCREEN, title=[".*remote_right.*"],
+                wm_class=["InputOutput"],
+                dynamic_groups_rules=dgroups_app_rules)))
+    set_hostconfig_keys(
+        keys, 'monitor_key', lazy.function(
+            SwitchToWindowGroup(
+                groups, "monitor", cmd=terminal("monitor"),
+                title=[".*monitor.*"], screen=SECONDARY_SCREEN,
+                wm_class=["InputOutput"],
+                dynamic_groups_rules=dgroups_app_rules)))
 
     laptop_keys = [
         # laptop keys
@@ -180,9 +183,8 @@ def get_keys(mod, groups, dgroups_app_rules):
         # Media controls
         ([], "XF86AudioMute", lazy.function(RaiseWindowOrSpawn(wmclass='Pavucontrol', cmd='pavucontrol'))),
         #([], "XF86AudioMute", lazy.spawn("pavucontrol")),
-        ([], "XF86AudioLowerVolume", lazy.spawn("sudo samctl.py -k up")),
-        ([], "XF86AudioRaiseVolume", lazy.spawn(
-            "sudo samctl.py -v down")),
+        ([], "XF86AudioLowerVolume", lazy.spawn("samctl.py -k up")),
+        ([], "XF86AudioRaiseVolume", lazy.spawn("samctl.py -v down")),
         ([], "XF86WLAN", lazy.spawn(
             "nmcli con up id Xperia\ Z1\ Network --nowait")),
     ]
