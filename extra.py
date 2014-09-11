@@ -34,10 +34,14 @@ class SwitchGroup(object):
         else:
             screen = qtile.currentScreen
 
-        index = int(self.name)
-        if screen.index > 0:
-            index = index + (screen.index * 10)
-        index = str(index)
+        try:
+            index = int(self.name)
+        except ValueError:
+            index = self.name
+        else:
+            if screen.index > 0:
+                index = index + (screen.index * 10)
+            index = str(index)
 
         screen.cmd_togglegroup(index)
 
