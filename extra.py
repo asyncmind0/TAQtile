@@ -157,8 +157,8 @@ def check_restart(qtile):
     except Exception as e:
         logging.exception("Syntax error")
     else:
-        import signal
-        signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+        #import signal
+        #signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         logging.info("restarting qtile ...")
         qtile.cmd_restart()
 
