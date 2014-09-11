@@ -56,7 +56,7 @@ def startup():
         commands[os.path.expanduser("rightmonitor")] = None
 
     for command, process_filter in commands.iteritems():
-        execute_once(command, process_filter)
+        execute_once(command, process_filter, hook.qtile)
 
 
 def should_be_floating(w):

@@ -1,9 +1,11 @@
 """Platform specific configurtation options
 """
-import logging as log
+import logging
 import platform
+import sh
 import subprocess
 
+log = logging.getLogger('qtile')
 
 mod= "mod4"
 
@@ -12,7 +14,8 @@ common_autostart = {
     'xscreensaver -nosplash': None,
     'dropbox start': 'dropbox',
     'insync start': 'insync',
-    'bluedevil-monolithic': 'bluedevil-monol'
+    'bluedevil-monolithic': 'bluedevil-monol',
+    '~/.bin/xstartup': None
 }
 
 laptop_autostart = dict(common_autostart)
@@ -80,22 +83,25 @@ def get_num_monitors():
     #    height = values[1]
     #    print "Width:" + width + ",height:" + height
 
+
 def execute_once(process, process_filter=None, qtile=None):
     cmd = process.split()
     process_filter = process_filter or cmd[0]
     pid = None
     try:
-        pid = subprocess.check_output(
-            ["pgrep", "-f", process_filter])
+        pid = sh.pgrep("-f", process_filter)
+        pid.wait()
     except Exception as e:
         log.exception("CalledProcessError")
     if not pid:
         # spawn the process using a shell command with subprocess.Popen
         log.debug("Starting: %s", cmd)
-        if qtile:
-            qtile.cmd_spawn(process)
-        else:
-            pid = subprocess.Popen(
-                process, shell=True, close_fds=True,
-                stdin=subprocess.PIPE).pid
-        log.debug("Started: %s: %s", cmd, pid)
+        try:
+            if qtile:
+                qtile.cmd_spawn(process)
+            else:
+                cmd = sh.Command(process)
+                cmd()
+            log.info("Started: %s: %s", cmd, pid)
+        except Exception as e:
+            log.exception("Error running %s", cmd)
