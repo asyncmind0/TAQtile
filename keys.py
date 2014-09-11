@@ -107,7 +107,9 @@ def get_keys(mod, groups, dgroups_app_rules):
         ([mod], "Return", lazy.spawn("st")),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         ([mod, "shift"], "p", lazy.spawn("passmenu")),
-        ([mod, "control"], "s", lazy.spawn("pybrowse")),
+        ([mod, "control"], "b", lazy.spawn("pybrowse")),
+        ([mod, ], "e", lazy.spawn("conf")),
+        ([mod, ], "Return", lazy.spawn("st")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "control"], "s", lazy.spawn("surf")),
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
@@ -119,12 +121,12 @@ def get_keys(mod, groups, dgroups_app_rules):
         # Switch groups
         ([], "F1", lazy.function(SwitchGroup("1"))),
         ([], "F2", lazy.function(SwitchGroup("2"))),
-        #([], "F10", lazy.function(SwitchGroup("4", 0))),
-        ([], "F10", lazy.function(
-            SwitchToWindowGroup(
-                groups, "mail", title=[".*mail.*"], cmd="kontact",
-                wm_class=["kontact"], screen=PRIMARY_SCREEN,
-                dynamic_groups_rules=dgroups_app_rules))),
+        ([], "F10", lazy.function(SwitchGroup("mail", 0))),
+        #([], "F10", lazy.function(
+        #    SwitchToWindowGroup(
+        #        groups, "mail", title=[".*mail.*"], cmd="kontact",
+        #        wm_class=["kontact"], screen=PRIMARY_SCREEN,
+        #        dynamic_groups_rules=dgroups_app_rules))),
         ([], "F9", lazy.function(
             SwitchToWindowGroup(
                 groups, "comm", title=[".*comm.*"], cmd=terminal("comm"),
