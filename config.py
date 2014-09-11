@@ -1,5 +1,7 @@
 # TODO handle MultiScreenGroupBox clicks and events
 import logging
+from libqtile.log_utils import init_log
+import os
 
 from libqtile import layout
 from libqtile.command import lazy
@@ -67,7 +69,13 @@ groups = generate_groups(
     num_monitors, keys, dgroups_app_rules, mod,
     layouts) + groups
 screens = get_screens(num_monitors)
+log_level = logging.DEBUG
+log_path = os.path.expanduser("~/.qtile.log")
 
 
 def main(self):
+    self.log = init_log(log_level=logging.ERROR, log_path=log_path)
     pass
+
+
+import hooks
