@@ -83,6 +83,11 @@ class SwitchToWindowGroup(object):
         if dynamic_groups_rules:
             dynamic_groups_rules.append(Rule(Match(title=title), group=name))
 
+    def raise_window(self, qtile):
+        for window in qtile.windowMap.values():
+            if window.group and window.match(wname=self.name):
+                qtile.currentGroup.focus(window, False)
+
     def spawn_ifnot(self, qtile):
         logging.debug(qtile.currentGroup)
         for window in qtile.windowMap.values():
@@ -94,12 +99,13 @@ class SwitchToWindowGroup(object):
     def __call__(self, qtile):
         logging.debug("currentScreen:%s", qtile.currentScreen.index)
         logging.debug(self.screen)
+        self.spawn_ifnot(qtile)
         if self.screen > len(qtile.screens) - 1:
             self.screen = len(qtile.screens) - 1
         if qtile.currentScreen.index != self.screen:
             qtile.cmd_to_screen(self.screen)
             return
-        self.spawn_ifnot(qtile)
+        #self.raise_window(qtile)
         qtile.currentScreen.cmd_togglegroup(self.name)
 
 
@@ -163,9 +169,14 @@ def check_restart(qtile):
         qtile.cmd_restart()
 
 
-def list_windows(qtile):
+def list_windows(qtile, current_group=False):
     from sh import dmenu
-    window_titles = [w.name for w in qtile.windowMap.values() if w.name != "<no name>"]
+    if current_group:
+        window_titles = [
+            w.name for w in  qtile.groupMap[qtile.currentGroup.name].windows
+            if w.name != "<no name>"]
+    else:
+        window_titles = [w.name for w in qtile.windowMap.values() if w.name != "<no name>"]
     logging.info(window_titles)
     from themes import dmenu_defaults
     dmenu_defaults = dmenu_defaults.replace("'", "").split()
@@ -189,7 +200,6 @@ def list_windows(qtile):
             except Exception as e:
                 logging.exception("error in group")
         return True
-        
 
     try:
         s = dmenu(
@@ -199,3 +209,7 @@ def list_windows(qtile):
         s.wait()
     except Exception as e:
         logging.exception("error running dmenu")
+
+
+def list_windows_group(qtile):
+    return list_windows(qtile, current_group=True)

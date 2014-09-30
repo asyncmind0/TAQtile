@@ -3,7 +3,7 @@ from libqtile.command import lazy
 from libqtile.config import Key
 from extra import (SwitchToWindowGroup, check_restart,
                    terminal, MoveToOtherScreenGroup, SwitchGroup,
-                   RaiseWindowOrSpawn, list_windows)
+                   RaiseWindowOrSpawn, list_windows, list_windows_group)
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
@@ -102,7 +102,8 @@ def get_keys(mod, groups, dgroups_app_rules):
         # APP LAUNCHERS
         #([mod], "r", lazy.spawncmd()),
         ([mod], "F2", lazy.spawn("dmenu_run %s" % dmenu_defaults)),
-        ([mod], "F3", lazy.function(list_windows)),
+        ([mod], "F3", lazy.function(list_windows_group)),
+        ([mod], "F5", lazy.function(list_windows)),
         ([mod], "r", lazy.spawncmd()),
         ([mod], "Return", lazy.spawn("st")),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
@@ -155,14 +156,14 @@ def get_keys(mod, groups, dgroups_app_rules):
     set_hostconfig_keys(
         keys, 'left_remote_termkey', lazy.function(
             SwitchToWindowGroup(
-                groups, "remote_left", cmd="st -t remote_left ",
+                groups, "left", cmd="st -t remote_left ",
                 screen=PRIMARY_SCREEN, title=[".*remote_left.*"],
                 wm_class=["InputOutput"],
                 dynamic_groups_rules=dgroups_app_rules)))
     set_hostconfig_keys(
         keys, 'right_remote_termkey', lazy.function(
             SwitchToWindowGroup(
-                groups, "remote_right", cmd="st -t remote_right ",
+                groups, "right", cmd="st -t remote_right ",
                 screen=SECONDARY_SCREEN, title=[".*remote_right.*"],
                 wm_class=["InputOutput"],
                 dynamic_groups_rules=dgroups_app_rules)))
