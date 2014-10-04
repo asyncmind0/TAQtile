@@ -1,24 +1,24 @@
 import logging
 from libqtile.command import lazy
-from libqtile.config import Key
+from libqtile.config import Key, Match, Rule
 from extra import (SwitchToWindowGroup, check_restart,
                    terminal, MoveToOtherScreenGroup, SwitchGroup,
-                   RaiseWindowOrSpawn, list_windows, list_windows_group)
+                   RaiseWindowOrSpawn, list_windows, list_windows_group,
+                   MoveToGroup)
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
 
-
-def set_hostconfig_keys(keys, name, binding):
-    nkeys = get_hostconfig(name)
-    for key in nkeys:
-        keys.append((key[0], key[1], binding))
+log = logging.getLogger('myqtile')
+log.setLevel(logging.DEBUG)
 
 
-def get_keys(mod, groups, dgroups_app_rules):
-    #dmenu_defaults = dmenu_defaults.replace('#', '#')
-    logging.debug(dmenu_defaults)
+def get_keys(mod, num_groups, num_monitors):
+    log.debug(dmenu_defaults)
     is_laptop = get_hostconfig('laptop')
+    group_split = (num_groups / 2, )
+    multi_monitor = num_monitors > 1
+
     keys = [
         # Switch between windows in current stack pane
         (
@@ -118,62 +118,31 @@ def get_keys(mod, groups, dgroups_app_rules):
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
         ([mod, "shift"], "F2", lazy.spawn("dmenu_xclip %s" % dmenu_defaults)),
-        
-        # Switch groups
-        ([], "F1", lazy.function(SwitchGroup("1"))),
-        ([], "F2", lazy.function(SwitchGroup("2"))),
-        ([], "F10", lazy.function(SwitchGroup("mail", 0))),
-        #([], "F10", lazy.function(
-        #    SwitchToWindowGroup(
-        #        groups, "mail", title=[".*mail.*"], cmd="kontact",
-        #        wm_class=["kontact"], screen=PRIMARY_SCREEN,
-        #        dynamic_groups_rules=dgroups_app_rules))),
-        ([], "F9", lazy.function(
-            SwitchToWindowGroup(
-                groups, "comm", title=[".*comm.*"], cmd=terminal("comm"),
-                wm_class=["InputOutput"], screen=PRIMARY_SCREEN,
-                dynamic_groups_rules=dgroups_app_rules))),
         ([], "XF86Launch1", lazy.function(
             RaiseWindowOrSpawn(
                 wmname='tail', cmd='st -t tail -e sudo journalctl -xf',
                 cmd_match="st -t tail", floating=True,
                 toggle=True,
                 static=[0, 100, 100, 1024, 200]))),
-    ]
-    set_hostconfig_keys(
-        keys, 'left_termkey', lazy.function(
-            SwitchToWindowGroup(
-                groups, "left", title=[".*left.*"], cmd=terminal("left"),
-                wm_class=["InputOutput"], screen=PRIMARY_SCREEN,
-                dynamic_groups_rules=dgroups_app_rules)))
+        # Switch groups
+        ([], "F1", lazy.function(SwitchGroup("1"))),
+        ([], "F2", lazy.function(SwitchGroup("2"))),
 
-    set_hostconfig_keys(
-        keys, 'right_termkey', lazy.function(
-            SwitchToWindowGroup(
-                groups, "right", cmd=terminal("right"), title=[".*right.*"],
-                wm_class=["InputOutput"], screen=SECONDARY_SCREEN,
-                dynamic_groups_rules=dgroups_app_rules)))
-    set_hostconfig_keys(
-        keys, 'left_remote_termkey', lazy.function(
-            SwitchToWindowGroup(
-                groups, "left", cmd="st -t remote_left ",
-                screen=PRIMARY_SCREEN, title=[".*remote_left.*"],
-                wm_class=["InputOutput"],
-                dynamic_groups_rules=dgroups_app_rules)))
-    set_hostconfig_keys(
-        keys, 'right_remote_termkey', lazy.function(
-            SwitchToWindowGroup(
-                groups, "right", cmd="st -t remote_right ",
-                screen=SECONDARY_SCREEN, title=[".*remote_right.*"],
-                wm_class=["InputOutput"],
-                dynamic_groups_rules=dgroups_app_rules)))
-    set_hostconfig_keys(
-        keys, 'monitor_key', lazy.function(
-            SwitchToWindowGroup(
-                groups, "monitor", cmd=terminal("monitor"),
-                title=[".*monitor.*"], screen=SECONDARY_SCREEN,
-                wm_class=["InputOutput"],
-                dynamic_groups_rules=dgroups_app_rules)))
+        ([], "Menu", lazy.function(SwitchToWindowGroup(
+            'monitor', 'monitor', screen=PRIMARY_SCREEN,
+            spawn=terminal('monitor')))),
+        ([], "XF86Eject", lazy.function(SwitchToWindowGroup(
+            'monitor', 'monitor', screen=PRIMARY_SCREEN,
+            spawn=terminal('monitor')))),
+        ([], "F10", lazy.function(SwitchToWindowGroup(
+            'mail', 'mail', screen=PRIMARY_SCREEN, spawn=terminal('mail')))),
+        ([], "F9", lazy.function(SwitchToWindowGroup(
+            'comm', 'comm', screen=PRIMARY_SCREEN, spawn=terminal('comm')))),
+        ([], "F11", lazy.function(SwitchToWindowGroup(
+            'left', 'left', screen=SECONDARY_SCREEN, spawn=terminal('left')))),
+        ([], "F12", lazy.function(SwitchToWindowGroup(
+            'right', 'right', screen=PRIMARY_SCREEN, spawn=terminal('right')))),
+    ]
 
     laptop_keys = [
         # laptop keys
@@ -193,4 +162,8 @@ def get_keys(mod, groups, dgroups_app_rules):
     ]
     if is_laptop:
         keys.extend(laptop_keys)
+
+    for i in range(1, 11):
+        keys.append(([mod], str(i)[-1], lazy.function(SwitchGroup(i))))
+        keys.append(([mod, "shift"], str(i)[-1], lazy.function(MoveToGroup(i))))
     return [Key(*k) for k in keys]

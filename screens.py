@@ -58,15 +58,10 @@ class GraphHistory(widget.NetGraph):
     def push(self, value):
         return super(widget.NetGraph, self).push(value)
 
-#Pacman = widget.Pacman
-Pacman = ThreadedPacman
-#GroupBox = widget.GroupBox
-GroupBox = MultiScreenGroupBox
 
-
-def get_screens(num_monitors=1):
-
+def get_screens(num_monitors, num_groups, groups):
     screens = []
+    multi_monitor = num_monitors > 1
 
     def default_params(**kwargs):
         de = dict(themes.current_theme)
@@ -118,33 +113,27 @@ def get_screens(num_monitors=1):
     netgraph_params = dict(graph_defaults)
     sep_params = default_params(padding=2, fontsize=9, height_percent=60)
     #netgraph_params['fill_color'] = "80FF00.3"
+    group_splits = ((num_groups / num_monitors) if multi_monitor else num_groups,)
 
-    gb1 = dict([(str(i), str(i)) for i in range(1, 10)])
-    gb2 = dict([(str(i), str(i - 10)) for i in range(11, 20)])
-    if num_monitors == 1:
-        gb1['right'] = "term1"
-        gb1['left'] = "term2"
-        gb1['remote_right'] = "remote_term1"
-        gb1['remote_left'] = "remote_term2"
-        gb1['monitor'] = "monitor"
-    else:
-        # if primary and seconday are reversed
-        if PRIMARY_SCREEN:
-            gb1['right'] = "term"
-            gb2['left'] = "term"
-            gb1['remote_right'] = "remote_term"
-            gb2['remote_left'] = "remote_term"
+    # change labels of groups for multi monitor support
+    gb1 = {}
+    gb2 = {}
+    mon_map = {0: gb1, 1: gb2}
+    groupnum = 0
+    mon = 0
+    for i, group in enumerate(groups):
+        if group.name.isdigit():
+            if multi_monitor and int(group.name)-1 in group_splits:
+                mon += 1
+        groupname =  group.name
+        grouplabel = group.name[-1] if group.name.isdigit() else group.name
+        if group.screen_affinity is None or not multi_monitor:
+            mon_map[mon][groupname] = grouplabel
         else:
-            gb1['left'] = "term"
-            gb2['right'] = "term"
-            gb1['remote_left'] = "remote_term"
-            gb2['monitor'] = "monitor"
-            gb2['remote_right'] = "remote_term"
-    gb1['comm'] = "comm"
-    gb1['mail'] = "mail"
+            mon_map[group.screen_affinity][groupname] = grouplabel
 
     w1 = [
-        GroupBox(namemap=gb1, **groupbox_params),
+        MultiScreenGroupBox(namemap=gb1, **groupbox_params),
         widget.Sep(**sep_params),
         widget.Prompt(**prompt_params),
         widget.Sep(**sep_params),
@@ -156,7 +145,7 @@ def get_screens(num_monitors=1):
         widget.Sep(**sep_params),
         # widget.BitcoinTicker(**bitcointicker_params),
         # widget.Sep(**sep_params),
-        # Pacman(**pacman_params),
+        # ThreadedPacman(**pacman_params),
         widget.DF(**default_params()),
         PriorityNotify(**default_params()),
         # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
@@ -179,7 +168,7 @@ def get_screens(num_monitors=1):
     w1.append(CalClock(**clock_params))
 
     w2 = [
-        GroupBox(namemap=gb2, **groupbox_params),
+        MultiScreenGroupBox(namemap=gb2, **groupbox_params),
         widget.Sep(**sep_params),
         widget.WindowTabs(**windowtabs_params),
         widget.Sep(**sep_params),
