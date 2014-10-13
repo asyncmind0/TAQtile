@@ -60,6 +60,11 @@ class MoveToGroup(object):
             index = index + (screenindex * 10)
         index = str(index)
         qtile.currentWindow.cmd_togroup(index)
+        
+class MoveToNextGroup(object):
+    def __call__(self, qtile):
+        logging.debug("MoveToNextGroup:%s:%s", qtile.currentScreen.index, self.name)
+        qtile.currentWindow.cmd_togroup(index)
 
 
 class MoveToOtherScreenGroup(object):
