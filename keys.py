@@ -89,8 +89,6 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "Left", lazy.screen.prevgroup()),
         ([mod, "shift"], "Right", MoveToNextGroup()),
         ([mod, "shift"], "Left", MoveToNextGroup()),
-        ([], "F6",      lazy.function(SwitchGroup(
-            "6", SECONDARY_SCREEN if is_laptop else PRIMARY_SCREEN))),
 
         ([mod], "m", lazy.group.setlayout('max')),
         ([mod], "t", lazy.group.setlayout('tile')),
@@ -136,8 +134,10 @@ def get_keys(mod, num_groups, num_monitors):
             spawn=terminal('monitor')))),
         ([], "F10", lazy.function(SwitchToWindowGroup(
             'mail', 'mail', screen=PRIMARY_SCREEN, spawn=terminal('mail')))),
+        ([], "F6", lazy.function(SwitchGroup(
+            "comm2", SECONDARY_SCREEN if is_laptop else PRIMARY_SCREEN))),
         ([], "F9", lazy.function(SwitchToWindowGroup(
-            'comm', 'comm', screen=PRIMARY_SCREEN, spawn=terminal('comm')))),
+            'comm1', 'comm', screen=PRIMARY_SCREEN, spawn=terminal('comm')))),
         ([], "F11", lazy.function(SwitchToWindowGroup(
             'term1', 'left', screen=SECONDARY_SCREEN, spawn=terminal('left')))),
         ([], "F12", lazy.function(SwitchToWindowGroup(

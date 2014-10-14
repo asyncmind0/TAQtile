@@ -28,12 +28,18 @@ platform_specific = {
         'battery': True,
         'laptop': True,
         'autostart-once': laptop_autostart,
+        'screen_preferences': {
+            2: [{'wmclass': "google-chrome-stable"},
+                {"wmclass": "Navigator"}],
+            1: []
+        },
     },
     'sydsjoseph-pc1': {
         'screens': {0: 0, 1: 1},
         'battery': False,
         'laptop': False,
         'autostart-once': common_autostart,
+        'screen_preferences': {},
     }
 }
 
