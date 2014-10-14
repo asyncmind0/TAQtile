@@ -7,7 +7,7 @@ import subprocess
 
 log = logging.getLogger('qtile')
 
-mod= "mod4"
+mod = "mod4"
 
 common_autostart = {
     'klipper': None,
@@ -24,32 +24,16 @@ laptop_autostart.update({
 
 platform_specific = {
     'steven-series9': {
-        'screens': {0: 1, 1: 0},
+        'screens': {0: 0, 1: 1},
         'battery': True,
         'laptop': True,
         'autostart-once': laptop_autostart,
-        'screen_preferences': {
-            2: [{'wmclass': "google-chrome-stable"},
-                {"wmclass": "Navigator"}],
-            1: []
-        },
-        'left_termkey': [([], "F11")],
-        'right_termkey': [([], "F12")],
-        'left_remote_termkey': [([mod], "F11")],
-        'right_remote_termkey': [([mod], "F12")],
-        'monitor_key': [([], "XF86Eject"), ([], 'Menu')],
     },
     'sydsjoseph-pc1': {
         'screens': {0: 0, 1: 1},
         'battery': False,
         'laptop': False,
         'autostart-once': common_autostart,
-        'screen_preferences': {},
-        'left_termkey': [([], "XF86Launch5")],
-        'right_termkey': [([], "XF86Launch6")],
-        'left_remote_termkey': [([], "XF86Launch9")],
-        'right_remote_termkey': [([], "F19")],
-        'monitor_key': [([], "XF86Eject")],
     }
 }
 
@@ -92,7 +76,7 @@ def execute_once(process, process_filter=None, qtile=None):
         pid = sh.pgrep("-f", process_filter)
         pid.wait()
     except Exception as e:
-        log.exception("CalledProcessError")
+        log.error("CalledProcessError")
     if not pid:
         # spawn the process using a shell command with subprocess.Popen
         log.debug("Starting: %s", cmd)
@@ -104,4 +88,4 @@ def execute_once(process, process_filter=None, qtile=None):
                 cmd()
             log.info("Started: %s: %s", cmd, pid)
         except Exception as e:
-            log.exception("Error running %s", cmd)
+            log.error("Error running %s", cmd)

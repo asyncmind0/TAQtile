@@ -62,20 +62,20 @@ cursor_warp = False
 auto_fullscreen = True
 widget_defaults = {}
 dgroups_app_rules = []
+num_groups = num_monitors * 10
 
-
-keys = get_keys(mod, groups, dgroups_app_rules)
 groups = generate_groups(
-    num_monitors, keys, dgroups_app_rules, mod,
-    layouts) + groups
-screens = get_screens(num_monitors)
+    num_groups, num_monitors, dgroups_app_rules, layouts)
+keys = get_keys(mod, num_groups, num_monitors)
+screens = get_screens(num_monitors, num_groups, groups)
 log_level = logging.DEBUG
 log_path = os.path.expanduser("~/.qtile.log")
+mylog_path = os.path.expanduser("~/.qtile.my.log")
 
 
 def main(self):
     self.log = init_log(log_level=logging.ERROR, log_path=log_path)
-    pass
+    self.mylog = init_log(log_level=logging.DEBUG, logger='myqtile', log_path=mylog_path)
 
 
 import hooks

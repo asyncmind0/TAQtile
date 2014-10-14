@@ -1,10 +1,9 @@
-import logging as log
+import logging
 import os
 import signal
 
 from libqtile import hook, window
 
-from config import float_windows
 from system import get_hostconfig, get_num_monitors, execute_once
 
 
@@ -14,6 +13,10 @@ event_cntr = 2
 prev_timestamp = 0
 initial_num_mons = get_num_monitors()
 all_desktops = ['tail']
+
+log = logging.getLogger("qtile")
+
+log.error("importin hooks")
 
 
 @hook.subscribe.setgroup
@@ -28,15 +31,15 @@ def move_special_windows():
 
 @hook.subscribe.screen_change
 def restart_on_randr(qtile, ev):
-    log.debug("Screen change: %s", ev.__dict__)
+    print("Screen change: %s", ev.__dict__)
     global event_cntr, prev_timestamp
     cur_timestamp = ev.timestamp
     num_mons = get_num_monitors()
-    if abs(prev_timestamp - cur_timestamp) > 1000 \
-       and num_mons != initial_num_mons:
+    if abs(prev_timestamp - cur_timestamp) > 1000:
+        # and num_mons != initial_num_mons:
         # if num_screens != get_num_monitors():
-        signal.signal(signal.SIGCHLD, signal.SIG_DFL)
-        log.debug("RESTART screen change")
+        #signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+        print("RESTART screen change")
         qtile.cmd_restart()
     else:
         prev_timestamp = cur_timestamp
@@ -45,7 +48,7 @@ def restart_on_randr(qtile, ev):
 @hook.subscribe.startup
 def startup():
     # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
-    signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+    #signal.signal(signal.SIGCHLD, signal.SIG_IGN)
     commands = get_hostconfig('autostart-once')
     num_mons = get_num_monitors()
     log.debug("Num MONS:%s", num_mons)
@@ -89,11 +92,15 @@ def new_client(client):
         window_class = client.window.get_wm_class()[0]
         window_type = client.get_wm_type() if hasattr(
             client, 'get_wm_type') else ''
+        window_name = client.window.get_name()
         if window_class in [
                 "screenkey", "kruler"]:
             client.static(0)
         if window_class == "screenkey" and window_type != 'dialog':
-            client.place(100, 100, 800, 50, 2, 2, 'green')
+            client.place(100, 100, 800, 50, 2, 2, '00C000')
+        if window_name == "st":
+            client.window.floating = 1
+            client.place(50, 30, 500, 400, 1, None, force=True)#, '00C000')
         log.debug(window_class)
         log.debug(window_type)
     except Exception as e:

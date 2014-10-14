@@ -7,6 +7,7 @@ from libqtile.config import Group, Match, Rule
 
 from system import execute_once
 
+log=logging.getLogger('myqtile')
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
 terminal1 = "st -t %s -e tmx_outer %s"
@@ -24,7 +25,7 @@ class SwitchGroup(object):
     def __call__(self, qtile):
         logging.debug("SwitchGroup:%s:%s", qtile.currentScreen.index, self.name)
         max_screen = len(qtile.screens) - 1
-        if (self.preferred_screen is not None and
+        if(self.preferred_screen is not None and
             self.preferred_screen <= max_screen):
             screen = qtile.screens[self.preferred_screen]
             if self.preferred_screen != qtile.currentScreen.index:
@@ -39,9 +40,10 @@ class SwitchGroup(object):
         except ValueError:
             index = self.name
         else:
-            if screen.index > 0:
+            if screen.index >= 0:
                 index = index + (screen.index * 10)
             index = str(index)
+        log.debug("SwitchGroup: %s", index)
 
         screen.cmd_togglegroup(index)
 
@@ -73,20 +75,21 @@ class MoveToOtherScreenGroup(object):
 
 class SwitchToWindowGroup(object):
     def __init__(
-            self, groups, name, title=None, cmd=None, screen=0, wm_class=None,
-            exclusive=False, dynamic_groups_rules=None):
+            self, name, title=None, spawn=None, screen=0, matches=None):
         self.name = name
-        self.cmd = cmd
+        self.title = title
+        self.cmd = spawn
         self.screen = screen
-        groups.append(Group(name, exclusive=exclusive, spawn=cmd,
-                            matches=[Match(title=title, wm_class=wm_class)]))
-        if dynamic_groups_rules:
-            dynamic_groups_rules.append(Rule(Match(title=title), group=name))
+
+    def raise_window(self, qtile):
+        for window in qtile.windowMap.values():
+            if window.group and window.match(wname=self.title):
+                qtile.currentGroup.focus(window, False)
 
     def spawn_ifnot(self, qtile):
         logging.debug(qtile.currentGroup)
         for window in qtile.windowMap.values():
-            if window.group and window.match(wname=self.name):
+            if window.group and window.match(wname=self.title):
                 return True
         qtile.cmd_spawn(self.cmd)
         return False
@@ -94,12 +97,13 @@ class SwitchToWindowGroup(object):
     def __call__(self, qtile):
         logging.debug("currentScreen:%s", qtile.currentScreen.index)
         logging.debug(self.screen)
+        self.spawn_ifnot(qtile)
         if self.screen > len(qtile.screens) - 1:
             self.screen = len(qtile.screens) - 1
         if qtile.currentScreen.index != self.screen:
             qtile.cmd_to_screen(self.screen)
             return
-        self.spawn_ifnot(qtile)
+        #self.raise_window(qtile)
         qtile.currentScreen.cmd_togglegroup(self.name)
 
 
@@ -163,9 +167,14 @@ def check_restart(qtile):
         qtile.cmd_restart()
 
 
-def list_windows(qtile):
+def list_windows(qtile, current_group=False):
     from sh import dmenu
-    window_titles = [w.name for w in qtile.windowMap.values() if w.name != "<no name>"]
+    if current_group:
+        window_titles = [
+            w.name for w in  qtile.groupMap[qtile.currentGroup.name].windows
+            if w.name != "<no name>"]
+    else:
+        window_titles = [w.name for w in qtile.windowMap.values() if w.name != "<no name>"]
     logging.info(window_titles)
     from themes import dmenu_defaults
     dmenu_defaults = dmenu_defaults.replace("'", "").split()
@@ -189,7 +198,6 @@ def list_windows(qtile):
             except Exception as e:
                 logging.exception("error in group")
         return True
-        
 
     try:
         s = dmenu(
@@ -199,3 +207,7 @@ def list_windows(qtile):
         s.wait()
     except Exception as e:
         logging.exception("error running dmenu")
+
+
+def list_windows_group(qtile):
+    return list_windows(qtile, current_group=True)
