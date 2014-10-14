@@ -4,7 +4,7 @@ from libqtile.config import Key, Match, Rule
 from extra import (SwitchToWindowGroup, check_restart,
                    terminal, MoveToOtherScreenGroup, SwitchGroup,
                    RaiseWindowOrSpawn, list_windows, list_windows_group,
-                   MoveToGroup)
+                   MoveToGroup, MoveToNextGroup)
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
@@ -16,8 +16,6 @@ log.setLevel(logging.DEBUG)
 def get_keys(mod, num_groups, num_monitors):
     log.debug(dmenu_defaults)
     is_laptop = get_hostconfig('laptop')
-    group_split = (num_groups / 2, )
-    multi_monitor = num_monitors > 1
 
     keys = [
         # Switch between windows in current stack pane
@@ -89,8 +87,8 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "control"], "r", lazy.function(check_restart)),
         ([mod], "Right", lazy.screen.nextgroup()),
         ([mod], "Left", lazy.screen.prevgroup()),
-        ([], "F6",      lazy.function(SwitchGroup(
-            "6", SECONDARY_SCREEN if is_laptop else PRIMARY_SCREEN))),
+        ([mod, "shift"], "Right", MoveToNextGroup()),
+        ([mod, "shift"], "Left", MoveToNextGroup()),
 
         ([mod], "m", lazy.group.setlayout('max')),
         ([mod], "t", lazy.group.setlayout('tile')),
@@ -136,12 +134,14 @@ def get_keys(mod, num_groups, num_monitors):
             spawn=terminal('monitor')))),
         ([], "F10", lazy.function(SwitchToWindowGroup(
             'mail', 'mail', screen=PRIMARY_SCREEN, spawn=terminal('mail')))),
+        ([], "F6", lazy.function(SwitchGroup(
+            "comm2", SECONDARY_SCREEN if is_laptop else PRIMARY_SCREEN))),
         ([], "F9", lazy.function(SwitchToWindowGroup(
-            'comm', 'comm', screen=PRIMARY_SCREEN, spawn=terminal('comm')))),
+            'comm1', 'comm', screen=PRIMARY_SCREEN, spawn=terminal('comm')))),
         ([], "F11", lazy.function(SwitchToWindowGroup(
-            'left', 'left', screen=SECONDARY_SCREEN, spawn=terminal('left')))),
+            'term1', 'left', screen=SECONDARY_SCREEN, spawn=terminal('left')))),
         ([], "F12", lazy.function(SwitchToWindowGroup(
-            'right', 'right', screen=PRIMARY_SCREEN, spawn=terminal('right')))),
+            'term2', 'right', screen=PRIMARY_SCREEN, spawn=terminal('right')))),
     ]
 
     laptop_keys = [
@@ -153,12 +153,13 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "XF86KbdBrightnessDown", lazy.spawn(
             "sudo samctl.py -k down")),
         # Media controls
-        ([], "XF86AudioMute", lazy.function(RaiseWindowOrSpawn(wmclass='Pavucontrol', cmd='pavucontrol'))),
-        #([], "XF86AudioMute", lazy.spawn("pavucontrol")),
-        ([], "XF86AudioLowerVolume", lazy.spawn("samctl.py -k up")),
+        ([], "XF86AudioMute", lazy.function(RaiseWindowOrSpawn(
+            wmclass='Pavucontrol', cmd='pavucontrol'))),
+        # ([], "XF86AudioMute", lazy.spawn("pavucontrol")),
+        ([], "XF86AudioLowerVolume", lazy.spawn("samctl.py -v up")),
         ([], "XF86AudioRaiseVolume", lazy.spawn("samctl.py -v down")),
         ([], "XF86WLAN", lazy.spawn(
-            "nmcli con up id Xperia\ Z1\ Network --nowait")),
+            "sudo nmcli con up id Xperia\ Z1\ Network --nowait")),
     ]
     if is_laptop:
         keys.extend(laptop_keys)
