@@ -2,7 +2,7 @@ import logging
 from libqtile.command import lazy
 from libqtile.config import Key, Match, Rule
 from extra import (SwitchToWindowGroup, check_restart,
-                   terminal, MoveToOtherScreenGroup, SwitchGroup,
+                   terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchGroup,
                    RaiseWindowOrSpawn, list_windows, list_windows_group,
                    MoveToGroup, MoveToNextGroup)
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
@@ -16,6 +16,8 @@ log.setLevel(logging.DEBUG)
 def get_keys(mod, num_groups, num_monitors):
     log.debug(dmenu_defaults)
     is_laptop = get_hostconfig('laptop')
+    term1_key = get_hostconfig('term1_key')
+    term2_key = get_hostconfig('term2_key')
 
     keys = [
         # Switch between windows in current stack pane
@@ -129,20 +131,21 @@ def get_keys(mod, num_groups, num_monitors):
 
         ([], "Menu", lazy.function(SwitchToWindowGroup(
             'monitor', 'monitor', screen=PRIMARY_SCREEN,
-            spawn=terminal('monitor')))),
+            spawn=terminal_tmux('monitor')))),
         ([], "XF86Eject", lazy.function(SwitchToWindowGroup(
             'monitor', 'monitor', screen=PRIMARY_SCREEN,
-            spawn=terminal('monitor')))),
+            spawn=terminal_tmux('monitor')))),
+        #([], "F10", lazy.function(SwitchGroup("mail"))),
         ([], "F10", lazy.function(SwitchToWindowGroup(
-            'mail', 'mail', screen=PRIMARY_SCREEN, spawn=terminal('mail')))),
+            'mail', 'mail', screen=SECONDARY_SCREEN, spawn=terminal_tmux('mail')))),
         ([], "F6", lazy.function(SwitchGroup(
-            "comm2", SECONDARY_SCREEN if is_laptop else PRIMARY_SCREEN))),
+            "comm2", SECONDARY_SCREEN))),
         ([], "F9", lazy.function(SwitchToWindowGroup(
-            'comm1', 'comm', screen=PRIMARY_SCREEN, spawn=terminal('comm')))),
-        ([], "F11", lazy.function(SwitchToWindowGroup(
-            'term1', 'left', screen=SECONDARY_SCREEN, spawn=terminal('left')))),
-        ([], "F12", lazy.function(SwitchToWindowGroup(
-            'term2', 'right', screen=PRIMARY_SCREEN, spawn=terminal('right')))),
+            'comm1', 'comm', screen=SECONDARY_SCREEN, spawn=terminal_tmux('comm')))),
+        ([], term1_key, lazy.function(SwitchToWindowGroup(
+            'term1', 'left', screen=SECONDARY_SCREEN, spawn=terminal_tmux('left')))),
+        ([], term2_key, lazy.function(SwitchToWindowGroup(
+            'term2', 'right', screen=PRIMARY_SCREEN, spawn=terminal_tmux('right')))),
     ]
 
     laptop_keys = [
@@ -162,8 +165,28 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "XF86WLAN", lazy.spawn(
             "sudo nmcli con up id Xperia\ Z1\ Network --nowait")),
     ]
+
+    desktop_keys = [
+        ([], "XF86Launch9", lazy.function(SwitchToWindowGroup(
+            'remote_term1', 'remote_term1', screen=SECONDARY_SCREEN,
+            spawn=terminal('remote_term1')))),
+        ([], "F19", lazy.function(SwitchToWindowGroup(
+            'remote_term2', 'remote_term2', screen=PRIMARY_SCREEN,
+            spawn=terminal('remote_term2')))),
+        ([], "KP_Begin", lazy.function(SwitchToWindowGroup(
+            'htop', 'htop', screen=SECONDARY_SCREEN,
+            spawn=terminal('htop', 'htop')))),
+        ([], "KP_Left", lazy.function(SwitchToWindowGroup(
+            'log', 'log', screen=SECONDARY_SCREEN,
+            spawn=terminal('log', 'sudo journalctl -xf')))),
+        ([], "KP_Right", lazy.function(SwitchToWindowGroup(
+            'ulog', 'ulog', screen=SECONDARY_SCREEN,
+            spawn=terminal('ulog', 'journalctl --user -xf')))),
+    ]
     if is_laptop:
         keys.extend(laptop_keys)
+    else:
+        keys.extend(desktop_keys)
 
     for i in range(1, 11):
         keys.append(([mod], str(i)[-1], lazy.function(SwitchGroup(i))))

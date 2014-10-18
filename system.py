@@ -22,24 +22,32 @@ laptop_autostart = dict(common_autostart)
 laptop_autostart.update({
     'nm-applet': None})
 
+desktop_autostart = dict(common_autostart)
+desktop_autostart.update({
+    'jabberel-tray.py': None})
+
+
 platform_specific = {
     'steven-series9': {
         'screens': {0: 0, 1: 1},
         'battery': True,
         'laptop': True,
         'autostart-once': laptop_autostart,
-        'screen_preferences': {
-            2: [{'wmclass': "google-chrome-stable"},
-                {"wmclass": "Navigator"}],
-            1: []
+        'screen_affinity': {
         },
+        'term1_key': 'F11',
+        'term2_key': 'F12',
     },
     'sydsjoseph-pc1': {
         'screens': {0: 0, 1: 1},
         'battery': False,
         'laptop': False,
         'autostart-once': common_autostart,
-        'screen_preferences': {},
+        'screen_affinity': {
+            'mail': 1
+        },
+        'term1_key': 'XF86Launch5',
+        'term2_key': 'XF86Launch6',
     }
 }
 
