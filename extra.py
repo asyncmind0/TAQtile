@@ -174,17 +174,28 @@ def check_restart(qtile):
 
 def list_windows(qtile, current_group=False):
     from sh import dmenu
+
+    def title_format(x):
+        return "[%s] %s" % (
+            x.group.name if x.group else '',
+            x.name)
+
     if current_group:
         window_titles = [
-            w.name for w in  qtile.groupMap[qtile.currentGroup.name].windows
-            if w.name != "<no name>"]
+            w.name for w in qtile.groupMap[qtile.currentGroup.name].windows
+            if w.name != "<no name>"
+        ]
     else:
-        window_titles = [w.name for w in qtile.windowMap.values() if w.name != "<no name>"]
+        window_titles = [
+            title_format(w) for w in qtile.windowMap.values() if w.name != "<no name>"
+        ]
     logging.info(window_titles)
     from themes import dmenu_defaults
     dmenu_defaults = dmenu_defaults.replace("'", "").split()
 
     def process_selected(selected):
+        if not current_group:
+            group, selected = selected.split(']', 1)
         selected = selected.strip()
         logging.info("Switch to: %s", selected)
         for window in qtile.windowMap.values():
@@ -206,7 +217,8 @@ def list_windows(qtile, current_group=False):
 
     try:
         s = dmenu(
-            "-i", "-p", ">>> ",
+            "-i", "-p", "%s >>> " % ((
+                "[%s]" % qtile.currentGroup.name) if current_group else "[*]"),
             *dmenu_defaults,
             _in="\n".join(window_titles), _out=process_selected)
         s.wait()
