@@ -1,6 +1,5 @@
 import logging
 import os
-import signal
 
 from libqtile import hook, window
 
@@ -34,11 +33,11 @@ def restart_on_randr(qtile, ev):
     print("Screen change: %s", ev.__dict__)
     global event_cntr, prev_timestamp
     cur_timestamp = ev.timestamp
-    num_mons = get_num_monitors()
+    # num_mons = get_num_monitors()
     if abs(prev_timestamp - cur_timestamp) > 1000:
         # and num_mons != initial_num_mons:
         # if num_screens != get_num_monitors():
-        #signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+        # signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         print("RESTART screen change")
         qtile.cmd_restart()
     else:
@@ -48,7 +47,7 @@ def restart_on_randr(qtile, ev):
 @hook.subscribe.startup
 def startup():
     # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
-    #signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+    # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
     commands = get_hostconfig('autostart-once')
     num_mons = get_num_monitors()
     log.debug("Num MONS:%s", num_mons)
