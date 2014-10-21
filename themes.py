@@ -12,8 +12,9 @@ import os
 default_theme = dict(
     fontsize=14,
     padding=0,
-    borderwidth=1,
-    font="Inconsolata"
+    font="Inconsolata",
+    borderwidth=2,
+    bar_height=18
 )
 
 star_trek_blue = dict(
@@ -32,7 +33,7 @@ matrix_green = dict(
 )
 
 current_theme = dict(default_theme)
-current_theme.update(matrix_green)
+current_theme.update(star_trek_blue)
 log.debug("Current theme:%s", current_theme)
 #current_theme = matrix_green
 dmenu_defaults = (
