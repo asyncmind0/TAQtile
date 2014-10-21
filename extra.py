@@ -10,11 +10,18 @@ from system import execute_once
 log=logging.getLogger('myqtile')
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
-terminal1 = "st -t %s -e tmx_outer %s"
+_terminal = "st -t %s "
 
 
-def terminal(x):
-    return terminal1 % (x, x)
+def terminal_tmux(x):
+    return (_terminal + "-e tmx_outer %s") % (x, x)
+
+
+def terminal(title, cmd=None):
+    term = _terminal % title
+    if cmd:
+        term += " -e %s" % cmd
+    return term
 
 
 class SwitchGroup(object):

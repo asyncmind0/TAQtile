@@ -106,9 +106,9 @@ def new_client(client):
         log.exception("client_new hook")
 
 
-@hook.subscribe.client_managed
+#@hook.subscribe.client_managed
 def move_windows_multimonitor(window):
-    screen_preferences = get_hostconfig('screen_preferences')
+    screen_preferences = get_hostconfig('screen_affinity')
     for screenno, pref in screen_preferences.iteritems():
         for rule in pref:
             if hasattr(window, 'match') and window.match(**rule):
