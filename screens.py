@@ -112,20 +112,20 @@ def get_screens(num_monitors, num_groups, groups):
     memgraph_params['type'] = "linefill"
     netgraph_params = dict(graph_defaults)
     sep_params = default_params(padding=2, fontsize=9, height_percent=60)
-    #netgraph_params['fill_color'] = "80FF00.3"
+    # netgraph_params['fill_color'] = "80FF00.3"
     group_splits = ((num_groups / num_monitors) if multi_monitor else num_groups,)
 
     # change labels of groups for multi monitor support
     gb1 = {}
     gb2 = {}
-    mon_map = {0: gb1, 1: gb2}
+    mon_map = {1: gb1, 0: gb2}
     groupnum = 0
     mon = 0
     for i, group in enumerate(groups):
         if group.name.isdigit():
             if multi_monitor and int(group.name)-1 in group_splits:
                 mon += 1
-        groupname =  group.name
+        groupname = group.name
         grouplabel = group.name[-1] if group.name.isdigit() else group.name
         if group.screen_affinity is None or not multi_monitor:
             mon_map[mon][groupname] = grouplabel
@@ -158,7 +158,7 @@ def get_screens(num_monitors, num_groups, groups):
         widget.TextBox("n:", **default_params()),
         widget.NetGraph(**netgraph_params),
         # widget.Sep(**sep_params),
-        #widget.Notify(width=30, **notify_params),
+        # widget.Notify(width=30, **notify_params),
         widget.Sep(**sep_params)
     ]
     if system.get_hostconfig('battery'):
@@ -177,7 +177,7 @@ def get_screens(num_monitors, num_groups, groups):
         CalClock(**clock_params),
     ]
     bar_height = groupbox_params.get('bar_height', 10)
-    screens.append(Screen(bar.Bar(w1, bar_height)))
+    screens.append(Screen(bar.Bar(w2, bar_height)))
     if num_monitors > 1:
-        screens.append(Screen(bar.Bar(w2, bar_height)))
+        screens.append(Screen(bar.Bar(w1, bar_height)))
     return screens

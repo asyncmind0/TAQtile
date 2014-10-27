@@ -1,12 +1,4 @@
-from libqtile.config import Key, Click, Drag, Screen, Group, Match, Rule
-from libqtile.command import lazy
-from libqtile import layout, bar, widget, hook
-from libqtile.dgroups import simple_key_binder
 import logging as log
-import subprocess
-from py_compile import compile
-import re
-import os
 
 
 default_theme = dict(
