@@ -7,14 +7,14 @@ from libqtile.config import Group, Match, Rule
 
 from system import execute_once
 
-log=logging.getLogger('myqtile')
+log = logging.getLogger('myqtile')
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
 _terminal = "st -t %s "
 
 
-def terminal_tmux(x):
-    return (_terminal + "-e tmx_outer %s") % (x, x)
+def terminal_tmux(level, session):
+    return (_terminal + "-e tmux.py %s") % (level, session)
 
 
 def terminal(title, cmd=None):
@@ -67,11 +67,20 @@ class MoveToGroup(object):
             index = index + (screenindex * 10)
         index = str(index)
         qtile.currentWindow.cmd_togroup(index)
-        
-class MoveToNextGroup(object):
-    def __call__(self, qtile):
-        logging.debug("MoveToNextGroup:%s:%s", qtile.currentScreen.index, self.name)
-        qtile.currentWindow.cmd_togroup(index)
+
+
+def move_to_next_group(qtile):
+    index = qtile.groups.index(qtile.currentGroup) + 1
+    if len(qtile.groups) == index:
+        index = 0
+    qtile.currentWindow.cmd_togroup(qtile.groups[index].name)
+
+
+def move_to_prev_group(qtile):
+    index = qtile.groups.index(qtile.currentGroup) - 1
+    if index < 0:
+        index = len(qtile.groups) - 1
+    qtile.currentWindow.cmd_togroup(qtile.groups[index].name)
 
 
 class MoveToOtherScreenGroup(object):
@@ -79,10 +88,12 @@ class MoveToOtherScreenGroup(object):
         self.direction = -1 if prev else 1
 
     def __call__(self, qtile):
+        logging.error("MoveToOtherScreenGroup:%s", qtile.currentScreen.index)
         otherscreen = (qtile.screens.index(qtile.currentScreen)
                        + self.direction) % len(qtile.screens)
         othergroup = qtile.screens[otherscreen].group.name
-        qtile.currentWindow.cmd_togroup(othergroup)
+        if qtile.currentWindow:
+            qtile.currentWindow.cmd_togroup(othergroup)
 
 
 class SwitchToWindowGroup(object):
@@ -146,7 +157,7 @@ class RaiseWindowOrSpawn(object):
                 #window.cmd_togroup(qtile.currentGroup.name)
                 self.window = window
                 break
-        
+
         if self.window:
             window = self.window
             if self.static and isinstance(self.static, list):

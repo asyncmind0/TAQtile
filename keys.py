@@ -4,7 +4,7 @@ from libqtile.config import Key, Match, Rule
 from extra import (SwitchToWindowGroup, check_restart,
                    terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchGroup,
                    RaiseWindowOrSpawn, list_windows, list_windows_group,
-                   MoveToGroup, MoveToNextGroup)
+                   MoveToGroup, move_to_next_group, move_to_prev_group)
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
@@ -53,12 +53,15 @@ def get_keys(mod, num_groups, num_monitors):
          lazy.layout.down().when('monadtall'),
          lazy.layout.next()),
 
-        ([mod, "shift"], "l",
-         lazy.layout.client_to_next().when('stack'),
-         lazy.layout.increase_ratio().when('tile')),
-        ([mod, "shift"], "h",
-         lazy.layout.client_to_previous().when('stack'),
-         lazy.layout.decrease_ratio().when('tile')),
+        ([mod, "shift"], "comma",
+         lazy.layout.client_to_next()),
+        ([mod, "shift"], "period",
+         lazy.layout.client_to_previous()),
+
+        ([mod, "shift"], "Left",
+         lazy.function(move_to_prev_group)),
+        ([mod, "shift"], "Right",
+         lazy.function(move_to_next_group)),
 
         ([mod, "shift"], "space", lazy.layout.flip().when('monadtall'),
          lazy.layout.rotate().when('tile')),
@@ -89,8 +92,6 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "control"], "r", lazy.function(check_restart)),
         ([mod], "Right", lazy.screen.nextgroup()),
         ([mod], "Left", lazy.screen.prevgroup()),
-        ([mod, "shift"], "Right", MoveToNextGroup()),
-        ([mod, "shift"], "Left", MoveToNextGroup()),
 
         ([mod], "m", lazy.group.setlayout('max')),
         ([mod], "t", lazy.group.setlayout('tile')),
@@ -106,12 +107,11 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "F3", lazy.function(list_windows_group)),
         ([mod], "F5", lazy.function(list_windows)),
         ([mod], "r", lazy.spawncmd()),
-        ([mod], "Return", lazy.spawn("st")),
+        ([mod], "Return", lazy.spawn("st -t shrapnel")),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         ([mod, "shift"], "p", lazy.spawn("passmenu")),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
         ([mod, ], "e", lazy.spawn("conf")),
-        ([mod, ], "Return", lazy.spawn("st")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "control"], "s", lazy.spawn("surf")),
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
@@ -131,21 +131,26 @@ def get_keys(mod, num_groups, num_monitors):
 
         ([], "Menu", lazy.function(SwitchToWindowGroup(
             'monitor', 'monitor', screen=PRIMARY_SCREEN,
-            spawn=terminal_tmux('monitor')))),
+            spawn=terminal_tmux('outer', 'monitor')))),
         ([], "XF86Eject", lazy.function(SwitchToWindowGroup(
             'monitor', 'monitor', screen=PRIMARY_SCREEN,
-            spawn=terminal_tmux('monitor')))),
+            spawn=terminal_tmux('outer', 'monitor')))),
         #([], "F10", lazy.function(SwitchGroup("mail"))),
         ([], "F10", lazy.function(SwitchToWindowGroup(
-            'mail', 'mail', screen=SECONDARY_SCREEN, spawn=terminal_tmux('mail')))),
+            'mail', 'mail', screen=SECONDARY_SCREEN,
+        ))),
+            #spawn=terminal_tmux('mail')))),
         ([], "F6", lazy.function(SwitchGroup(
             "comm2", SECONDARY_SCREEN))),
         ([], "F9", lazy.function(SwitchToWindowGroup(
-            'comm1', 'comm', screen=SECONDARY_SCREEN, spawn=terminal_tmux('comm')))),
+            'comm1', 'comm', screen=SECONDARY_SCREEN,
+            spawn=terminal_tmux('outer', 'comm')))),
         ([], term1_key, lazy.function(SwitchToWindowGroup(
-            'term1', 'left', screen=SECONDARY_SCREEN, spawn=terminal_tmux('left')))),
+            'term1', 'left', screen=SECONDARY_SCREEN,
+            spawn=terminal_tmux('outer', 'left')))),
         ([], term2_key, lazy.function(SwitchToWindowGroup(
-            'term2', 'right', screen=PRIMARY_SCREEN, spawn=terminal_tmux('right')))),
+            'term2', 'right', screen=PRIMARY_SCREEN,
+            spawn=terminal_tmux('outer', 'right')))),
     ]
 
     laptop_keys = [
