@@ -1,6 +1,7 @@
 import glob
 import logging
 import os
+from os.path import expanduser
 from py_compile import compile
 
 from libqtile.config import Group, Match, Rule
@@ -10,15 +11,16 @@ from system import execute_once
 log = logging.getLogger('myqtile')
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
-_terminal = "st -t %s "
+_terminal = "st -t {0} "
 
 
 def terminal_tmux(level, session):
-    return (_terminal + "-e tmux.py %s") % (level, session)
+    return "{0} -e {1} {2} {3}".format(
+        _terminal.format(session), expanduser("~/.bin/tmux.py"), level, session)
 
 
 def terminal(title, cmd=None):
-    term = _terminal % title
+    term = _terminal.format(title)
     if cmd:
         term += " -e %s" % cmd
     return term
