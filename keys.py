@@ -137,8 +137,8 @@ def get_keys(mod, num_groups, num_monitors):
             spawn=terminal_tmux('outer', 'monitor')))),
         #([], "F10", lazy.function(SwitchGroup("mail"))),
         ([], "F10", lazy.function(SwitchToWindowGroup(
-            'mail', 'mail', screen=SECONDARY_SCREEN,
-        ))),
+            'mail', 'kontact', screen=SECONDARY_SCREEN,
+            spawn="kontact"))),
             #spawn=terminal_tmux('mail')))),
         ([], "F6", lazy.function(SwitchGroup(
             "comm2", SECONDARY_SCREEN))),
