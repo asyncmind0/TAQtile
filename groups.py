@@ -38,6 +38,8 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         Rule(Match(wm_class=["KeePass2"]), float=True),
         Rule(Match(wm_class=["Kruler"]), float=True),
         Rule(Match(wm_class=["Screenkey"]), float=True, intrusive=True),
+        Rule(Match(title=[re.compile(".*Org Select.*")]),
+             float=True, intrusive=True),
         Rule(Match(wm_class=["rdesktop"]), group="5"),
         Rule(Match(wm_class=[re.compile(r".*VirtualBox.*")]),
              group="13" if multi_monitor else "4"),
@@ -56,7 +58,9 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
     groups = []
     # map og group and prefered screen
     group_args = OrderedDict()
-    group_args['comm1'] = dict(screen_affinity=SECONDARY_SCREEN, matches=terminal_matches([r"^comm$"]))
+    group_args['comm1'] = dict(
+        screen_affinity=SECONDARY_SCREEN,
+        matches=terminal_matches([r"^comm$"]))
     group_args['comm2'] = dict(
         layout="slice",
         matches=[Match(title=[re.compile(r"^Hangouts$")])],

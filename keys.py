@@ -103,6 +103,7 @@ def get_keys(mod, num_groups, num_monitors):
         # APP LAUNCHERS
         #([mod], "r", lazy.spawncmd()),
         ([mod], "F2", lazy.spawn("dmenu-run-recent %s" % dmenu_defaults)),
+        ([mod], "o", lazy.spawn("orgcapture.py")),
         #([mod], "F2", lazy.spawn("dmenu_run %s" % dmenu_defaults)),
         ([mod], "F3", lazy.function(list_windows_group)),
         ([mod], "F5", lazy.function(list_windows)),

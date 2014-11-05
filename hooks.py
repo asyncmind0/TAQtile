@@ -18,7 +18,7 @@ log = logging.getLogger("qtile")
 log.error("importin hooks")
 
 
-@hook.subscribe.setgroup
+#@hook.subscribe.setgroup
 def move_special_windows():
     for name in all_desktops:
         for w in hook.qtile.windowMap.values():
@@ -85,25 +85,46 @@ def dbus_register():
                       'string:' + x])
 
 
-@hook.subscribe.client_new
-def new_client(client):
+@hook.subscribe.window_name_change
+def apply_rules(*args, **kwarg):
     try:
-        window_class = client.window.get_wm_class()[0]
-        window_type = client.get_wm_type() if hasattr(
-            client, 'get_wm_type') else ''
-        window_name = client.window.get_name()
-        if window_class in [
-                "screenkey", "kruler"]:
-            client.static(0)
-        if window_class == "screenkey" and window_type != 'dialog':
-            client.place(100, 100, 800, 50, 2, 2, '00C000')
-        if window_name == "st":
-            client.window.floating = 1
-            client.place(50, 30, 500, 400, 1, None, force=True)#, '00C000')
-        log.debug(window_class)
-        log.debug(window_type)
+        log.error("APPLY RULES")
+        #import remote_pdb;remote_pdb.set_trace(port=9999)
+        windows = [
+            i for i in hook.qtile.windowMap.values()
+            if not isinstance(i, window.Internal)]
+        for client in windows:
+            window_class = client.window.get_wm_class()
+            window_class = window_class[0] if window_class else ''
+            window_type = client.get_wm_type() if hasattr(
+                client, 'get_wm_type') else ''
+            window_name = client.name
+            log.error('Name:%s', window_name)
+            if window_class in [
+                    "screenkey", "kruler"]:
+                client.static(0)
+            if window_class == "screenkey" and window_type != 'dialog':
+                client.place(100, 100, 800, 50, 2, 2, '00C000')
+            if window_name in ["shrapnel", "*Org Select*"]:
+                client.cmd_enable_floating()
+                #client.static(0)
+                client.place(600, 60, 500, 400, 1, None, force=True)#, '00C000')
+                #client.cmd_move_floating(10, 10, 0, 0)
+                #client.cmd_set_position_floating(50, 50, 0, 0)
+            log.debug(window_class)
+            log.debug(window_type)
     except Exception as e:
         log.exception("client_new hook")
+
+@hook.subscribe.client_new
+def client_new(client, *args, **kwargs):
+    log.error("client_new:%s" % client.window.get_name())
+    if client.window.get_name() == 'shrapnel':
+        client.cmd_enable_floating()
+        #client.static(0)
+        client.place(50, 30, 500, 400, 1, None, force=True)#, '00C000')
+        
+
 
 
 #@hook.subscribe.client_managed
@@ -122,16 +143,3 @@ def move_windows_multimonitor(window):
                     log.debug("not an integer group")
     # if should_be_floating(window.window):
     #    window.window.floating = True
-
-
-@hook.subscribe.window_name_change
-def change_name():
-    try:
-        windows = [
-            i for i in hook.qtile.windowMap.values()
-            if not isinstance(i, window.Internal)]
-        for win in windows:
-            if hasattr(win, 'defunct'):
-                hook.qtile.dgroups._add(win)
-    except Exception as e:
-        log.exception("change_name")
