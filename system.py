@@ -10,6 +10,7 @@ log = logging.getLogger('qtile')
 mod = "mod4"
 
 common_autostart = {
+    'xcompmgr': None,
     'klipper': None,
     'xscreensaver -nosplash': None,
     'dropbox start': 'dropbox',

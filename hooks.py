@@ -105,26 +105,28 @@ def apply_rules(*args, **kwarg):
                 client.static(0)
             if window_class == "screenkey" and window_type != 'dialog':
                 client.place(100, 100, 800, 50, 2, 2, '00C000')
+            #if window_name == "Hangouts":
+            #    client.cmd_togroup("comm2")
             if window_name in ["shrapnel", "*Org Select*"]:
+                if hasattr(client, 'applied'):
+                    continue
+                client.applied = True
                 client.cmd_enable_floating()
-                #client.static(0)
-                client.place(600, 60, 500, 400, 1, None, force=True)#, '00C000')
-                #client.cmd_move_floating(10, 10, 0, 0)
-                #client.cmd_set_position_floating(50, 50, 0, 0)
+                client.place(500, 50, 800, 400, 1, None, force=True) #, '00C000')
             log.debug(window_class)
             log.debug(window_type)
     except Exception as e:
         log.exception("client_new hook")
+
 
 @hook.subscribe.client_new
 def client_new(client, *args, **kwargs):
     log.error("client_new:%s" % client.window.get_name())
     if client.window.get_name() == 'shrapnel':
         client.cmd_enable_floating()
-        #client.static(0)
-        client.place(50, 30, 500, 400, 1, None, force=True)#, '00C000')
-        
-
+        client.place(500, 50, 800, 400, 1, None, above=True, force=True)#, '00C000')
+        client.cmd_opacity(0.85)
+        # client.static(0)
 
 
 #@hook.subscribe.client_managed
