@@ -24,20 +24,23 @@ def get_keys(mod, num_groups, num_monitors):
         (
             [mod], "k",
             lazy.layout.up().when('stack'),
-            lazy.layout.up().when('max'),
+            #lazy.layout.up().when('max'),
             lazy.layout.up().when('tile'),
-            lazy.layout.up().when('slice'),
+            #lazy.layout.up().when('slice'),
             lazy.layout.previous().when('monadtall'),
-            #lazy.layout.previous().when(when_floating=True)
+            #lazy.layout.previous().when(when_floating=True),
+            lazy.group.next_window(),
         ),
         (
             [mod], "j",
+            #lazy.layout.next(),
             lazy.layout.down().when('stack'),
-            lazy.layout.down().when('max'),
+            #lazy.layout.down().when('max'),
             lazy.layout.down().when('tile'),
-            lazy.layout.down().when('slice'),
+            #lazy.layout.down().when('slice'),
             lazy.layout.next().when('monadtall'),
-            #lazy.layout.next().when(when_floating=True)
+            #lazy.layout.next().when(when_floating=True),
+            lazy.group.prev_window()
         ),
 
         #([mod], "k", lazy.layout.up()),
@@ -53,15 +56,11 @@ def get_keys(mod, num_groups, num_monitors):
          lazy.layout.down().when('monadtall'),
          lazy.layout.next()),
 
-        ([mod, "shift"], "comma",
-         lazy.layout.client_to_next()),
-        ([mod, "shift"], "period",
-         lazy.layout.client_to_previous()),
+        ([mod], "comma", lazy.layout.client_to_next()),
+        ([mod], "period", lazy.layout.client_to_previous()),
 
-        ([mod, "shift"], "Left",
-         lazy.function(move_to_prev_group)),
-        ([mod, "shift"], "Right",
-         lazy.function(move_to_next_group)),
+        ([mod, "shift"], "comma", lazy.function(move_to_prev_group)),
+        ([mod, "shift"], "period", lazy.function(move_to_next_group)),
 
         ([mod, "shift"], "space", lazy.layout.flip().when('monadtall'),
          lazy.layout.rotate().when('tile')),
@@ -69,6 +68,14 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "shift"], "Right", lazy.window.move_floating(5, 0, 0, 0)),
         ([mod, "shift"], "Up", lazy.window.move_floating(0, -5, 0, 0)),
         ([mod, "shift"], "Down", lazy.window.move_floating(0, 5, 0, 0)),
+        ([mod, "shift", "control"],
+         "Left", lazy.window.resize_floating(-5, 0, 0, 0)),
+        ([mod, "shift", "control"],
+         "Right", lazy.window.resize_floating(5, 0, 0, 0)),
+        ([mod, "shift", "control"],
+         "Up", lazy.window.resize_floating(0, -5, 0, 0)),
+        ([mod, "shift", "control"],
+         "Down", lazy.window.resize_floating(0, 5, 0, 0)),
 
         # Swap panes of split stack
         # toggle between windows just like in unity with 'alt+tab'
@@ -98,6 +105,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "s", lazy.group.setlayout('stack')),
         ([mod], "x", lazy.group.setlayout('monadtall')),
         ([mod], "f", lazy.window.toggle_floating()),
+        ([mod], "n", lazy.window.toggle_minimize()),
         #([mod], "t", lazy.group.setlayout('xmonad-tall')),
 
         # APP LAUNCHERS
@@ -152,6 +160,12 @@ def get_keys(mod, num_groups, num_monitors):
         ([], term2_key, lazy.function(SwitchToWindowGroup(
             'term2', 'right', screen=PRIMARY_SCREEN,
             spawn=terminal_tmux('outer', 'right')))),
+        ([mod], term1_key, lazy.function(SwitchToWindowGroup(
+            'iress_right', 'iress_right', screen=SECONDARY_SCREEN,
+            spawn="iress_right"))),
+        ([mod], term2_key, lazy.function(SwitchToWindowGroup(
+            'iress_left', 'iress_left', screen=PRIMARY_SCREEN,
+            spawn="iress_left"))),
     ]
 
     laptop_keys = [
@@ -166,8 +180,8 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "XF86AudioMute", lazy.function(RaiseWindowOrSpawn(
             wmclass='Pavucontrol', cmd='pavucontrol'))),
         # ([], "XF86AudioMute", lazy.spawn("pavucontrol")),
-        ([], "XF86AudioLowerVolume", lazy.spawn("samctl.py -v up")),
-        ([], "XF86AudioRaiseVolume", lazy.spawn("samctl.py -v down")),
+        ([], "XF86AudioLowerVolume", lazy.spawn("samctl.py -v down")),
+        ([], "XF86AudioRaiseVolume", lazy.spawn("samctl.py -v up")),
         ([], "XF86WLAN", lazy.spawn(
             "sudo nmcli con up id Xperia\ Z1\ Network --nowait")),
     ]

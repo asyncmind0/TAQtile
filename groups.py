@@ -47,6 +47,15 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             re.compile(r".*iress development.*conkeror$", re.I),
             re.compile(r".*wealth management support.*conkeror$"),
         ]), group="11"),
+        Rule(Match(role=[re.compile("^browser$")],
+                   wm_class=["Google-chrome-stable"]),
+             group="11" if multi_monitor else "1",
+             break_on_match=False),
+        Rule(Match(title=[re.compile(r"^Hangouts$")]), group="comm2",
+             break_on_match=False),
+        Rule(Match(role=[re.compile("^pop-up$")],
+                   wm_instance_class=["^crx_.*"]),
+             group="comm2", break_on_match=False),
     ])
 
     def terminal_matches(regexes):
@@ -63,13 +72,13 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         matches=terminal_matches([r"^comm$"]))
     group_args['comm2'] = dict(
         layout="slice",
-        matches=[Match(title=[re.compile(r"^Hangouts$")])],
         layouts=[
-            #layout.Slice('right', 256, role='buddy_list',
-            ##             fallback=layout.Tile(**current_theme)),
+            layout.Slice('right', 256, role='buddy_list',
+                         fallback=layout.Tile(**current_theme)),
             # a layout for hangouts
-            layout.Slice('right', 356, wname="Hangouts",
-                         fallback=layout.Tile(**current_theme))])
+            layout.Slice(
+                'right', 356, wname="Hangouts", role="pop-up",
+                fallback=layout.Tile(**current_theme))])
     group_args['monitor'] = dict(
         screen_affinity=0, matches=terminal_matches([r"^monitor$"]))
     group_args['mail'] = dict(

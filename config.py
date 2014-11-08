@@ -36,13 +36,17 @@ layouts = [
 # Automatically float these types. This overrides the default behavior (which
 # is to also float utility types), but the default behavior breaks our fancy
 # gimp slice layout specified later on.
-floating_layout = layout.Floating(auto_float_types=[
-    "notification",
-    "toolbar",
-    "splash",
-    'dialog',  # this has to be here else dialogs go to new group
-    "Screenkey",
-], **current_theme)
+floating_layout = layout.Floating(
+    float_rules=[
+        {'wname': 'shrapnel'},
+    ],
+    auto_float_types=[
+        "notification",
+        "toolbar",
+        "splash",
+        'dialog',  # this has to be here else dialogs go to new group
+        "Screenkey",
+    ], **current_theme)
 
 
 # This allows you to drag windows around with the mouse if you want.
@@ -56,7 +60,7 @@ mouse = [
 
 groups = []
 float_windows = ['buddy_list', ]
-# follow_mouse_focus = True
+follow_mouse_focus = False
 bring_front_click = False
 cursor_warp = False
 auto_fullscreen = True
