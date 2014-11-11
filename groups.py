@@ -19,9 +19,6 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
 
     # dgroup rules that not belongs to any group
     dgroups_app_rules.extend([
-        Rule(Match(title=[
-            re.compile(r"^Developer.*"), re.compile(r"^Inspector.*")]),
-             group="2", break_on_match=True),
         # Everything i want to be float, but don't want to change group
         Rule(Match(title=['nested', 'gscreenshot'],
                    wm_class=['Guake.py', 'Exe', 'Onboard', 'Florence',
@@ -56,6 +53,9 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         Rule(Match(role=[re.compile("^pop-up$")],
                    wm_instance_class=["^crx_.*"]),
              group="comm2", break_on_match=False),
+        Rule(Match(title=[
+            re.compile(r"^Developer.*"), re.compile(r"^Inspector.*")]),
+             group="2", break_on_match=True),
     ])
 
     def terminal_matches(regexes):
