@@ -73,8 +73,8 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
     group_args['comm2'] = dict(
         layout="slice",
         layouts=[
-            layout.Slice('right', 256, role='buddy_list',
-                         fallback=layout.Tile(**current_theme)),
+            #layout.Slice('right', 256, role='buddy_list',
+            #             fallback=layout.Tile(**current_theme)),
             # a layout for hangouts
             layout.Slice(
                 'right', 356, wname="Hangouts", role="pop-up",

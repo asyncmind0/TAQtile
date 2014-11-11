@@ -12,6 +12,8 @@ from themes import current_theme, dmenu_defaults
 log = logging.getLogger('myqtile')
 log.setLevel(logging.DEBUG)
 
+cmd_autossh_iress = "st -t iress_{0} -e autossh -M 0 -p 3307 -X localhost -t '~/.bin/tmux.py -r outer {0}'"
+
 
 def get_keys(mod, num_groups, num_monitors):
     log.debug(dmenu_defaults)
@@ -24,23 +26,21 @@ def get_keys(mod, num_groups, num_monitors):
         (
             [mod], "k",
             lazy.layout.up().when('stack'),
-            #lazy.layout.up().when('max'),
+            lazy.layout.up().when('max'),
             lazy.layout.up().when('tile'),
-            #lazy.layout.up().when('slice'),
+            lazy.layout.previous().when('slice'),
             lazy.layout.previous().when('monadtall'),
-            #lazy.layout.previous().when(when_floating=True),
-            lazy.group.next_window(),
+            lazy.group.prev_window().when("floating"),
         ),
         (
             [mod], "j",
             #lazy.layout.next(),
             lazy.layout.down().when('stack'),
-            #lazy.layout.down().when('max'),
+            lazy.layout.down().when('max'),
             lazy.layout.down().when('tile'),
-            #lazy.layout.down().when('slice'),
+            lazy.layout.next().when('slice'),
             lazy.layout.next().when('monadtall'),
-            #lazy.layout.next().when(when_floating=True),
-            lazy.group.prev_window()
+            lazy.group.next_window().when("floating"),
         ),
 
         #([mod], "k", lazy.layout.up()),
@@ -48,13 +48,13 @@ def get_keys(mod, num_groups, num_monitors):
         # Move windows up or down in current stack
         ([mod, "shift"], "k", lazy.layout.shuffle_up()),
         ([mod, "shift"], "j", lazy.layout.shuffle_down()),
+        ([mod, "shift"], "h", lazy.layout.client_to_previous().when("stack")),
+        ([mod, "shift"], "l", lazy.layout.client_to_next().when("stack")),
 
         ([mod], "h",
-         lazy.layout.up().when('monadtall'),
-         lazy.layout.previous()),
+         lazy.group.prev_window()),
         ([mod], "l",
-         lazy.layout.down().when('monadtall'),
-         lazy.layout.next()),
+         lazy.group.next_window()),
 
         ([mod], "comma", lazy.layout.client_to_next()),
         ([mod], "period", lazy.layout.client_to_previous()),
@@ -161,11 +161,11 @@ def get_keys(mod, num_groups, num_monitors):
             'term2', 'right', screen=PRIMARY_SCREEN,
             spawn=terminal_tmux('outer', 'right')))),
         ([mod], term1_key, lazy.function(SwitchToWindowGroup(
-            'iress_right', 'iress_right', screen=SECONDARY_SCREEN,
-            spawn="iress_right"))),
+            'term1', 'iress_right', screen=SECONDARY_SCREEN,
+            spawn=cmd_autossh_iress.format("right")))),
         ([mod], term2_key, lazy.function(SwitchToWindowGroup(
-            'iress_left', 'iress_left', screen=PRIMARY_SCREEN,
-            spawn="iress_left"))),
+            'term2', 'iress_left', screen=PRIMARY_SCREEN,
+            spawn=cmd_autossh_iress.format("left")))),
     ]
 
     laptop_keys = [
@@ -177,11 +177,12 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "XF86KbdBrightnessDown", lazy.spawn(
             "sudo samctl.py -k down")),
         # Media controls
-        ([], "XF86AudioMute", lazy.function(RaiseWindowOrSpawn(
+        ([], "XF86LaunchB", lazy.function(RaiseWindowOrSpawn(
             wmclass='Pavucontrol', cmd='pavucontrol'))),
         # ([], "XF86AudioMute", lazy.spawn("pavucontrol")),
         ([], "XF86AudioLowerVolume", lazy.spawn("samctl.py -v down")),
         ([], "XF86AudioRaiseVolume", lazy.spawn("samctl.py -v up")),
+        ([], "XF86AudioPlay", lazy.spawn("mpc toggle")),
         ([], "XF86WLAN", lazy.spawn(
             "sudo nmcli con up id Xperia\ Z1\ Network --nowait")),
     ]

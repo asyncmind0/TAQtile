@@ -10,8 +10,9 @@ default_theme = dict(
 )
 
 star_trek_blue = dict(
-    border="#42B1FF",
-    border_normal="#42B1FF",
+    border="#00FFDD",
+    border_focus="#00FFDD",
+    border_normal="#000000",
     foreground="#06B4E7",
     background="#010F2C",
 )
