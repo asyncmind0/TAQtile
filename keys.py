@@ -120,7 +120,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         ([mod, "shift"], "p", lazy.spawn("passmenu")),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
-        ([mod, ], "e", lazy.spawn("conf")),
+        ([mod, ], "e", lazy.spawn("krusader")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "control"], "s", lazy.spawn("surf")),
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
@@ -138,9 +138,9 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "F1", lazy.function(SwitchGroup("1"))),
         ([], "F2", lazy.function(SwitchGroup("2"))),
 
-        ([], "Menu", lazy.function(SwitchToWindowGroup(
-            'monitor', 'monitor', screen=PRIMARY_SCREEN,
-            spawn=terminal_tmux('outer', 'monitor')))),
+        #([], "Menu", lazy.function(SwitchToWindowGroup(
+        #    'monitor', 'monitor', screen=PRIMARY_SCREEN,
+        #    spawn=terminal_tmux('outer', 'monitor')))),
         ([], "XF86Eject", lazy.function(SwitchToWindowGroup(
             'monitor', 'monitor', screen=PRIMARY_SCREEN,
             spawn=terminal_tmux('outer', 'monitor')))),

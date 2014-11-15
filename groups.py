@@ -37,7 +37,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         Rule(Match(wm_class=["Screenkey"]), float=True, intrusive=True),
         Rule(Match(title=[re.compile(".*Org Select.*")]),
              float=True, intrusive=True),
-        Rule(Match(wm_class=["rdesktop"]), group="5"),
+        Rule(Match(wm_class=["rdesktop"]), group="15"),
         Rule(Match(wm_class=[re.compile(r".*VirtualBox.*")]),
              group="13" if multi_monitor else "4"),
         Rule(Match(title=[
