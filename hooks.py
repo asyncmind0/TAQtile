@@ -113,6 +113,9 @@ def apply_rules(*args, **kwarg):
                 client.applied = True
                 client.cmd_enable_floating()
                 client.place(500, 50, 800, 400, 1, None, force=True) #, '00C000')
+            if window_class in ["kgpg"]:
+                client.cmd_enable_floating()
+                client.place(50, 50, 800, 400, 1, None, force=True) #, '00C000')
             log.debug(window_class)
             log.debug(window_type)
     except Exception as e:
