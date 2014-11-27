@@ -28,7 +28,7 @@ def get_keys(mod, num_groups, num_monitors):
             lazy.layout.up().when('stack'),
             lazy.layout.up().when('max'),
             lazy.layout.up().when('tile'),
-            lazy.layout.previous().when('slice'),
+            lazy.layout.up().when('slice'),
             lazy.layout.previous().when('monadtall'),
             lazy.group.prev_window().when("floating"),
         ),
@@ -38,7 +38,7 @@ def get_keys(mod, num_groups, num_monitors):
             lazy.layout.down().when('stack'),
             lazy.layout.down().when('max'),
             lazy.layout.down().when('tile'),
-            lazy.layout.next().when('slice'),
+            lazy.layout.down().when('slice'),
             lazy.layout.next().when('monadtall'),
             lazy.group.next_window().when("floating"),
         ),
@@ -146,14 +146,13 @@ def get_keys(mod, num_groups, num_monitors):
             spawn=terminal_tmux('outer', 'monitor')))),
         #([], "F10", lazy.function(SwitchGroup("mail"))),
         ([], "F10", lazy.function(SwitchToWindowGroup(
-            'mail', 'kontact', screen=SECONDARY_SCREEN,
-            spawn="kontact"))),
+            'mail', 'kmail', screen=SECONDARY_SCREEN,
+            spawn="kmail"))),
             #spawn=terminal_tmux('mail')))),
         ([], "F6", lazy.function(SwitchGroup(
             "comm2", SECONDARY_SCREEN))),
-        ([], "F9", lazy.function(SwitchToWindowGroup(
-            'comm1', 'comm', screen=SECONDARY_SCREEN,
-            spawn=terminal_tmux('outer', 'comm')))),
+        ([], "F9", lazy.function(SwitchGroup(
+            "comm1", SECONDARY_SCREEN))),
         ([], term1_key, lazy.function(SwitchToWindowGroup(
             'term1', 'left', screen=SECONDARY_SCREEN,
             spawn=terminal_tmux('outer', 'left')))),
