@@ -120,7 +120,6 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         ([mod, "shift"], "p", lazy.spawn("passmenu")),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
-        ([mod, ], "e", lazy.spawn("krusader")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "control"], "s", lazy.spawn("surf")),
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
@@ -165,6 +164,9 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], term2_key, lazy.function(SwitchToWindowGroup(
             'term2', 'iress_left', screen=PRIMARY_SCREEN,
             spawn=cmd_autossh_iress.format("left")))),
+        ([mod], "e", lazy.function(SwitchToWindowGroup(
+            'krusader', 'krusader', screen=SECONDARY_SCREEN,
+            spawn="krusader"))),
     ]
 
     laptop_keys = [
@@ -179,8 +181,8 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "XF86LaunchB", lazy.function(RaiseWindowOrSpawn(
             wmclass='Pavucontrol', cmd='pavucontrol'))),
         # ([], "XF86AudioMute", lazy.spawn("pavucontrol")),
-        ([], "XF86AudioLowerVolume", lazy.spawn("samctl.py -v down")),
-        ([], "XF86AudioRaiseVolume", lazy.spawn("samctl.py -v up")),
+        #([], "XF86AudioLowerVolume", lazy.spawn("samctl.py -v down")),
+        #([], "XF86AudioRaiseVolume", lazy.spawn("samctl.py -v up")),
         ([], "XF86AudioPlay", lazy.spawn("mpc toggle")),
         ([], "XF86WLAN", lazy.spawn(
             "sudo nmcli con up id Xperia\ Z1\ Network --nowait")),

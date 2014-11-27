@@ -16,7 +16,9 @@ common_autostart = {
     'dropbox start': 'dropbox',
     'insync start': 'insync',
     'bluedevil-monolithic': 'bluedevil-monol',
-    '~/.bin/xstartup': None
+    '~/.bin/xstartup': None,
+    '/usr/bin/start-pulseaudio-x11': 'pulseaudio',
+    'kmix': None,
 }
 
 laptop_autostart = dict(common_autostart)

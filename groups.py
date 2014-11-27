@@ -98,6 +98,12 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
     group_args['term2'] = dict(
         screen_affinity=0, exclusive=False,
         matches=terminal_matches(["^iress_left$", "^right$"]))
+    group_args['krusader'] = dict(
+        screen_affinity=SECONDARY_SCREEN,
+        persist=False,
+        matches=[Match(
+            title=[".*krusader.*"],
+            wm_class=["Krusader"])])
     if not is_laptop:
         group_args['remote_term1'] = dict(
             screen_affinity=1, exclusive=False,
