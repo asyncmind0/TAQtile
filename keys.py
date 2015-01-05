@@ -114,7 +114,13 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "o", lazy.spawn("orgcapture.py")),
         #([mod], "F2", lazy.spawn("dmenu_run %s" % dmenu_defaults)),
         ([mod], "F3", lazy.function(list_windows_group)),
-        ([mod], "F5", lazy.function(list_windows)),
+        ([mod], "F4", lazy.function(list_windows)),
+        #([mod], "F5", lazy.spawn('st -t {0} -e {0}'.format('ncmpcpp'))),
+        ([mod], "F5", lazy.function(RaiseWindowOrSpawn(
+            wmname='ncmpcpp',
+            cmd='st -t {0} -e {0}'.format('ncmpcpp'),
+            toggle=True,
+            cmd_match="st -t ncmpcpp", floating=True))),
         ([mod], "r", lazy.spawncmd()),
         ([mod], "Return", lazy.spawn("st -t shrapnel")),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
@@ -123,6 +129,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "control"], "s", lazy.spawn("surf")),
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
+        ([mod], "F1", lazy.spawn("xset dpms force off")),
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
@@ -144,10 +151,12 @@ def get_keys(mod, num_groups, num_monitors):
             'monitor', 'monitor', screen=PRIMARY_SCREEN,
             spawn=terminal_tmux('outer', 'monitor')))),
         #([], "F10", lazy.function(SwitchGroup("mail"))),
-        ([], "F10", lazy.function(SwitchToWindowGroup(
-            'mail', 'kmail', screen=SECONDARY_SCREEN,
-            spawn="kmail"))),
+        #([], "F10", lazy.function(SwitchToWindowGroup(
+        #    'mail', 'kmail', screen=SECONDARY_SCREEN,
+        #    spawn="kmail"))),
             #spawn=terminal_tmux('mail')))),
+        ([], "F10", lazy.function(SwitchGroup(
+            "mail", SECONDARY_SCREEN))),
         ([], "F6", lazy.function(SwitchGroup(
             "comm2", SECONDARY_SCREEN))),
         ([], "F9", lazy.function(SwitchGroup(
@@ -184,6 +193,9 @@ def get_keys(mod, num_groups, num_monitors):
         #([], "XF86AudioLowerVolume", lazy.spawn("samctl.py -v down")),
         #([], "XF86AudioRaiseVolume", lazy.spawn("samctl.py -v up")),
         ([], "XF86AudioPlay", lazy.spawn("mpc toggle")),
+        ([], "XF86AudioPause", lazy.spawn("mpc toggle")),
+        ([], "XF86AudioPrev", lazy.spawn("mpc prev")),
+        ([], "XF86AudioNext", lazy.spawn("mpc next")),
         ([], "XF86WLAN", lazy.spawn(
             "sudo nmcli con up id Xperia\ Z1\ Network --nowait")),
     ]

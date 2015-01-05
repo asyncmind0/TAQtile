@@ -4,6 +4,7 @@ import threading
 
 import gobject
 from libqtile import bar, widget
+from libqtile.widget import graph
 from libqtile.config import Screen
 
 import system
@@ -42,6 +43,20 @@ class ThreadedPacman(widget.Pacman):
         return True
 
 
+class BankBalance(graph._Graph):
+    defaults = [
+        ("account", "all", "Which account to show (all/0/1/2/...)"),
+    ]
+    fixed_upper_bound = False
+
+    def __init__(self, **config):
+        graph._Graph.__init__(self, **config)
+        self.add_defaults(BankBalance.defaults)
+
+    def update_graph(self):
+        pass
+
+
 class CalClock(widget.Clock):
     # def button_release(self, x, y, button):
 
@@ -50,6 +65,9 @@ class CalClock(widget.Clock):
 
 
 class GraphHistory(widget.NetGraph):
+    """Graph that persists history and reloads it when restarted.
+    provides a continuous graph, desipite qtile restarting.
+    """
     default_store = None
 
     def __init__(self, *args, **kwargs):
@@ -147,6 +165,7 @@ def get_screens(num_monitors, num_groups, groups):
         # widget.Sep(**sep_params),
         # ThreadedPacman(**pacman_params),
         widget.DF(**default_params()),
+        BankBalance(**default_params()),
         PriorityNotify(**default_params()),
         # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
         widget.TextBox("c:", **default_params()),

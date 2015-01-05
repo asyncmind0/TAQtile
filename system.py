@@ -13,12 +13,10 @@ common_autostart = {
     'xcompmgr': None,
     'klipper': None,
     'xscreensaver -nosplash': None,
-    'dropbox start': 'dropbox',
-    'insync start': 'insync',
     'bluedevil-monolithic': 'bluedevil-monol',
     '~/.bin/xstartup': None,
-    '/usr/bin/start-pulseaudio-x11': 'pulseaudio',
     'kmix': None,
+    'setxkbmap -option \'ctrl:swapcaps\'': None,
 }
 
 laptop_autostart = dict(common_autostart)

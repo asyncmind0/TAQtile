@@ -107,7 +107,7 @@ def apply_rules(*args, **kwarg):
                 client.place(100, 100, 800, 50, 2, 2, '00C000')
             #if window_name == "Hangouts":
             #    client.cmd_togroup("comm2")
-            if window_name in ["shrapnel", "*Org Select*"]:
+            if window_name in ["shrapnel", "*Org Select*", 'ncmpcpp']:
                 if hasattr(client, 'applied'):
                     continue
                 client.applied = True
