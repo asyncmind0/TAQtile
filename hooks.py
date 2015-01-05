@@ -87,13 +87,13 @@ def dbus_register():
 
 @hook.subscribe.window_name_change
 def apply_rules(*args, **kwarg):
-    try:
-        log.error("APPLY RULES")
-        #import remote_pdb;remote_pdb.set_trace(port=9999)
-        windows = [
-            i for i in hook.qtile.windowMap.values()
-            if not isinstance(i, window.Internal)]
-        for client in windows:
+    log.error("APPLY RULES")
+    #import remote_pdb;remote_pdb.set_trace(port=9999)
+    windows = [
+        i for i in hook.qtile.windowMap.values()
+        if not isinstance(i, window.Internal)]
+    for client in windows:
+        try:
             window_class = client.window.get_wm_class()
             window_class = window_class[0] if window_class else ''
             window_type = client.get_wm_type() if hasattr(
@@ -116,10 +116,10 @@ def apply_rules(*args, **kwarg):
             if window_class in ["kgpg"]:
                 client.cmd_enable_floating()
                 client.place(50, 50, 800, 400, 1, None, force=True) #, '00C000')
-            log.debug(window_class)
-            log.debug(window_type)
-    except Exception as e:
-        log.exception("client_new hook")
+            if window_class in ["Google-chrome-stable"]:
+                hook.qtile.dgroups._add(client)
+        except Exception as e:
+            log.exception("client_new hook")
 
 
 @hook.subscribe.client_new

@@ -45,8 +45,8 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             re.compile(r".*wealth management support.*conkeror$"),
         ]), group="11"),
         Rule(Match(title=[
-            re.compile(r"^Developer.*"), re.compile(r"^Inspector.*")]),
-             group="2", break_on_match=True),
+            re.compile(r"^Developer.*", re.I), re.compile(r"^Inspector.*")]),
+             group="2"),
         Rule(Match(role=[re.compile("^browser$")],
                    wm_class=["Google-chrome-stable"]),
              group="11" if multi_monitor else "1",
@@ -69,10 +69,14 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
     group_args = OrderedDict()
     group_args['comm1'] = dict(
         screen_affinity=SECONDARY_SCREEN,
-        matches=terminal_matches([r"^comm$"]) + [Match(wm_class=["psi"])],
+        #matches=terminal_matches([r"^comm$"]) + [
+        #    Match(wm_class=[re.compile(r'psi.*', re.I)])],
         layouts=[
-            layout.Slice('right', 256, wname='Psi',
-                         fallback=layout.Tile(**current_theme))
+            layout.Slice(
+                'right', 256,
+                wname="Psi+",
+                #wmclass="Psi-plus",
+                fallback=layout.Tile(**current_theme))
         ])
     group_args['comm2'] = dict(
         layout="slice",
