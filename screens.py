@@ -1,17 +1,19 @@
-import logging as log
+import logging
 import subprocess
 import threading
 
 import gobject
 from libqtile import bar, widget
-from libqtile.widget import graph
+from libqtile.widget import graph, base
 from libqtile.config import Screen
 
 import system
 import themes
 from multiscreengroupbox import MultiScreenGroupBox
 from priority_notify import PriorityNotify
+from bank import CommBank
 
+log = logging.getLogger('qtile')
 
 PRIMARY_SCREEN = system.get_screen(0)
 SECONDARY_SCREEN = system.get_screen(1)
@@ -21,7 +23,7 @@ class ThreadedPacman(widget.Pacman):
 
     def __init__(self, *args, **kwargs):
         super(ThreadedPacman, self).__init__(*args, **kwargs)
-        self.timeout_add(self.interval, self.wx_updater)
+        self.timeout_add(self.update_interval, self.wx_updater)
         self.wx_updater()
 
     def update(self, data=None):
@@ -43,18 +45,47 @@ class ThreadedPacman(widget.Pacman):
         return True
 
 
-class BankBalance(graph._Graph):
+class BankBalance(base.ThreadedPollText):
     defaults = [
+        ('warning', 'FF0000', 'Warning Color - no updates.'),
+        ('unavailable', 'ffffff', 'Unavailable Color - no updates.'),
         ("account", "all", "Which account to show (all/0/1/2/...)"),
     ]
     fixed_upper_bound = False
 
     def __init__(self, **config):
-        graph._Graph.__init__(self, **config)
+        # graph._Graph.__init__(self, **config)
+        base.ThreadedPollText.__init__(self, **config)
         self.add_defaults(BankBalance.defaults)
 
-    def update_graph(self):
-        pass
+    def draw(self):
+        try:
+            if float(self.text) <= 0:
+                self.layout.colour = self.warning
+            else:
+                self.layout.colour = self.foreground
+        except Exception as e:
+            log.exception("Draw error")
+        base.ThreadedPollText.draw(self)
+
+    def poll(self, data=None):
+        text = "$$$$"
+        try:
+            user = subprocess.check_output(
+                ['pass', "financial/commbank/debit/user"]).strip()
+            password = subprocess.check_output(
+                ['pass', "financial/commbank/debit/pass"]).strip()
+            log.warning("BankBalance:%s", user)
+            commbank = CommBank(user, password)
+            self.data = data = commbank.data
+            text = commbank.get_currency(
+                commbank.data['AccountGroups'][0]['ListAccount'][-2]['AvailableFunds']
+            )
+            log.warning("BankBalance:%s", text)
+        except Exception as e:
+            log.exception("BankBalance: %s %s", user, data)
+        # text = commbank.net_position
+        return str(text)
 
 
 class CalClock(widget.Clock):
@@ -163,11 +194,15 @@ def get_screens(num_monitors, num_groups, groups):
         widget.Sep(**sep_params),
         # widget.BitcoinTicker(**bitcointicker_params),
         # widget.Sep(**sep_params),
-        # ThreadedPacman(**pacman_params),
+        #ThreadedPacman(**pacman_params),
+        widget.Sep(**sep_params),
         widget.DF(**default_params()),
+        widget.Sep(**sep_params),
         BankBalance(**default_params()),
+        widget.Sep(**sep_params),
         PriorityNotify(**default_params()),
         # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
+        widget.Sep(**sep_params),
         widget.TextBox("c:", **default_params()),
         widget.CPUGraph(**cpugraph_params),
         # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/media-flash-memory-stick.png"),
