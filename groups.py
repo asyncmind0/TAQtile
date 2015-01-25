@@ -48,12 +48,11 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         ),
         Rule(
             Match(
-                wm_class=["KeePass2"]
-            ),
-            float=True),
-        Rule(
-            Match(
-                wm_class=["Kruler"]
+                wm_class=[
+                    "KeePass2",
+                    "Kruler",
+                    "Torbrowser-launcher",
+                ]
             ),
             float=True),
         Rule(
@@ -66,6 +65,13 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         Rule(
             Match(
                 title=[re.compile(".*Org Select.*")]
+            ),
+            float=True,
+            intrusive=True
+        ),
+        Rule(
+            Match(
+                title=['pinentry']
             ),
             float=True,
             intrusive=True
@@ -118,8 +124,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         ),
         Rule(
             Match(
-                role=[re.compile("^pop-up$")],
-                #wm_class=["^crx_.*"],
+                wm_class=["^crx_.*"],
                 wm_instance_class=["^crx_.*"]
             ),
             group="comm2",

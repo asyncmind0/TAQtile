@@ -86,7 +86,7 @@ class NoTimerFilter(logging.Filter):
 
 def main(self):
     self.log = init_log(log_level=log_level, log_path=log_path)
-    self.log.addFilter(NoTimerFilter())
+    #self.log.addFilter(NoTimerFilter())
 
     self.mylog = init_log(log_level=logging.DEBUG, logger='myqtile', log_path=mylog_path)
 

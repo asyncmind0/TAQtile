@@ -88,14 +88,13 @@ def dbus_register():
 @hook.subscribe.window_name_change
 def apply_rules(*args, **kwarg):
     log.error("APPLY RULES")
-    #import remote_pdb;remote_pdb.set_trace(port=9999)
     windows = [
         i for i in hook.qtile.windowMap.values()
         if not isinstance(i, window.Internal)]
     for client in windows:
         try:
             window_class = client.window.get_wm_class()
-            window_class = window_class[0] if window_class else ''
+            window_class, instance_class = window_class if window_class else ('', '')
             window_type = client.get_wm_type() if hasattr(
                 client, 'get_wm_type') else ''
             window_name = client.name
@@ -105,19 +104,17 @@ def apply_rules(*args, **kwarg):
                 client.static(0)
             if window_class == "screenkey" and window_type != 'dialog':
                 client.place(100, 100, 800, 50, 2, 2, '00C000')
-            #if window_name == "Hangouts":
-            #    client.cmd_togroup("comm2")
             if window_name in ["shrapnel", "*Org Select*", 'ncmpcpp']:
                 if hasattr(client, 'applied'):
                     continue
                 client.applied = True
                 client.cmd_enable_floating()
                 client.place(500, 50, 800, 400, 1, None, force=True) #, '00C000')
-            if window_class in ["kgpg"]:
-                client.cmd_enable_floating()
-                client.place(50, 50, 800, 400, 1, None, force=True) #, '00C000')
-            if window_class in ["Google-chrome-stable"]:
-                hook.qtile.dgroups._add(client)
+            if instance_class in ["Google-chrome-stable", 'Chromium']:
+                try:
+                    hook.qtile.dgroups._add(client)
+                except Exception:
+                    log.exception("client_new hook")
         except Exception as e:
             log.exception("client_new hook")
 

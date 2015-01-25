@@ -123,7 +123,7 @@ def get_keys(mod, num_groups, num_monitors):
             cmd_match="st -t ncmpcpp", floating=True))),
         ([mod], "r", lazy.spawncmd()),
         ([mod], "Return", lazy.spawn("st -t shrapnel")),
-        ([mod, "shift"], "b", lazy.spawn("conkeror")),
+        ([mod, "shift"], "b", lazy.spawn("chromium")),
         ([mod, "shift"], "p", lazy.spawn("passmenu")),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
