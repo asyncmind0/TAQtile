@@ -104,7 +104,8 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 title=[
                     re.compile(r"^Developer.*"),
                     re.compile(r"^Inspector.*")
-                ]
+                ],
+                wm_class=["Transgui"],
             ),
             group="2",
         ),
