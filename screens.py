@@ -162,13 +162,10 @@ def get_screens(num_monitors, num_groups, groups):
     netgraph_params = dict(graph_defaults)
     sep_params = default_params(padding=2, fontsize=9, height_percent=60)
     # netgraph_params['fill_color'] = "80FF00.3"
-    group_splits = ((num_groups / num_monitors) if multi_monitor else num_groups,)
 
+    group_splits = ((num_groups / num_monitors) if multi_monitor else num_groups,)
     # change labels of groups for multi monitor support
-    gb1 = {}
-    gb2 = {}
-    mon_map = {1: gb1, 0: gb2}
-    groupnum = 0
+    mon_map = {0: {}, 1: {}}
     mon = 0
     for i, group in enumerate(groups):
         if group.name.isdigit():
@@ -181,8 +178,9 @@ def get_screens(num_monitors, num_groups, groups):
         else:
             mon_map[group.screen_affinity][groupname] = grouplabel
 
-    w1 = [
-        MultiScreenGroupBox(namemap=gb1, **groupbox_params),
+    primary_bar = [
+        MultiScreenGroupBox(
+            namemap=mon_map[PRIMARY_SCREEN], **groupbox_params),
         widget.Sep(**sep_params),
         widget.Prompt(**prompt_params),
         widget.Sep(**sep_params),
@@ -216,13 +214,14 @@ def get_screens(num_monitors, num_groups, groups):
         widget.Sep(**sep_params)
     ]
     if system.get_hostconfig('battery'):
-        w1.append(widget.Battery(**batteryicon_params))
-        w1.append(widget.Sep(**sep_params))
-    w1.append(widget.Systray(**systray_params))
-    w1.append(CalClock(**clock_params))
+        primary_bar.append(widget.Battery(**batteryicon_params))
+        primary_bar.append(widget.Sep(**sep_params))
+    primary_bar.append(widget.Systray(**systray_params))
+    primary_bar.append(CalClock(**clock_params))
 
-    w2 = [
-        MultiScreenGroupBox(namemap=gb2, **groupbox_params),
+    secondary_bar = [
+        MultiScreenGroupBox(
+            namemap=mon_map[SECONDARY_SCREEN], **groupbox_params),
         widget.Sep(**sep_params),
         widget.WindowTabs(**windowtabs_params),
         widget.Sep(**sep_params),
@@ -230,8 +229,9 @@ def get_screens(num_monitors, num_groups, groups):
         widget.Sep(**sep_params),
         CalClock(**clock_params),
     ]
+    bar_map = {PRIMARY_SCREEN: primary_bar, SECONDARY_SCREEN: secondary_bar}
     bar_height = groupbox_params.get('bar_height', 10)
-    screens.append(Screen(bar.Bar(w2, bar_height)))
+    screens.append(Screen(bar.Bar(bar_map[PRIMARY_SCREEN], bar_height)))
     if num_monitors > 1:
-        screens.append(Screen(bar.Bar(w1, bar_height)))
+        screens.append(Screen(bar.Bar(bar_map[SECONDARY_SCREEN], bar_height)))
     return screens

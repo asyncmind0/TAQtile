@@ -4,6 +4,7 @@ import logging
 import platform
 import sh
 import subprocess
+from os.path import expanduser
 
 log = logging.getLogger('qtile')
 
@@ -13,8 +14,7 @@ common_autostart = {
     'xcompmgr': None,
     'klipper': None,
     'xscreensaver -nosplash': None,
-    'bluedevil-monolithic': 'bluedevil-monol',
-    '~/.bin/xstartup': None,
+    expanduser('~/.bin/xstartup'): None,
     'kmix': None,
     'setxkbmap -option \'ctrl:swapcaps\'': None,
 }
@@ -35,6 +35,7 @@ platform_specific = {
         'laptop': True,
         'autostart-once': laptop_autostart,
         'screen_affinity': {
+            'mail': 1
         },
         'term1_key': 'F11',
         'term2_key': 'F12',
