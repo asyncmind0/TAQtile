@@ -134,6 +134,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
         ([mod, "shift"], "F2", lazy.spawn("dmenu_xclip %s" % dmenu_defaults)),
+        ([mod, "control"], "v", lazy.spawn("dmenu_xclip %s" % dmenu_defaults)),
         ([], "XF86Launch1", lazy.function(
             RaiseWindowOrSpawn(
                 wmname='tail', cmd='st -t tail -e sudo journalctl -xf',
