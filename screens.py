@@ -2,7 +2,6 @@ import logging
 import subprocess
 import threading
 
-import gobject
 from libqtile import bar, widget
 from libqtile.widget import graph, base
 from libqtile.config import Screen
@@ -36,6 +35,7 @@ class ThreadedPacman(widget.Pacman):
 
     def wx_updater(self):
         log.warn('adding WX Pacman widget timer')
+        import gobject
 
         def worker():
             pacman = subprocess.Popen(['checkupdates'], stdout=subprocess.PIPE)
@@ -64,6 +64,8 @@ class BankBalance(base.ThreadedPollText):
                 self.layout.colour = self.warning
             else:
                 self.layout.colour = self.foreground
+        except ValueError as e:
+            pass
         except Exception as e:
             log.exception("Draw error")
         base.ThreadedPollText.draw(self)

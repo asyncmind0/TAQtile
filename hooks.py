@@ -1,8 +1,7 @@
+from __future__ import print_function
 import logging
 import os
-
 from libqtile import hook, window
-
 from system import get_hostconfig, get_num_monitors, execute_once
 
 
@@ -15,7 +14,7 @@ all_desktops = ['tail']
 
 log = logging.getLogger("qtile")
 
-log.error("importin hooks")
+log.error("INITIALIZING  hooks")
 
 
 #@hook.subscribe.setgroup
@@ -87,7 +86,6 @@ def dbus_register():
 
 @hook.subscribe.window_name_change
 def apply_rules(*args, **kwarg):
-    log.error("APPLY RULES")
     windows = [
         i for i in hook.qtile.windowMap.values()
         if not isinstance(i, window.Internal)]
@@ -98,28 +96,25 @@ def apply_rules(*args, **kwarg):
             window_type = client.get_wm_type() if hasattr(
                 client, 'get_wm_type') else ''
             window_name = client.name
-            log.error('Name:%s', window_name)
-            if window_class in [
-                    "screenkey", "kruler"]:
+            if window_class in ["screenkey", "kruler", 'Dunst']:
                 client.static(0)
-            if window_class == "screenkey" and window_type != 'dialog':
-                client.place(100, 100, 800, 50, 2, 2, '00C000')
+            #if window_class == "screenkey" and window_type != 'dialog':
+            #    client.place(100, 100, 800, 50, 2, 2, '00C000')
             if window_name in ["shrapnel", "*Org Select*", 'ncmpcpp']:
                 if hasattr(client, 'applied'):
                     continue
                 client.applied = True
-                client.cmd_enable_floating()
-                client.place(500, 50, 800, 400, 1, None, force=True) #, '00C000')
-            if instance_class in ["Google-chrome-stable", 'Chromium']:
+            if window_class.startswith('crx_'):
+                client.applied = True
                 try:
-                    hook.qtile.dgroups._add(client)
+                    client.togroup('comm2')
                 except Exception:
                     log.exception("client_new hook")
         except Exception as e:
             log.exception("client_new hook")
 
 
-@hook.subscribe.client_new
+#@hook.subscribe.client_new
 def client_new(client, *args, **kwargs):
     log.error("client_new:%s" % client.window.get_name())
     if client.window.get_name() == 'shrapnel':
@@ -132,16 +127,15 @@ def client_new(client, *args, **kwargs):
 #@hook.subscribe.client_managed
 def move_windows_multimonitor(window):
     screen_preferences = get_hostconfig('screen_affinity')
-    for screenno, pref in screen_preferences.iteritems():
-        for rule in pref:
-            if hasattr(window, 'match') and window.match(**rule):
-                log.debug(window.group)
-                try:
-                    win_group = int(window.group.name)
-                    # TODO handle cases for more than 2 monitors
-                    if win_group < 10 and num_monitors > 1 and screenno > 1:
-                        window.togroup(str(win_group + 10))
-                except ValueError as e:
-                    log.debug("not an integer group")
+    for name, screen in screen_preferences.items():
+        if hasattr(window, 'match') and window.match(title=name):
+            log.debug(window.group)
+            try:
+                win_group = int(window.group.name)
+                # TODO handle cases for more than 2 monitors
+                if win_group < 10 and num_monitors > 1 and screenno > 1:
+                    window.togroup(str(win_group + 10))
+            except ValueError as e:
+                log.debug("not an integer group")
     # if should_be_floating(window.window):
     #    window.window.floating = True

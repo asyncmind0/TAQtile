@@ -70,13 +70,16 @@ def get_num_monitors():
     #import Xlib.display
     #display = Xlib.display.Display(':0')
     #return display.screen_count()
-    output = subprocess.Popen(
-        'xrandr | grep -e "\ connected" | cut -d" " -f1',
-        shell=True, stdout=subprocess.PIPE).communicate()[0]
+    try:
+        output = subprocess.Popen(
+            'xrandr | grep -e "\ connected" | cut -d" " -f1',
+            shell=True, stdout=subprocess.PIPE).communicate()[0]
 
-    displays = output.strip().split('\n')
-    log.debug(displays)
-    return len(displays)
+        displays = output.strip().split('\n')
+        log.debug(displays)
+        return len(displays)
+    except Exception:
+        logging.exception("failed to get number of monitors")
     #for display in displays:
     #    values = display.split('x')
     #    width = values[0]

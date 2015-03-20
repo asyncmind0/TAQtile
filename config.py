@@ -74,7 +74,7 @@ groups = generate_groups(
     num_groups, num_monitors, dgroups_app_rules, layouts)
 keys = get_keys(mod, num_groups, num_monitors)
 screens = get_screens(num_monitors, num_groups, groups)
-log_level = logging.DEBUG
+log_level = logging.WARNING
 log_path = os.path.expanduser("~/.qtile.log")
 mylog_path = os.path.expanduser("~/.qtile.my.log")
 

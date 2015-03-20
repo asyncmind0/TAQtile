@@ -129,7 +129,10 @@ class SwitchToWindowGroup(object):
             qtile.cmd_to_screen(self.screen)
             return
         #self.raise_window(qtile)
-        qtile.currentScreen.cmd_togglegroup(self.name)
+        try:
+            qtile.currentScreen.cmd_togglegroup(self.name)
+        except Exception as e:
+            log.exception("wierd")
 
 
 class RaiseWindowOrSpawn(object):
