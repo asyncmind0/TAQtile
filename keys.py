@@ -8,12 +8,12 @@ from extra import (SwitchToWindowGroup, check_restart,
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
+from clipboard import dmenu_xclip
 
 log = logging.getLogger('myqtile')
 log.setLevel(logging.DEBUG)
 
-cmd_autossh_iress = "st -t iress_{0} -e autossh -M 0 -p 3307 -X localhost -t '~/.bin/tmux.py -r outer {0}'"
-
+cmd_autossh_iress = "st -t iress{2}_{0} -e autossh -M 0 -p 330{1} -X localhost -t '~/.bin/tmux.py -r outer {0}'"
 
 def get_keys(mod, num_groups, num_monitors):
     log.debug(dmenu_defaults)
@@ -123,24 +123,27 @@ def get_keys(mod, num_groups, num_monitors):
             cmd_match="st -t ncmpcpp", floating=True))),
         ([mod], "r", lazy.spawncmd()),
         ([mod], "Return", lazy.spawn("st -t shrapnel")),
-        ([mod, "shift"], "b", lazy.spawn("chromium")),
+        ([mod, "shift"], "b", lazy.spawn("google-chrome-stable")),
         ([mod, "shift"], "p", lazy.spawn("passmenu")),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "control"], "s", lazy.spawn("surf")),
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
-        ([mod], "F1", lazy.spawn("xset dpms force off")),
+        ([mod], "F1", lazy.spawn("sleep 3;xset dpms force off")),
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
-        ([mod, "shift"], "F2", lazy.spawn("dmenu_xclip %s" % dmenu_defaults)),
-        ([mod, "control"], "v", lazy.spawn("dmenu_xclip %s" % dmenu_defaults)),
+        ([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_defaults)),
+        ([mod, "control"], "v", lazy.function(dmenu_xclip, dmenu_defaults)),
         ([], "XF86Launch1", lazy.function(
             RaiseWindowOrSpawn(
                 wmname='tail', cmd='st -t tail -e sudo journalctl -xf',
                 cmd_match="st -t tail", floating=True,
                 toggle=True,
                 static=[0, 100, 100, 1024, 200]))),
+        ([mod], "e", lazy.function(SwitchToWindowGroup(
+            'krusader', 'krusader', screen=SECONDARY_SCREEN,
+            spawn="krusader"))),
         # Switch groups
         ([], "F1", lazy.function(SwitchGroup("1"))),
         ([], "F2", lazy.function(SwitchGroup("2"))),
@@ -158,7 +161,7 @@ def get_keys(mod, num_groups, num_monitors):
             #spawn=terminal_tmux('mail')))),
         ([], "F10", lazy.function(SwitchGroup(
             "mail", SECONDARY_SCREEN))),
-        ([], "F6", lazy.function(SwitchGroup(
+        ([mod], "F6", lazy.function(SwitchGroup(
             "comm2", SECONDARY_SCREEN))),
         ([], "F9", lazy.function(SwitchGroup(
             "comm1", SECONDARY_SCREEN))),
@@ -170,13 +173,16 @@ def get_keys(mod, num_groups, num_monitors):
             spawn=terminal_tmux('outer', 'right')))),
         ([mod], term1_key, lazy.function(SwitchToWindowGroup(
             'term1', 'iress_right', screen=SECONDARY_SCREEN,
-            spawn=cmd_autossh_iress.format("right")))),
+            spawn=cmd_autossh_iress.format("right", "7", "")))),
         ([mod], term2_key, lazy.function(SwitchToWindowGroup(
             'term2', 'iress_left', screen=PRIMARY_SCREEN,
-            spawn=cmd_autossh_iress.format("left")))),
-        ([mod], "e", lazy.function(SwitchToWindowGroup(
-            'krusader', 'krusader', screen=SECONDARY_SCREEN,
-            spawn="krusader"))),
+            spawn=cmd_autossh_iress.format("left", "7", "")))),
+        ([mod, "shift"], term1_key, lazy.function(SwitchToWindowGroup(
+            'term1', 'iress2_right', screen=SECONDARY_SCREEN,
+            spawn=cmd_autossh_iress.format("right", "8", "2")))),
+        ([mod, "shift"], term2_key, lazy.function(SwitchToWindowGroup(
+            'term2', 'iress2_left', screen=PRIMARY_SCREEN,
+            spawn=cmd_autossh_iress.format("left", "8", "2")))),
     ]
 
     laptop_keys = [

@@ -3,6 +3,7 @@ import logging
 import os
 from libqtile import hook, xcbq
 import json
+from plumbum import local
 
 log = logging.getLogger("qtile")
 use_selection = 'CLIPBOARD'
@@ -61,3 +62,28 @@ def hook_change(name, selection):
     history.append(text)
     with open(history_file, 'w+') as qfile:
         json.dump(history, qfile)
+
+
+def dmenu_xclip(qtile, args):
+    dmenu = local['dmenu']
+    echo = local['echo']
+    xclip = local['xclip']
+
+    logging.basicConfig(level=logging.DEBUG)
+    history = []
+    args = args.split(' ')
+    args.extend(['-p', 'Clip:'])
+
+    if os.path.isfile(history_file):
+        with open(history_file, 'r') as qfile:
+            history = json.load(qfile)
+
+    command = (echo['\n'.join(reversed(history))] | dmenu[args])(retcode=None)
+    outf = os.popen('xclip -selection secondary', 'w')
+    outf.write(command)
+    outf.close()
+    outf = os.popen('xclip -selection primary', 'w')
+    outf.write(command)
+    outf.close()
+    #(echo[command] | xclip['-i', '-selection', 'primary'])()
+    #(echo[command] | xclip['-i', '-selection', 'secondary'])()
