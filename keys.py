@@ -9,6 +9,7 @@ from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
 from clipboard import dmenu_xclip
+from passmenu import passmenu
 
 log = logging.getLogger('myqtile')
 log.setLevel(logging.DEBUG)
@@ -124,7 +125,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "r", lazy.spawncmd()),
         ([mod], "Return", lazy.spawn("st -t shrapnel")),
         ([mod, "shift"], "b", lazy.spawn("google-chrome-stable")),
-        ([mod, "shift"], "p", lazy.spawn("passmenu")),
+        ([mod, "shift"], "p", lazy.function(passmenu, dmenu_defaults)),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "control"], "s", lazy.spawn("surf")),
