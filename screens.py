@@ -122,9 +122,8 @@ def get_screens(num_monitors, num_groups, groups):
     groupbox_params = default_params(
         urgent_alert_method='text',
         rounded=False,
-        highlight_method='block',
         padding=-1,
-        this_current_screen_border=themes.current_theme['border'])
+    )
 
     prompt_params = default_params()
     systray_params = default_params()
@@ -139,7 +138,7 @@ def get_screens(num_monitors, num_groups, groups):
     batteryicon_params = default_params()
     batteryicon_params['battery_name'] = "BAT1"
     batteryicon_params['format'] = "{percent:5.0%}"
-    windowtabs_params = default_params(selected=("[", "]"))
+    windowtabs_params = default_params(selected=("[", "]"), separator='|')
     graph_defaults = {k[0]: k[1] for k in[
         ("graph_color", "18BAEB.6", "Graph color"),
         ("fill_color", "1667EB.3", "Fill color for linefill graph"),

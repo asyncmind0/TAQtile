@@ -1,10 +1,11 @@
 import logging
 from libqtile.command import lazy
 from libqtile.config import Key, Match, Rule
-from extra import (SwitchToWindowGroup, check_restart,
-                   terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchGroup,
-                   RaiseWindowOrSpawn, list_windows, list_windows_group,
-                   MoveToGroup, move_to_next_group, move_to_prev_group)
+from extra import (
+    SwitchToWindowGroup, check_restart,
+    terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchGroup,
+    RaiseWindowOrSpawn, list_windows, list_windows_group,
+    MoveToGroup, move_to_next_group, move_to_prev_group)
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
@@ -14,7 +15,11 @@ from passmenu import passmenu
 log = logging.getLogger('myqtile')
 log.setLevel(logging.DEBUG)
 
-cmd_autossh_iress = "st -t iress{2}_{0} -e autossh -M 0 -p 330{1} -X localhost -t '~/.bin/tmux.py -r outer {0}'"
+cmd_autossh_iress = (
+    "st -t iress{2}_{0} -e autossh -M 0 -p 330{1} -X localhost "
+    "-t '~/.bin/tmux.py -r outer {0}'"
+)
+
 
 def get_keys(mod, num_groups, num_monitors):
     log.debug(dmenu_defaults)
@@ -130,7 +135,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "control"], "s", lazy.spawn("surf")),
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
-        ([mod], "F1", lazy.spawn("sleep 3;xset dpms force off")),
+        ([mod], "F1", lazy.spawn("xset dpms force off")),
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
