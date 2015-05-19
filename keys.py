@@ -142,12 +142,12 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
         ([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_defaults)),
         ([mod, "control"], "v", lazy.function(dmenu_xclip, dmenu_defaults)),
-        ([], "XF86Launch1", lazy.function(
-            RaiseWindowOrSpawn(
-                wmname='tail', cmd='st -t tail -e sudo journalctl -xf',
-                cmd_match="st -t tail", floating=True,
-                toggle=True,
-                static=[0, 100, 100, 1024, 200]))),
+        #([], "XF86Launch1", lazy.function(
+        #    RaiseWindowOrSpawn(
+        #        wmname='tail', cmd='st -t tail -e sudo journalctl -xf',
+        #        cmd_match="st -t tail", floating=True,
+        #        toggle=True,
+        #        static=[0, 100, 100, 1024, 200]))),
         ([mod], "e", lazy.function(SwitchToWindowGroup(
             'krusader', 'krusader', screen=SECONDARY_SCREEN,
             spawn="krusader"))),
@@ -158,37 +158,35 @@ def get_keys(mod, num_groups, num_monitors):
         #([], "Menu", lazy.function(SwitchToWindowGroup(
         #    'monitor', 'monitor', screen=PRIMARY_SCREEN,
         #    spawn=terminal_tmux('outer', 'monitor')))),
-        ([], "XF86Eject", lazy.function(SwitchToWindowGroup(
-            'monitor', 'monitor', screen=PRIMARY_SCREEN,
-            spawn=terminal_tmux('outer', 'monitor')))),
+        #([], "XF86Eject", lazy.function(SwitchToWindowGroup(
+        #    'monitor', 'monitor', screen=PRIMARY_SCREEN,
+        #    spawn=terminal_tmux('outer', 'monitor')))),
         #([], "F10", lazy.function(SwitchGroup("mail"))),
-        #([], "F10", lazy.function(SwitchToWindowGroup(
-        #    'mail', 'kmail', screen=SECONDARY_SCREEN,
-        #    spawn="kmail"))),
-            #spawn=terminal_tmux('mail')))),
-        ([], "F10", lazy.function(SwitchGroup(
-            "mail", SECONDARY_SCREEN))),
-        ([mod], "F6", lazy.function(SwitchGroup(
-            "comm2", SECONDARY_SCREEN))),
-        ([], "F9", lazy.function(SwitchGroup(
-            "comm1", SECONDARY_SCREEN))),
+        ([], "F10", lazy.function(SwitchToWindowGroup(
+            'mail', 'mail', screen=SECONDARY_SCREEN,
+            spawn=terminal_tmux('inner', 'mail')))),
+        ([mod], "F6", lazy.function(SwitchToWindowGroup(
+            "comm2", screen=SECONDARY_SCREEN))),
+        ([], "F9", lazy.function(SwitchToWindowGroup(
+            'comm1', 'comm1', screen=PRIMARY_SCREEN,
+            spawn=terminal_tmux('inner', 'comm1')))),
         ([], term1_key, lazy.function(SwitchToWindowGroup(
-            'term1', 'left', screen=SECONDARY_SCREEN,
+            'term1', 'left', screen=PRIMARY_SCREEN,
             spawn=terminal_tmux('outer', 'left')))),
         ([], term2_key, lazy.function(SwitchToWindowGroup(
-            'term2', 'right', screen=PRIMARY_SCREEN,
+            'term2', 'right', screen=SECONDARY_SCREEN,
             spawn=terminal_tmux('outer', 'right')))),
         ([mod], term1_key, lazy.function(SwitchToWindowGroup(
-            'term1', 'iress_right', screen=SECONDARY_SCREEN,
+            'term1', 'iress_right', screen=PRIMARY_SCREEN,
             spawn=cmd_autossh_iress.format("right", "7", "")))),
         ([mod], term2_key, lazy.function(SwitchToWindowGroup(
-            'term2', 'iress_left', screen=PRIMARY_SCREEN,
+            'term2', 'iress_left', screen=SECONDARY_SCREEN,
             spawn=cmd_autossh_iress.format("left", "7", "")))),
         ([mod, "shift"], term1_key, lazy.function(SwitchToWindowGroup(
-            'term1', 'iress2_right', screen=SECONDARY_SCREEN,
+            'term1', 'iress2_right', screen=PRIMARY_SCREEN,
             spawn=cmd_autossh_iress.format("right", "8", "2")))),
         ([mod, "shift"], term2_key, lazy.function(SwitchToWindowGroup(
-            'term2', 'iress2_left', screen=PRIMARY_SCREEN,
+            'term2', 'iress2_left', screen=SECONDARY_SCREEN,
             spawn=cmd_autossh_iress.format("left", "8", "2")))),
     ]
 
@@ -215,12 +213,12 @@ def get_keys(mod, num_groups, num_monitors):
     ]
 
     desktop_keys = [
-        ([], "XF86Launch9", lazy.function(SwitchToWindowGroup(
-            'remote_term1', 'remote_term1', screen=SECONDARY_SCREEN,
-            spawn=terminal('remote_term1')))),
-        ([], "F19", lazy.function(SwitchToWindowGroup(
-            'remote_term2', 'remote_term2', screen=PRIMARY_SCREEN,
-            spawn=terminal('remote_term2')))),
+        #([], "XF86Launch9", lazy.function(SwitchToWindowGroup(
+        #    'remote_term1', 'remote_term1', screen=SECONDARY_SCREEN,
+        #    spawn=terminal('remote_term1')))),
+        #([], "F19", lazy.function(SwitchToWindowGroup(
+        #    'remote_term2', 'remote_term2', screen=PRIMARY_SCREEN,
+        #    spawn=terminal('remote_term2')))),
         ([], "KP_Begin", lazy.function(SwitchToWindowGroup(
             'htop', 'htop', screen=SECONDARY_SCREEN,
             spawn=terminal('htop', 'htop')))),

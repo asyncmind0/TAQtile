@@ -4,17 +4,16 @@ import re
 from libqtile import layout
 from libqtile.config import Group, Match, Rule
 
-from system import get_hostconfig
+from system import get_hostconfig, get_group_affinity
 from themes import current_theme
 from collections import OrderedDict
-from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
+from screens import SECONDARY_SCREEN
 
 
 log = logging.getLogger('qtile.config')
 
 
 def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
-    multi_monitor = num_monitors > 1
     is_laptop = get_hostconfig('laptop')
 
     # dgroup rules that not belongs to any group
@@ -80,7 +79,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             Match(
                 wm_class=["rdesktop"]
             ),
-            group="15"
+            group=get_group_affinity('rdesktop'),
         ),
         Rule(
             Match(
@@ -88,7 +87,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                     re.compile(r".*VirtualBox.*")
                 ]
             ),
-            group="13" if multi_monitor else "4"
+            group=get_group_affinity('virtualbox'),
         ),
         Rule(
             Match(
@@ -108,13 +107,13 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 ],
                 wm_class=["Transgui"],
             ),
-            group="11" if PRIMARY_SCREEN else '1',
+            group=get_group_affinity('transgui'),
         ),
         Rule(
             Match(
                 role=[re.compile("^browser$")],
                 wm_class=["Google-chrome-stable"]),
-            group="11" if multi_monitor else "1",
+            group=get_group_affinity('browser'),
             break_on_match=False
         ),
         Rule(
@@ -150,13 +149,13 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         screen_affinity=SECONDARY_SCREEN,
         # matches=terminal_matches([r"^comm$"]) + [
         #    Match(wm_class=[re.compile(r'psi.*', re.I)])],
-        layouts=[
-            layout.Slice(
-                'right', 256,
-                wname="Psi+",
-                # wmclass="Psi-plus",
-                fallback=layout.Tile(**current_theme))
-        ]
+        #layouts=[
+        #    layout.Slice(
+        #        'right', 256,
+        #        wname="Psi+",
+        #        #wmclass="Psi-plus",
+        #        fallback=layout.Tile(**current_theme))
+        #]
     )
     group_args['comm2'] = dict(
         layout="slice",
@@ -234,7 +233,8 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             matches=terminal_matches([r"^ulog$"])
         )
 
-    for i in range(1, num_groups+1) + group_args.keys():
+    from itertools import chain
+    for i in chain(range(1, num_groups+1), group_args.keys()):
         groups.append(Group(
             str(i), **group_args.get(
                 str(i), {'layout': "max", 'layouts': layouts})))

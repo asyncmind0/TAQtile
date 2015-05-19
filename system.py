@@ -11,11 +11,10 @@ log = logging.getLogger('qtile')
 mod = "mod4"
 
 common_autostart = {
-    'xcompmgr': None,
+    #'xcompmgr': None,
     'klipper': None,
     'xscreensaver -nosplash': None,
     expanduser('~/.bin/xstartup'): None,
-    'kmix': None,
     'setxkbmap -option \'ctrl:swapcaps\'': None,
 }
 
@@ -27,7 +26,20 @@ desktop_autostart = dict(common_autostart)
 desktop_autostart.update({
     'jabberel-tray.py': None})
 
-
+iress_config = {
+        'screens': {0: 0, 1: 1},
+        'battery': False,
+        'laptop': False,
+        'autostart-once': common_autostart,
+        'screen_affinity': {
+            'mail': 1,
+            'browser': 1,
+            'virtualbox': 4,
+            'rdesktop': 5,
+        },
+        'term1_key': 'XF86Launch5',
+        'term2_key': 'XF86Launch6',
+    }
 platform_specific = {
     'steven-series9': {
         'screens': {0: 0, 1: 1},
@@ -35,22 +47,16 @@ platform_specific = {
         'laptop': True,
         'autostart-once': laptop_autostart,
         'screen_affinity': {
-            'mail': 1
+            'mail': 1,
+            'browser': 11,
+            'transgui': 1,
+            'rdesktop': 15,
         },
         'term1_key': 'F11',
         'term2_key': 'F12',
     },
-    'sydsjoseph-pc1': {
-        'screens': {0: 0, 1: 1},
-        'battery': False,
-        'laptop': False,
-        'autostart-once': common_autostart,
-        'screen_affinity': {
-            'mail': 1
-        },
-        'term1_key': 'XF86Launch5',
-        'term2_key': 'XF86Launch6',
-    }
+    'sydsjoseph-pc1': iress_config,
+    'au02-sjosephpc2': iress_config,
 }
 
 
@@ -66,6 +72,10 @@ def get_screen(index):
     return get_hostconfig('screens')[index]
 
 
+def get_group_affinity(pattern):
+    return get_hostconfig('screen_affinity').get(pattern, 0)
+
+
 def get_num_monitors():
     #import Xlib.display
     #display = Xlib.display.Display(':0')
@@ -75,7 +85,7 @@ def get_num_monitors():
             'xrandr | grep -e "\ connected" | cut -d" " -f1',
             shell=True, stdout=subprocess.PIPE).communicate()[0]
 
-        displays = output.strip().split('\n')
+        displays = output.strip().decode('utf8').split('\n')
         log.debug(displays)
         return len(displays)
     except Exception:

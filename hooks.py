@@ -56,7 +56,7 @@ def startup():
     elif num_mons == 1:
         commands[os.path.expanduser("rightmonitor")] = None
 
-    for command, process_filter in commands.iteritems():
+    for command, process_filter in commands.items():
         execute_once(command, process_filter, hook.qtile)
 
 
@@ -125,17 +125,17 @@ def client_new(client, *args, **kwargs):
 
 
 #@hook.subscribe.client_managed
-def move_windows_multimonitor(window):
-    screen_preferences = get_hostconfig('screen_affinity')
-    for name, screen in screen_preferences.items():
-        if hasattr(window, 'match') and window.match(title=name):
-            log.debug(window.group)
-            try:
-                win_group = int(window.group.name)
-                # TODO handle cases for more than 2 monitors
-                if win_group < 10 and num_monitors > 1 and screenno > 1:
-                    window.togroup(str(win_group + 10))
-            except ValueError as e:
-                log.debug("not an integer group")
-    # if should_be_floating(window.window):
-    #    window.window.floating = True
+#def move_windows_multimonitor(window):
+#    screen_preferences = get_hostconfig('screen_affinity')
+#    for name, screen in screen_preferences.items():
+#        if hasattr(window, 'match') and window.match(title=name):
+#            log.debug(window.group)
+#            try:
+#                win_group = int(window.group.name)
+#                # TODO handle cases for more than 2 monitors
+#                if win_group < 10 and num_monitors > 1 and screenno > 1:
+#                    window.togroup(str(win_group + 10))
+#            except ValueError as e:
+#                log.debug("not an integer group")
+#    # if should_be_floating(window.window):
+#    #    window.window.floating = True

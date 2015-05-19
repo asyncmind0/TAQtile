@@ -15,6 +15,8 @@ log = logging.getLogger('qtile')
 
 PRIMARY_SCREEN = system.get_screen(0)
 SECONDARY_SCREEN = system.get_screen(1)
+PRIMARY_MONITOR = 0
+SECONDARY_MONITOR = 1
 
 
 
