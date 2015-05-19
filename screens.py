@@ -153,7 +153,7 @@ def get_screens(num_monitors, num_groups, groups):
         widget.Sep(**sep_params),
         CalClock(**clock_params),
     ]
-    bar_map = {PRIMARY_SCREEN: primary_bar, SECONDARY_SCREEN: secondary_bar}
+    bar_map = {0: primary_bar, 1: secondary_bar}
     bar_height = groupbox_params.get('bar_height', 10)
     screens.append(Screen(bar.Bar(bar_map[PRIMARY_SCREEN], bar_height)))
     if num_monitors > 1:

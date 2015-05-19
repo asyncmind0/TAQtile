@@ -33,6 +33,9 @@ iress_config = {
         'autostart-once': common_autostart,
         'screen_affinity': {
             'mail': 1,
+            }
+        'group_affinity': {
+            'mail': 1,
             'browser': 1,
             'virtualbox': 4,
             'rdesktop': 5,
@@ -42,11 +45,14 @@ iress_config = {
     }
 platform_specific = {
     'steven-series9': {
-        'screens': {0: 0, 1: 1},
+        'screens': {0: 1, 1: 0},
         'battery': True,
         'laptop': True,
         'autostart-once': laptop_autostart,
         'screen_affinity': {
+            'mail': 1,
+            },
+        'group_affinity': {
             'mail': 1,
             'browser': 11,
             'transgui': 1,
@@ -69,11 +75,18 @@ def get_hostconfig(key):
 
 def get_screen(index):
     """Get platform specific screen """
+    monitors  = get_num_monitors()
+    if monitors == 1:
+        return 0
     return get_hostconfig('screens')[index]
 
 
-def get_group_affinity(pattern):
-    return str(get_hostconfig('screen_affinity').get(pattern, 0))
+def get_screen_affinity(app):
+    return str(get_hostconfig('screen_affinity').get(app, 0))
+
+
+def get_group_affinity(app):
+    return str(get_hostconfig('group_affinity').get(app, 0))
 
 
 def get_num_monitors():

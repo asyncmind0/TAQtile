@@ -4,10 +4,10 @@ import re
 from libqtile import layout
 from libqtile.config import Group, Match, Rule
 
-from system import get_hostconfig, get_group_affinity
+from system import get_hostconfig, get_group_affinity, get_screen_affinity
 from themes import current_theme
 from collections import OrderedDict
-from screens import SECONDARY_SCREEN
+from screens import SECONDARY_SCREEN, PRIMARY_SCREEN
 
 
 log = logging.getLogger('qtile.config')
@@ -144,76 +144,76 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
     log.debug("num_groups:%s", num_groups)
     groups = []
     # map og group and prefered screen
-    group_args = OrderedDict()
-    group_args['comm1'] = dict(
-        screen_affinity=SECONDARY_SCREEN,
-        # matches=terminal_matches([r"^comm$"]) + [
-        #    Match(wm_class=[re.compile(r'psi.*', re.I)])],
-        #layouts=[
-        #    layout.Slice(
-        #        'right', 256,
-        #        wname="Psi+",
-        #        #wmclass="Psi-plus",
-        #        fallback=layout.Tile(**current_theme))
-        #]
-    )
-    group_args['comm2'] = dict(
-        layout="slice",
-        layouts=[
-            # layout.Slice('right', 256, role='buddy_list',
-            #             fallback=layout.Tile(**current_theme)),
-            # a layout for hangouts
-            layout.Slice(
-                'right', 356, wname="Hangouts", role="pop-up",
-                fallback=layout.Tile(**current_theme))
-        ]
-    )
-    group_args['monitor'] = dict(
-        screen_affinity=0,
-        matches=terminal_matches([r"^monitor$"])
-    )
-    group_args['mail'] = dict(
-        screen_affinity=get_hostconfig('screen_affinity').get('mail', 0),
-        matches=[
-            Match(wm_class=["Kmail", "Kontact"]),
-            Match(
-                role=[
-                    re.compile("^kmail-mainwindow.*"),
-                    re.compile("^kontact-mainwindow.*")
-                ]
-            )
-        ]
-        + terminal_matches([r"^mail$"])
-    )
-    group_args['term1'] = dict(
-        screen_affinity=1,
-        exclusive=False,
-        matches=terminal_matches([r".*_right$", "^left$"])
-    )
-    group_args['term2'] = dict(
-        screen_affinity=0,
-        exclusive=False,
-        matches=terminal_matches([".*_left$", "^right$"])
-    )
-    group_args['krusader'] = dict(
-        screen_affinity=SECONDARY_SCREEN,
-        persist=False,
-        matches=[
-            Match(
-                title=[".*krusader.*"],
-                wm_class=["Krusader"],
-            ),
-        ]
-    )
+    group_args = OrderedDict({
+        'comm1': dict(
+            screen_affinity=SECONDARY_SCREEN,
+            # matches=terminal_matches([r"^comm$"]) + [
+            #    Match(wm_class=[re.compile(r'psi.*', re.I)])],
+            # layouts=[
+            #    layout.Slice(
+            #        'right', 256,
+            #        wname="Psi+",
+            # wmclass="Psi-plus",
+            #        fallback=layout.Tile(**current_theme))
+            #]
+        ),
+        'comm2': dict(
+            layout="slice",
+            layouts=[
+                # layout.Slice('right', 256, role='buddy_list',
+                #             fallback=layout.Tile(**current_theme)),
+                # a layout for hangouts
+                layout.Slice(
+                    'right', 356, wname="Hangouts", role="pop-up",
+                    fallback=layout.Tile(**current_theme))
+            ]
+        ),
+        'monitor': dict(
+            screen_affinity=PRIMARY_SCREEN,
+            matches=terminal_matches([r"^monitor$"])
+        ),
+        'mail': dict(
+            screen_affinity=get_screen_affinity('mail'),
+            matches=[
+                Match(wm_class=["Kmail", "Kontact"]),
+                Match(
+                    role=[
+                        re.compile("^kmail-mainwindow.*"),
+                        re.compile("^kontact-mainwindow.*")
+                    ]
+                )
+            ] + terminal_matches([r"^mail$"])
+        ),
+        'term1': dict(
+            screen_affinity=PRIMARY_SCREEN,
+            exclusive=False,
+            matches=terminal_matches([r".*_right$", "^left$"])
+        ),
+        'term2': dict(
+            screen_affinity=SECONDARY_SCREEN,
+            exclusive=False,
+            matches=terminal_matches([".*_left$", "^right$"])
+        ),
+        'krusader': dict(
+            screen_affinity=SECONDARY_SCREEN,
+            persist=False,
+            matches=[
+                Match(
+                    title=[".*krusader.*"],
+                    wm_class=["Krusader"],
+                ),
+            ]
+        )
+    })
     if not is_laptop:
         group_args['remote_term1'] = dict(
-            screen_affinity=1,
+            screen_affinity=PRIMARY_SCREEN,
             exclusive=False,
             matches=terminal_matches(
                 [r"^remote_term1$"])
         )
         group_args['remote_term2'] = dict(
-            screen_affinity=0,
+            screen_affinity=SECONDARY_SCREEN,
             exclusive=False,
             matches=terminal_matches(["^remote_term2$"])
         )
@@ -234,7 +234,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         )
 
     from itertools import chain
-    for i in chain(range(1, num_groups+1), group_args.keys()):
+    for i in chain(range(1, num_groups + 1), group_args.keys()):
         groups.append(Group(
             str(i), **group_args.get(
                 str(i), {'layout': "max", 'layouts': layouts})))
