@@ -73,7 +73,7 @@ def get_screen(index):
 
 
 def get_group_affinity(pattern):
-    return get_hostconfig('screen_affinity').get(pattern, 0)
+    return str(get_hostconfig('screen_affinity').get(pattern, 0))
 
 
 def get_num_monitors():
