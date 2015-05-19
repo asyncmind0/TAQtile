@@ -1,7 +1,10 @@
 from __future__ import print_function
+
 import logging
 import os
+
 from plumbum import local
+
 
 log = logging.getLogger("qtile")
 

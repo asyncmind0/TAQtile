@@ -1,113 +1,21 @@
 import logging
-import subprocess
-import threading
-
-from libqtile import bar, widget
-from libqtile.widget import graph, base
-from libqtile.config import Screen
 
 import system
 import themes
-from multiscreengroupbox import MultiScreenGroupBox
-from priority_notify import PriorityNotify
-from bank import CommBank
+from libqtile import bar, widget
+from libqtile.config import Screen
+from widgets import CalClock
+from widgets.bankbalance import BankBalance
+from widgets.multiscreengroupbox import MultiScreenGroupBox
+from widgets.priority_notify import PriorityNotify
+from widgets.tasklist2 import TaskList2
+
 
 log = logging.getLogger('qtile')
 
 PRIMARY_SCREEN = system.get_screen(0)
 SECONDARY_SCREEN = system.get_screen(1)
 
-
-class ThreadedPacman(widget.Pacman):
-
-    def __init__(self, *args, **kwargs):
-        super(ThreadedPacman, self).__init__(*args, **kwargs)
-        self.timeout_add(self.update_interval, self.wx_updater)
-        self.wx_updater()
-
-    def update(self, data=None):
-        if self.configured and data:
-            self.updates_data = str(data)
-            if self.text != self.updates_data:
-                self.text = self.updates_data
-                self.bar.draw()
-        return "N/A"
-
-    def wx_updater(self):
-        log.warn('adding WX Pacman widget timer')
-        import gobject
-
-        def worker():
-            pacman = subprocess.Popen(['checkupdates'], stdout=subprocess.PIPE)
-            data = len(pacman.stdout.readlines())
-            gobject.idle_add(self.update, data)
-        threading.Thread(target=worker).start()
-        return True
-
-
-class BankBalance(base.ThreadedPollText):
-    defaults = [
-        ('warning', 'FF0000', 'Warning Color - no updates.'),
-        ('unavailable', 'ffffff', 'Unavailable Color - no updates.'),
-        ("account", "all", "Which account to show (all/0/1/2/...)"),
-    ]
-    fixed_upper_bound = False
-
-    def __init__(self, **config):
-        # graph._Graph.__init__(self, **config)
-        base.ThreadedPollText.__init__(self, **config)
-        self.add_defaults(BankBalance.defaults)
-
-    def draw(self):
-        try:
-            if float(self.text) <= 0:
-                self.layout.colour = self.warning
-            else:
-                self.layout.colour = self.foreground
-        except ValueError as e:
-            pass
-        except Exception as e:
-            log.exception("Draw error")
-        base.ThreadedPollText.draw(self)
-
-    def poll(self, data=None):
-        text = "$$$$"
-        try:
-            user = subprocess.check_output(
-                ['pass', "financial/commbank/debit/user"]).strip()
-            password = subprocess.check_output(
-                ['pass', "financial/commbank/debit/pass"]).strip()
-            log.warning("BankBalance:%s", user)
-            commbank = CommBank(user, password)
-            self.data = data = commbank.data
-            text = commbank.get_currency(
-                commbank.data['AccountGroups'][0]['ListAccount'][-2]['AvailableFunds']
-            )
-            log.warning("BankBalance:%s", text)
-        except Exception as e:
-            log.exception("BankBalance: %s %s", user, data)
-        # text = commbank.net_position
-        return str(text)
-
-
-class CalClock(widget.Clock):
-    # def button_release(self, x, y, button):
-
-    def button_press(self, x, y, button):
-        self.qtile.cmd_spawn("calendar_applet.py")
-
-
-class GraphHistory(widget.NetGraph):
-    """Graph that persists history and reloads it when restarted.
-    provides a continuous graph, desipite qtile restarting.
-    """
-    default_store = None
-
-    def __init__(self, *args, **kwargs):
-        super(widget.NetGraph, self).__init__(*args, **kwargs)
-
-    def push(self, value):
-        return super(widget.NetGraph, self).push(value)
 
 
 def get_screens(num_monitors, num_groups, groups):
@@ -131,7 +39,7 @@ def get_screens(num_monitors, num_groups, groups):
         name="default", padding=2)
     #windowname_params = default_params
     systray_params = default_params()
-    clock_params = default_params(padding=2, fmt='%Y-%m-%d %a %H:%M')
+    clock_params = default_params(padding=2, format='%Y-%m-%d %a %H:%M')
     pacman_params = default_params()
     notify_params = default_params()
     bitcointicker_params = default_params()
@@ -139,6 +47,19 @@ def get_screens(num_monitors, num_groups, groups):
     batteryicon_params['battery_name'] = "BAT1"
     batteryicon_params['format'] = "{percent:5.0%}"
     windowtabs_params = default_params(selected=("[", "]"), separator='|')
+    tasklist_params = default_params(
+        fontsize=12,
+        selected=("[", "]"),
+        separator='|',
+        rounded=False,
+        padding_x=2,
+        padding_y=0,
+        margin_y=0,
+        margin_x=0,
+        border=themes.current_theme['border_focus'],
+        #foreground=themes.current_theme['foreground'],
+    )
+
     graph_defaults = {k[0]: k[1] for k in[
         ("graph_color", "18BAEB.6", "Graph color"),
         ("fill_color", "1667EB.3", "Fill color for linefill graph"),
@@ -185,7 +106,7 @@ def get_screens(num_monitors, num_groups, groups):
         widget.Sep(**sep_params),
         widget.Prompt(**prompt_params),
         widget.Sep(**sep_params),
-        widget.WindowTabs(**windowtabs_params),
+        TaskList2(**tasklist_params),
         # widget.WindowName(**windowname_params),
         # widget.TextBox(**layout_textbox_params),
         widget.Sep(**sep_params),
@@ -224,7 +145,7 @@ def get_screens(num_monitors, num_groups, groups):
         MultiScreenGroupBox(
             namemap=mon_map[SECONDARY_SCREEN], **groupbox_params),
         widget.Sep(**sep_params),
-        widget.WindowTabs(**windowtabs_params),
+        TaskList2(**tasklist_params),
         widget.Sep(**sep_params),
         widget.CurrentLayout(**current_layout_params),
         widget.Sep(**sep_params),

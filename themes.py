@@ -6,20 +6,20 @@ default_theme = dict(
     padding=0,
     font="Inconsolata",
     #font="Terminus",
-    borderwidth=2,
+    borderwidth=1,
     bar_height=20
 )
 
 star_trek_blue = dict(
     border="#5981B9",
-    border_focus="#1C294C",
+    border_focus="#263767",
     #this_current_screen_border="#1C294C",
     #border_focus="#1E90FF",
     border_normal="#0000A0",
-    border_width=2,
     foreground="#06B4E7",
     background="#010F2C",
-    active="#8CC3DF",
+    #active="#8CC3DF",
+    active="#263767",
     this_current_screen_border="#5981B9",
     highlight_method="block",
     disable_drag=True,
@@ -30,12 +30,14 @@ matrix_green = dict(
     border_focus="#1AF03E",
     foreground="#00FD00",
     background="#125B29",
-    borderwidth=2,
+    active="#00FD00",
+    this_current_screen_border="#1AF03E",
     bar_height=18
 )
 
 current_theme = dict(default_theme)
-current_theme.update(star_trek_blue)
+#current_theme.update(star_trek_blue)
+current_theme.update(matrix_green)
 log.debug("Current theme:%s", current_theme)
 #current_theme = matrix_green
 dmenu_defaults = (

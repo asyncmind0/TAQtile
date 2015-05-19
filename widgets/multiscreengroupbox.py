@@ -6,7 +6,7 @@ class MultiScreenGroupBox(widget.GroupBox):
         widget.GroupBox.__init__(self, **config)
         self.namemap = config.get('namemap', {})
 
-    def calculate_width(self):
+    def calculate_length(self):
         width = 0
         for g in self.qtile.groups:
             gtext = self.get_label(g.name)
@@ -73,4 +73,4 @@ class MultiScreenGroupBox(widget.GroupBox):
                 bw - self.margin_x * 2 - self.padding_x * 2
             )
             offset += bw
-        self.drawer.draw(self.offset, self.width)
+        self.drawer.draw(offsetx=self.offset, width=self.width)

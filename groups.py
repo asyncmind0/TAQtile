@@ -103,11 +103,12 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             Match(
                 title=[
                     re.compile(r"^Developer.*"),
+                    re.compile(r"^Devtools.*"),
                     re.compile(r"^Inspector.*")
                 ],
                 wm_class=["Transgui"],
             ),
-            group="2",
+            group="11" if PRIMARY_SCREEN else '1',
         ),
         Rule(
             Match(
@@ -147,20 +148,20 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
     group_args = OrderedDict()
     group_args['comm1'] = dict(
         screen_affinity=SECONDARY_SCREEN,
-        #matches=terminal_matches([r"^comm$"]) + [
+        # matches=terminal_matches([r"^comm$"]) + [
         #    Match(wm_class=[re.compile(r'psi.*', re.I)])],
         layouts=[
             layout.Slice(
                 'right', 256,
                 wname="Psi+",
-                #wmclass="Psi-plus",
+                # wmclass="Psi-plus",
                 fallback=layout.Tile(**current_theme))
         ]
     )
     group_args['comm2'] = dict(
         layout="slice",
         layouts=[
-            #layout.Slice('right', 256, role='buddy_list',
+            # layout.Slice('right', 256, role='buddy_list',
             #             fallback=layout.Tile(**current_theme)),
             # a layout for hangouts
             layout.Slice(
@@ -188,12 +189,12 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
     group_args['term1'] = dict(
         screen_affinity=1,
         exclusive=False,
-        matches=terminal_matches([r"^iress_right$", "^left$"])
+        matches=terminal_matches([r".*_right$", "^left$"])
     )
     group_args['term2'] = dict(
         screen_affinity=0,
         exclusive=False,
-        matches=terminal_matches(["^iress_left$", "^right$"])
+        matches=terminal_matches([".*_left$", "^right$"])
     )
     group_args['krusader'] = dict(
         screen_affinity=SECONDARY_SCREEN,
