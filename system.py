@@ -33,7 +33,7 @@ iress_config = {
         'autostart-once': common_autostart,
         'screen_affinity': {
             'mail': 1,
-            }
+            },
         'group_affinity': {
             'mail': 1,
             'browser': 1,
@@ -82,7 +82,7 @@ def get_screen(index):
 
 
 def get_screen_affinity(app):
-    return str(get_hostconfig('screen_affinity').get(app, 0))
+    return get_hostconfig('screen_affinity').get(app, 0)
 
 
 def get_group_affinity(app):
