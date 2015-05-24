@@ -57,6 +57,7 @@ platform_specific = {
             'browser': 11,
             'transgui': 1,
             'rdesktop': 15,
+            'virtualbox': 4,
         },
         'term1_key': 'F11',
         'term2_key': 'F12',
@@ -86,7 +87,12 @@ def get_screen_affinity(app):
 
 
 def get_group_affinity(app):
-    return str(get_hostconfig('group_affinity').get(app, 0))
+    ret = get_hostconfig('group_affinity').get(app, 0)
+    if ret > 9 and get_num_monitors() < 2:
+        ret-= 10
+    return str(ret)
+
+
 
 
 def get_num_monitors():

@@ -103,8 +103,8 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "q",      lazy.window.kill()),
         # Key([mod, "control"], "r", lazy.restart()),
         ([mod, "control"], "r", lazy.function(check_restart)),
-        ([mod], "Right", lazy.screen.nextgroup()),
-        ([mod], "Left", lazy.screen.prevgroup()),
+        ([mod], "Right", lazy.screen.next_group()),
+        ([mod], "Left", lazy.screen.prev_group()),
 
         ([mod], "m", lazy.group.setlayout('max')),
         ([mod], "t", lazy.group.setlayout('tile')),
