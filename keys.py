@@ -19,6 +19,7 @@ cmd_autossh_iress = (
     "st -t iress{2}_{0} -e autossh -M 0 -p 330{1} -X localhost "
     "-t '~/.bin/tmux.py -r outer {0}'"
 )
+samctl = "sudo /home/steven/.bin/samctl.py"
 
 
 def get_keys(mod, num_groups, num_monitors):
@@ -165,8 +166,8 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "F10", lazy.function(SwitchToWindowGroup(
             'mail', 'mail', screen=SECONDARY_SCREEN,
             spawn=terminal_tmux('inner', 'mail')))),
-        ([mod], "F6", lazy.function(SwitchToWindowGroup(
-            "comm2", screen=SECONDARY_SCREEN))),
+        ([], "F6", lazy.function(SwitchGroup(
+            "comm2", SECONDARY_SCREEN))),
         ([], "F9", lazy.function(SwitchToWindowGroup(
             'comm1', 'comm1', screen=PRIMARY_SCREEN,
             spawn=terminal_tmux('inner', 'comm1')))),
@@ -192,12 +193,10 @@ def get_keys(mod, num_groups, num_monitors):
 
     laptop_keys = [
         # laptop keys
-        ([], "XF86MonBrightnessUp", lazy.spawn("sudo samctl.py -s up")),
-        ([], "XF86MonBrightnessDown", lazy.spawn(
-            "sudo samctl.py -s down")),
-        ([], "XF86KbdBrightnessUp", lazy.spawn("sudo samctl.py -k up")),
-        ([], "XF86KbdBrightnessDown", lazy.spawn(
-            "sudo samctl.py -k down")),
+        ([], "XF86MonBrightnessUp", lazy.spawn("%s -s up" % samctl)),
+        ([], "XF86MonBrightnessDown", lazy.spawn("%s -s down" % samctl)),
+        ([], "XF86KbdBrightnessUp", lazy.spawn("%s -k up" % samctl)),
+        ([], "XF86KbdBrightnessDown", lazy.spawn("%s -k down" % samctl)),
         # Media controls
         ([], "XF86LaunchB", lazy.function(RaiseWindowOrSpawn(
             wmclass='Pavucontrol', cmd='pavucontrol'))),

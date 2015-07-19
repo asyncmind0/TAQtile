@@ -235,8 +235,12 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
 
     from itertools import chain
     for i in chain(range(1, num_groups + 1), group_args.keys()):
-        groups.append(Group(
-            str(i), **group_args.get(
-                str(i), {'layout': "max", 'layouts': layouts})))
+        groups.append(
+            Group(
+                str(i), **group_args.get(
+                    str(i), {'layout': "max", 'layouts': layouts}
+                )
+            )
+        )
 
     return groups

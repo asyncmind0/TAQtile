@@ -2,7 +2,11 @@ from libqtile import widget
 
 
 class TaskList2(widget.TaskList):
-    def draw_icon(self, surface, offset):
+    def draw_icon(self, window, offset):
+        if not getattr(window, 'icons', None):
+            return
+        surface = self.get_window_icon(window)
+                     
         if not surface:
             return
 

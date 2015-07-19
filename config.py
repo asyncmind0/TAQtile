@@ -41,6 +41,7 @@ floating_layout = layout.Floating(
         {'wname': 'shrapnel'},
         {'wname': 'Copying'},
         {'wmclass': 'Kgpg'},
+        {'wmclass': 'Insync.py'},
     ],
     auto_float_types=[
         "notification",
