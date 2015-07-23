@@ -5,19 +5,11 @@ class MultiScreenGroupBox(widget.GroupBox):
     def __init__(self, **config):
         widget.GroupBox.__init__(self, **config)
         self.namemap = config.get('namemap', {})
+        self.center_aligned = False
 
-    def calculate_length(self):
-        width = 0
-        for g in self.qtile.groups:
-            gtext = self.get_label(g.name)
-            if not gtext:
-                continue
-            width += self.label_width([gtext])
-        return width
-
-    def label_width(self, labels):
+    def box_width(self, groups):
         width, height = self.drawer.max_layout_size(
-            [i for i in labels],
+            [self.get_label(i.name) for i in groups],
             self.font,
             self.fontsize
         )
@@ -27,27 +19,39 @@ class MultiScreenGroupBox(widget.GroupBox):
     def get_label(self, group):
         return self.namemap.get(group)
 
+
     def draw(self):
         self.drawer.clear(self.background or self.bar.background)
 
         offset = 0
         for i, g in enumerate(self.qtile.groups):
+            is_block = (self.highlight_method == 'block')
             gtext = self.get_label(g.name)
             #log.debug(gtext)
             if not gtext:
                 continue
 
-            is_block = (self.highlight_method == 'block')
+            bw = self.box_width([g])
 
-            bw = self.label_width([gtext])
+            if self.group_has_urgent(g) and self.urgent_alert_method == "text":
+                text_color = self.urgent_text
+            elif g.windows:
+                text_color = self.active
+            else:
+                text_color = self.inactive
+
             if g.screen:
-                if self.bar.screen.group.name == g.name:
-                    if self.qtile.currentScreen == self.bar.screen:
-                        border = self.this_current_screen_border
-                    else:
-                        border = self.this_screen_border
+                if self.highlight_method == 'text':
+                    border = self.bar.background
+                    text_color = self.this_current_screen_border
                 else:
-                    border = self.other_screen_border
+                    if self.bar.screen.group.name == g.name:
+                        if self.qtile.currentScreen == self.bar.screen:
+                            border = self.this_current_screen_border
+                        else:
+                            border = self.this_screen_border
+                    else:
+                        border = self.other_screen_border
             elif self.group_has_urgent(g) and \
                     self.urgent_alert_method in ('border', 'block'):
                 border = self.urgent_border
@@ -56,18 +60,11 @@ class MultiScreenGroupBox(widget.GroupBox):
             else:
                 border = self.background or self.bar.background
 
-            if self.group_has_urgent(g) and self.urgent_alert_method == "text":
-                text = self.urgent_text
-            elif g.windows:
-                text = self.active
-            else:
-                text = self.inactive
-
             self.drawbox(
                 self.margin_x + offset,
-                gtext,
+                self.get_label(g.name),
                 border,
-                text,
+                text_color,
                 self.rounded,
                 is_block,
                 bw - self.margin_x * 2 - self.padding_x * 2
