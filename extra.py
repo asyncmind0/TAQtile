@@ -35,7 +35,7 @@ class SwitchGroup(object):
         logging.debug("SwitchGroup:%s:%s", qtile.currentScreen.index, self.name)
         max_screen = len(qtile.screens) - 1
         if(self.preferred_screen is not None and
-            self.preferred_screen <= max_screen):
+           self.preferred_screen <= max_screen):
             screen = qtile.screens[self.preferred_screen]
             if self.preferred_screen != qtile.currentScreen.index:
                 qtile.cmd_to_screen(self.preferred_screen)
