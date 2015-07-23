@@ -103,6 +103,7 @@ def get_screens(num_monitors, num_groups, groups):
             mon_map[group.screen_affinity][groupname] = grouplabel
 
     primary_bar = [
+        #widget.GroupBox(**groupbox_params),
         MultiScreenGroupBox(
             namemap=mon_map[PRIMARY_SCREEN], **groupbox_params),
         widget.Sep(**sep_params),
@@ -144,6 +145,7 @@ def get_screens(num_monitors, num_groups, groups):
     primary_bar.append(CalClock(**clock_params))
 
     secondary_bar = [
+        #widget.GroupBox(**groupbox_params),
         MultiScreenGroupBox(
             namemap=mon_map[SECONDARY_SCREEN], **groupbox_params),
         widget.Sep(**sep_params),

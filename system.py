@@ -27,22 +27,23 @@ desktop_autostart.update({
     'jabberel-tray.py': None})
 
 iress_config = {
-        'screens': {0: 0, 1: 1},
-        'battery': False,
-        'laptop': False,
-        'autostart-once': common_autostart,
-        'screen_affinity': {
-            'mail': 1,
-            },
-        'group_affinity': {
-            'mail': 1,
-            'browser': 1,
-            'virtualbox': 4,
-            'rdesktop': 5,
+    'screens': {0: 0, 1: 1},
+    'battery': False,
+    'laptop': False,
+    'autostart-once': common_autostart,
+    'screen_affinity': {
+        'mail': 1,
         },
-        'term1_key': 'XF86Launch5',
-        'term2_key': 'XF86Launch6',
-    }
+    'group_affinity': {
+        'mail': 1,
+        'browser': 1,
+        'virtualbox': 4,
+        'rdesktop': 5,
+    },
+    'term1_key': 'XF86Launch5',
+    'term2_key': 'XF86Launch6',
+}
+
 platform_specific = {
     'steven-series9': {
         'screens': {0: 1, 1: 0},
@@ -57,6 +58,7 @@ platform_specific = {
             'browser': 11,
             'transgui': 1,
             'rdesktop': 15,
+            'virtualbox': 4,
         },
         'term1_key': 'F11',
         'term2_key': 'F12',
@@ -86,7 +88,12 @@ def get_screen_affinity(app):
 
 
 def get_group_affinity(app):
-    return str(get_hostconfig('group_affinity').get(app, 0))
+    ret = get_hostconfig('group_affinity').get(app, 0)
+    if ret > 9 and get_num_monitors() < 2:
+        ret-= 10
+    return str(ret)
+
+
 
 
 def get_num_monitors():

@@ -3,13 +3,13 @@ from __future__ import print_function
 import logging
 import os
 
-from plumbum import local
 
 
 log = logging.getLogger("qtile")
 
 
 def passmenu(qtile, args):
+    from plumbum import local
     try:
         dmenu = local['dmenu']
         echo = local['echo']

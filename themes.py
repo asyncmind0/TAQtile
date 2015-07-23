@@ -18,8 +18,7 @@ star_trek_blue = dict(
     border_normal="#0000A0",
     foreground="#06B4E7",
     background="#010F2C",
-    #active="#8CC3DF",
-    active="#263767",
+    active="#8CC3DF",
     this_current_screen_border="#5981B9",
     highlight_method="block",
     disable_drag=True,
@@ -36,8 +35,8 @@ matrix_green = dict(
 )
 
 current_theme = dict(default_theme)
-#current_theme.update(star_trek_blue)
-current_theme.update(matrix_green)
+current_theme.update(star_trek_blue)
+#current_theme.update(matrix_green)
 log.debug("Current theme:%s", current_theme)
 #current_theme = matrix_green
 dmenu_defaults = (
