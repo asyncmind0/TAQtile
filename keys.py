@@ -5,7 +5,7 @@ from extra import (
     SwitchToWindowGroup, check_restart,
     terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchGroup,
     RaiseWindowOrSpawn, list_windows, list_windows_group,
-    MoveToGroup, move_to_next_group, move_to_prev_group)
+    MoveToGroup, move_to_next_group, move_to_prev_group, set_groups)
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
@@ -17,9 +17,10 @@ log.setLevel(logging.DEBUG)
 
 cmd_autossh_iress = (
     "st -t iress{2}_{0} -e autossh -M 0 -p 330{1} -X localhost "
-    "-t '~/.bin/tmux.py -r outer {0}'"
+    "-t '/home/steven/.local/bin/tmux.py -r outer {0}'"
 )
 samctl = "sudo /home/steven/.bin/samctl.py"
+
 
 
 def get_keys(mod, num_groups, num_monitors):
@@ -122,6 +123,7 @@ def get_keys(mod, num_groups, num_monitors):
         #([mod], "F2", lazy.spawn("dmenu_run %s" % dmenu_defaults)),
         ([mod], "F3", lazy.function(list_windows_group)),
         ([mod], "F4", lazy.function(list_windows)),
+        ([mod, "shift"], "F5", lazy.function(set_groups)),
         #([mod], "F5", lazy.spawn('st -t {0} -e {0}'.format('ncmpcpp'))),
         ([mod], "F5", lazy.function(RaiseWindowOrSpawn(
             wmname='ncmpcpp',

@@ -61,7 +61,6 @@ mouse = [
     #Click([mod], "Button2", lazy.window.bring_to_front())
 ]
 
-groups = []
 float_windows = ['buddy_list', ]
 follow_mouse_focus = True
 bring_front_click = True
