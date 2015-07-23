@@ -122,11 +122,6 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "F3", lazy.function(list_windows_group)),
         ([mod], "F4", lazy.function(list_windows)),
         #([mod], "F5", lazy.spawn('st -t {0} -e {0}'.format('ncmpcpp'))),
-        ([mod], "F5", lazy.function(RaiseWindowOrSpawn(
-            wmname='ncmpcpp',
-            cmd='st -t {0} -e {0}'.format('ncmpcpp'),
-            toggle=True,
-            cmd_match="st -t ncmpcpp", floating=True))),
         ([mod], "r", lazy.spawncmd()),
         ([mod], "Return", lazy.spawn("st -t shrapnel")),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
@@ -210,6 +205,11 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "XF86AudioNext", lazy.spawn("mpc next")),
         ([], "XF86WLAN", lazy.spawn(
             "sudo nmcli con up id Xperia\ Z1\ Network --nowait")),
+        ([mod], "F5", lazy.function(RaiseWindowOrSpawn(
+            wmname='ncmpcpp',
+            cmd='st -t {0} -e {0}'.format('ncmpcpp'),
+            toggle=True,
+            cmd_match="st -t ncmpcpp", floating=True))),
     ]
 
     desktop_keys = [
@@ -228,6 +228,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "KP_Right", lazy.function(SwitchToWindowGroup(
             'ulog', 'ulog', screen=SECONDARY_SCREEN,
             spawn=terminal('ulog', 'journalctl --user -xf')))),
+        ([mod], "F5", lazy.spawn('/home/steven/.bin/rdp_dfs')),
     ]
     if is_laptop:
         keys.extend(laptop_keys)
