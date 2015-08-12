@@ -258,4 +258,7 @@ def set_groups(qtile):
         for rule in qtile.dgroups.rules:
             if rule.matches(client):
                 if rule.group:
-                    client.togroup(rule.group)
+                    try:
+                        client.togroup(rule.group)
+                    except Exception as e:
+                        logging.exception("error setting groups")

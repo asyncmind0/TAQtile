@@ -69,6 +69,20 @@ def should_be_floating(w):
 
 
 @hook.subscribe.startup
+@hook.subscribe.window_name_change
+def set_groups():
+    for client in hook.qtile.windowMap.values():
+        for rule in hook.qtile.dgroups.rules:
+            log.error('Group rule %s' %  rule)
+            if rule.matches(client):
+                if rule.group:
+                    try:
+                        client.togroup(rule.group)
+                    except Exception as e:
+                        log.exception("Ignored exception switching group")
+
+
+@hook.subscribe.startup
 def dbus_register():
     import subprocess
     x = os.environ.get('DESKTOP_AUTOSTART_ID')
