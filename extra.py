@@ -253,12 +253,3 @@ def list_windows_group(qtile):
     return list_windows(qtile, current_group=True)
 
 
-def set_groups(qtile):
-    for client in qtile.windowMap.values():
-        for rule in qtile.dgroups.rules:
-            if rule.matches(client):
-                if rule.group:
-                    try:
-                        client.togroup(rule.group)
-                    except Exception as e:
-                        logging.exception("error setting groups")

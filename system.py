@@ -89,7 +89,7 @@ def get_screen_affinity(app):
 def get_group_affinity(app):
     ret = get_hostconfig('group_affinity').get(app, 0)
     if ret > 9 and get_num_monitors() < 2:
-        ret-= 10
+        ret -= 10
     return str(ret)
 
 
