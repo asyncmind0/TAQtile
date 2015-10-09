@@ -1,13 +1,15 @@
 from __future__ import print_function
 import logging
 import os
-from libqtile import hook, window
+from libqtile import hook
+from libqtile.layout import Slice
 from system import get_hostconfig, get_num_monitors, execute_once
 
 
 num_monitors = get_num_monitors()
 prev_timestamp = 0
 log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 log.error("INITIALIZING  hooks")
 
 
@@ -77,19 +79,25 @@ def client_new(client, *args, **kwargs):
         client.cmd_opacity(0.85)
 
 
-@hook.subscribe.setgroup
 def set_groups(*args, **kwargs):
     for client in hook.qtile.windowMap.values():
         for rule in hook.qtile.dgroups.rules:
             if rule.matches(client):
+                if rule.float:
+                    client.enablefloating()
+                else:
+                    client.disablefloating()
                 if rule.group:
                     try:
                         client.togroup(rule.group)
                     except Exception as e:
                         logging.exception("error setting groups")
     for w in hook.qtile.windowMap.values():
-        log.info(w)
         cliclass = w.window.get_wm_class()
         if cliclass and cliclass[1] == 'Conkeror':
             w.cmd_disable_floating()
             w.cmd_disable_fullscreen()
+
+hook.subscribe.window_name_change(set_groups)
+hook.subscribe.client_name_updated(set_groups)
+hook.subscribe.setgroup(set_groups)

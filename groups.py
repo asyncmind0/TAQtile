@@ -125,8 +125,8 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         ),
         Rule(
             Match(
-                wm_class=["^crx_.*"],
-                wm_instance_class=["^crx_.*"]
+                wm_class=[re.compile("^crx_.*")],
+                wm_instance_class=[re.compile("^crx_.*")]
             ),
             group="comm2",
             break_on_match=False
@@ -158,6 +158,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             #]
         ),
         'comm2': dict(
+            #screen_affinity=SECONDARY_SCREEN,
             layout="slice",
             layouts=[
                 # layout.Slice('right', 256, role='buddy_list',

@@ -16,7 +16,11 @@ _terminal = "st -t {0} "
 
 def terminal_tmux(level, session):
     return "{0} -e {1} {2} {3}".format(
-        _terminal.format(session), expanduser("~/.local/bin/tmux.py"), level, session)
+        _terminal.format(session),
+        expanduser("~/.local/bin/tmux.py"),
+        level,
+        session
+    )
 
 
 def terminal(title, cmd=None):
@@ -251,5 +255,3 @@ def list_windows(qtile, current_group=False):
 
 def list_windows_group(qtile):
     return list_windows(qtile, current_group=True)
-
-
