@@ -5,12 +5,13 @@ from extra import (
     SwitchToWindowGroup, check_restart,
     terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchGroup,
     RaiseWindowOrSpawn, list_windows, list_windows_group,
-    MoveToGroup, move_to_next_group, move_to_prev_group, set_groups)
+    MoveToGroup, move_to_next_group, move_to_prev_group) 
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
 from clipboard import dmenu_xclip
 from passmenu import passmenu
+from os.path import expanduser
 
 log = logging.getLogger('myqtile')
 log.setLevel(logging.DEBUG)
@@ -20,7 +21,6 @@ cmd_autossh_iress = (
     "-t '/home/steven/.local/bin/tmux.py -r outer {0}'"
 )
 samctl = "sudo /home/steven/.bin/samctl.py"
-
 
 
 def get_keys(mod, num_groups, num_monitors):
@@ -123,7 +123,6 @@ def get_keys(mod, num_groups, num_monitors):
         #([mod], "F2", lazy.spawn("dmenu_run %s" % dmenu_defaults)),
         ([mod], "F3", lazy.function(list_windows_group)),
         ([mod], "F4", lazy.function(list_windows)),
-        ([mod, "shift"], "F5", lazy.function(set_groups)),
         #([mod], "F5", lazy.spawn('st -t {0} -e {0}'.format('ncmpcpp'))),
         ([mod], "r", lazy.spawncmd()),
         ([mod], "Return", lazy.spawn("st -t shrapnel")),
@@ -205,7 +204,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "XF86AudioPrev", lazy.spawn("mpc prev")),
         ([], "XF86AudioNext", lazy.spawn("mpc next")),
         ([], "XF86WLAN", lazy.spawn(
-            "sudo nmcli con up id Xperia\ Z1\ Network --nowait")),
+            expanduser("~/.bin/mobilenet"))),
         ([mod], "F5", lazy.function(RaiseWindowOrSpawn(
             wmname='ncmpcpp',
             cmd='st -t {0} -e {0}'.format('ncmpcpp'),

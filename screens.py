@@ -33,6 +33,10 @@ def get_screens(num_monitors, num_groups, groups):
         urgent_alert_method='text',
         rounded=False,
         padding=-1,
+        border_width=1,
+        borderwidth=1,
+        border_focus='#FFFFFF',
+        linewidth=1,
     )
 
     prompt_params = default_params()

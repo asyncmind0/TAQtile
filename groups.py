@@ -125,8 +125,8 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         ),
         Rule(
             Match(
-                wm_class=["^crx_.*"],
-                wm_instance_class=["^crx_.*"]
+                wm_class=[re.compile("^crx_.*")],
+                wm_instance_class=[re.compile("^crx_.*")]
             ),
             group="comm2",
             break_on_match=False
@@ -137,7 +137,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         return [
             Match(
                 title=[re.compile(regex) for regex in regexes],
-                wm_class=["InputOutput"]
+                #wm_class=["InputOutput", "xterm-256color"]
             )
         ]
 
@@ -158,6 +158,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             #]
         ),
         'comm2': dict(
+            #screen_affinity=SECONDARY_SCREEN,
             layout="slice",
             layouts=[
                 # layout.Slice('right', 256, role='buddy_list',
@@ -174,6 +175,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         ),
         'mail': dict(
             screen_affinity=get_screen_affinity('mail'),
+            init=True,
             matches=[
                 Match(wm_class=["Kmail", "Kontact"]),
                 Match(
@@ -187,12 +189,14 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         'term1': dict(
             screen_affinity=PRIMARY_SCREEN,
             exclusive=False,
-            matches=terminal_matches([r".*_right$", "^left$"])
+            init=True,
+            matches=terminal_matches([r".*_right$", r"^left$"])
         ),
         'term2': dict(
             screen_affinity=SECONDARY_SCREEN,
             exclusive=False,
-            matches=terminal_matches([".*_left$", "^right$"])
+            init=True,
+            matches=terminal_matches([r".*_left$", r"^right$"])
         ),
         'krusader': dict(
             screen_affinity=SECONDARY_SCREEN,
