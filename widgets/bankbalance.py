@@ -1,6 +1,9 @@
 import subprocess
 import logging
-from builtins import str
+try:
+    from builtins import str
+except Exception as e:
+    from future.builtins import str
 
 from libqtile.widget import base
 

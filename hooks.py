@@ -68,15 +68,41 @@ def dbus_register():
         log.exception("error in dbus_register")
 
 
-@hook.subscribe.client_new
-def client_new(client, *args, **kwargs):
-    log.error("client_new:%s" % client.window.get_name())
-    log.error("client_new:%s, %s" % client.window.get_wm_class())
-    if client.window.get_name() == 'shrapnel':
+def rules_dunst(client):
+    client_name = client.window.get_name()
+    cliclass = client.window.get_wm_class()
+    if client_name == 'Dunst' or (
+            cliclass and cliclass[0] == 'Dunst'):
+        client.static(0)
+
+
+def rules_shrapnel(client):
+    client_name = client.window.get_name()
+    if client_name == 'shrapnel':
         client.cmd_enable_floating()
         client.place(
             500, 50, 800, 400, 1, None, above=True, force=True)#, '00C000')
         client.cmd_opacity(0.85)
+
+
+def rules_conkeror(client):
+    cliclass = client.window.get_wm_class()
+    if not cliclass:
+        return
+    if cliclass[1] == 'Conkeror':
+        client.cmd_disable_floating()
+        client.cmd_disable_fullscreen()
+
+
+extra_rules = [
+    rules_shrapnel, rules_dunst, rules_conkeror
+    ]
+
+
+@hook.subscribe.client_new
+def client_new(client, *args, **kwargs):
+    for rule in extra_rules:
+        rule(client)
 
 
 def set_groups(*args, **kwargs):
@@ -93,10 +119,8 @@ def set_groups(*args, **kwargs):
                     except Exception as e:
                         logging.exception("error setting groups")
     for w in hook.qtile.windowMap.values():
-        cliclass = w.window.get_wm_class()
-        if cliclass and cliclass[1] == 'Conkeror':
-            w.cmd_disable_floating()
-            w.cmd_disable_fullscreen()
+        for rule in extra_rules:
+            rule(w)
 
 hook.subscribe.window_name_change(set_groups)
 hook.subscribe.client_name_updated(set_groups)
