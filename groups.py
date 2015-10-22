@@ -146,7 +146,8 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
     # map og group and prefered screen
     group_args = OrderedDict({
         'comm1': dict(
-            screen_affinity=SECONDARY_SCREEN,
+            screen_affinity=PRIMARY_SCREEN,
+            matches=terminal_matches([r"^comm1$"])
             # matches=terminal_matches([r"^comm$"]) + [
             #    Match(wm_class=[re.compile(r'psi.*', re.I)])],
             # layouts=[
@@ -158,16 +159,16 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             #]
         ),
         'comm2': dict(
-            #screen_affinity=SECONDARY_SCREEN,
-            layout="slice",
-            layouts=[
-                # layout.Slice('right', 256, role='buddy_list',
-                #             fallback=layout.Tile(**current_theme)),
-                # a layout for hangouts
-                layout.Slice(
-                    'right', 356, wname="Hangouts", role="pop-up",
-                    fallback=layout.Tile(**current_theme))
-            ]
+            screen_affinity=SECONDARY_SCREEN,
+            #layout="slice",
+            #layouts=[
+            #    # layout.Slice('right', 256, role='buddy_list',
+            #    #             fallback=layout.Tile(**current_theme)),
+            #    # a layout for hangouts
+            #    layout.Slice(
+            #        'right', 356, wname="Hangouts", role="pop-up",
+            #        fallback=layout.Tile(**current_theme))
+            #]
         ),
         'monitor': dict(
             screen_affinity=PRIMARY_SCREEN,
