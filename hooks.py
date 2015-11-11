@@ -109,15 +109,15 @@ def set_groups(*args, **kwargs):
     for client in hook.qtile.windowMap.values():
         for rule in hook.qtile.dgroups.rules:
             if rule.matches(client):
-                if rule.float:
-                    client.enablefloating()
-                else:
-                    client.disablefloating()
-                if rule.group:
-                    try:
+                try:
+                    if rule.float:
+                        client.enablefloating()
+                    else:
+                        client.disablefloating()
+                    if rule.group:
                         client.togroup(rule.group)
-                    except Exception as e:
-                        logging.exception("error setting groups")
+                except Exception as e:
+                    logging.exception("error setting rules")
     for w in hook.qtile.windowMap.values():
         for rule in extra_rules:
             rule(w)

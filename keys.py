@@ -17,8 +17,7 @@ log = logging.getLogger('myqtile')
 log.setLevel(logging.DEBUG)
 
 cmd_autossh_iress = (
-    "st -t iress{2}_{0} -e autossh -M 0 -p 330{1} -X localhost "
-    "-t '/home/steven/.local/bin/tmux.py -r outer {0}'"
+    "st -t iress{2}_{0} -e /home/steven/.local/bin/autossh.py localhost:330{1} outer {0}"
 )
 samctl = "sudo /home/steven/.bin/samctl.py"
 
@@ -133,7 +132,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
         ([mod, "control"], "s", lazy.spawn("surf")),
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
-        ([mod], "F1", lazy.spawn("xset dpms force off")),
+        ([mod], "F1", lazy.spawn(expanduser("~/.bin/blank"))),
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),

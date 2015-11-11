@@ -3,8 +3,6 @@ from __future__ import print_function
 import logging
 import os
 
-
-
 log = logging.getLogger("qtile")
 
 
@@ -12,9 +10,8 @@ def passmenu(qtile, args):
     from plumbum import local
     try:
         dmenu = local['dmenu']
-        echo = local['echo']
         xdotool = local['xdotool']
-        pass_ = local['pass']
+        envoyexec = local['envoy-exec']
 
         with local.cwd(os.path.expanduser("~/.password-store/")):
             passfiles = [
@@ -26,10 +23,10 @@ def passmenu(qtile, args):
         args = args.split(' ')
         args.extend(['-p', 'Pass:'])
 
-        selection = (echo['\n'.join(reversed(passfiles))] | dmenu[args])(
+        selection = (dmenu[args] << '\n'.join(reversed(passfiles)))(
             retcode=None)
         xdotool(
             'type', '--clearmodifiers',
-            pass_('show', selection.strip()).split('\n')[0].strip())
+            envoyexec('pass', 'show', selection.strip()).split('\n')[0].strip())
     except:
         logging.exception("Error getting pass")

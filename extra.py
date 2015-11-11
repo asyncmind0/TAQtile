@@ -200,7 +200,7 @@ def check_restart(qtile):
 
 
 def list_windows(qtile, current_group=False):
-    from sh import dmenu
+    from plumbum.cmd import dmenu
 
     def title_format(x):
         return "[%s] %s" % (
@@ -243,12 +243,11 @@ def list_windows(qtile, current_group=False):
         return True
 
     try:
-        s = dmenu(
+        s = (dmenu[
             "-i", "-p", "%s >>> " % ((
                 "[%s]" % qtile.currentGroup.name) if current_group else "[*]"),
-            *dmenu_defaults,
-            _in="\n".join(window_titles), _out=process_selected)
-        s.wait()
+            ] << "\n".join(window_titles))(*dmenu_defaults)
+        process_selected(s)
     except Exception as e:
         logging.exception("error running dmenu")
 

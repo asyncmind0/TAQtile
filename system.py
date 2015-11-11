@@ -2,7 +2,7 @@
 """
 import logging
 import platform
-import sh
+from plumbum import local
 import subprocess
 from os.path import expanduser
 
@@ -122,7 +122,7 @@ def execute_once(process, process_filter=None, qtile=None):
     process_filter = process_filter or cmd[0]
     pid = None
     try:
-        pid = sh.pgrep("-f", process_filter)
+        pid = local['pgrep']("-f", process_filter)
         pid.wait()
     except Exception as e:
         log.error("CalledProcessError")
@@ -133,7 +133,7 @@ def execute_once(process, process_filter=None, qtile=None):
             if qtile:
                 qtile.cmd_spawn(process)
             else:
-                cmd = sh.Command(process)
+                cmd = local[process]
                 cmd()
             log.info("Started: %s: %s", cmd, pid)
         except Exception as e:

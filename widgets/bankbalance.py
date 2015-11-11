@@ -1,3 +1,4 @@
+from os.path import expanduser
 import subprocess
 import logging
 try:
@@ -65,3 +66,7 @@ class BankBalance(base.ThreadedPollText):
             log.exception("BankBalance: %s %s", user, data)
         # text = commbank.net_position
         return str(text)
+
+    def button_press(self, x, y, button):
+        user = subprocess.check_output(
+            ['python', expanduser("~/.bin/bank.py")]).strip().decode('utf8')
