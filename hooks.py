@@ -112,8 +112,8 @@ def set_groups(*args, **kwargs):
                 try:
                     if rule.float:
                         client.enablefloating()
-                    else:
-                        client.disablefloating()
+                    #else:
+                    #    client.disablefloating()
                     if rule.group:
                         client.togroup(rule.group)
                 except Exception as e:
@@ -122,6 +122,10 @@ def set_groups(*args, **kwargs):
         for rule in extra_rules:
             rule(w)
 
-hook.subscribe.window_name_change(set_groups)
-hook.subscribe.client_name_updated(set_groups)
-hook.subscribe.setgroup(set_groups)
+#hook.subscribe.window_name_change(set_groups)
+#hook.subscribe.client_name_updated(set_groups)
+#hook.subscribe.setgroup(set_groups)
+hook.subscribe.client_new(set_groups)
+hook.subscribe.screen_change(set_groups)
+
+hook.subscribe.startup(set_groups)
