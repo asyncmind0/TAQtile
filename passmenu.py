@@ -35,7 +35,7 @@ def passmenu(qtile, args):
         except ProcessExecutionError as e:
             logging.exception("Error getting pass output")
             notify_send(str(e))
-        password = password.decode('utf8').strip()
+        password = password.strip()
         if not password:
             return
         if len(password) > MAX_PASS:
