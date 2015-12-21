@@ -20,7 +20,10 @@ common_autostart = {
 
 laptop_autostart = dict(common_autostart)
 laptop_autostart.update({
-    'nm-applet': None})
+    'blueman-applet': None,
+    'nm-applet': None,
+    'redshift-gtk': None
+})
 
 desktop_autostart = dict(common_autostart)
 desktop_autostart.update({
