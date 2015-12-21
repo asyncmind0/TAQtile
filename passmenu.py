@@ -29,6 +29,7 @@ def passmenu(qtile, args):
             retcode=None).strip()
         if not selection:
             return
+        password = None
         try:
             password = envoyexec('pass', 'show', selection)
         except ProcessExecutionError as e:
