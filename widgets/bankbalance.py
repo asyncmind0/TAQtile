@@ -58,9 +58,13 @@ class BankBalance(base.ThreadedPollText):
             log.warning("BankBalance:%s", user)
             commbank = CommBank(user, password)
             self.data = data = commbank.data
-            text = commbank.get_currency(
+            credit = commbank.get_currency(
                 commbank.data['AccountGroups'][0]['ListAccount'][-2]['AvailableFunds']
             )
+            debit = commbank.get_currency(
+                commbank.data['AccountGroups'][0]['ListAccount'][0]['AvailableFunds']
+            )
+            text = "%sC|%sD" % (credit, debit)
             log.warning("BankBalance:%s", text)
         except Exception as e:
             log.exception("BankBalance: %s %s", user, data)
