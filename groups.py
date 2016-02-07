@@ -131,6 +131,13 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             group="comm2",
             break_on_match=False
         ),
+        Rule(
+            Match(
+                title=[re.compile(r"^(\[\d*\])*scudcloud$", re.I)]
+            ),
+            group="comm2",
+            break_on_match=False
+        ),
     ])
 
     def terminal_matches(regexes):
