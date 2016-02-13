@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import logging
 import os
+from dmenu import dmenu_show
 
 MAX_PASS = 200
 log = logging.getLogger("qtile")
@@ -10,7 +11,6 @@ log = logging.getLogger("qtile")
 def passmenu(qtile, args):
     from plumbum import local, ProcessExecutionError
     try:
-        dmenu = local['dmenu']
         xdotool = local['xdotool']
         envoyexec = local['envoy-exec']
         notify_send = local['notify-send']
@@ -25,8 +25,7 @@ def passmenu(qtile, args):
         args = args.split(' ')
         args.extend(['-p', 'Pass:'])
 
-        selection = (dmenu[args] << '\n'.join(reversed(passfiles)))(
-            retcode=None).strip()
+        selection = dmenu_show("pass", reversed(passfiles))
         if not selection:
             return
         password = None

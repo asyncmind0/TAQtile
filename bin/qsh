@@ -1,0 +1,9 @@
+from libqtile import sh, command
+from IPython import embed
+
+def main():
+    client = command.Client()
+    embed()
+
+if __name__ == "__main__":
+    main()

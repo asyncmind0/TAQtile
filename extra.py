@@ -1,10 +1,8 @@
 import glob
 import logging
 import os
-from os.path import expanduser
+from os.path import expanduser, isdir, join, pathsep
 from py_compile import compile
-
-from libqtile.config import Group, Match, Rule
 
 from system import execute_once
 
@@ -36,7 +34,8 @@ class SwitchGroup(object):
         self.preferred_screen = preferred_screen
 
     def __call__(self, qtile):
-        logging.debug("SwitchGroup:%s:%s", qtile.currentScreen.index, self.name)
+        logging.debug(
+            "SwitchGroup:%s:%s", qtile.currentScreen.index, self.name)
         max_screen = len(qtile.screens) - 1
         if(self.preferred_screen is not None and
            self.preferred_screen <= max_screen):
@@ -66,7 +65,8 @@ class MoveToGroup(object):
         self.name = group
 
     def __call__(self, qtile):
-        logging.debug("MoveToGroup:%s:%s", qtile.currentScreen.index, self.name)
+        logging.debug(
+            "MoveToGroup:%s:%s", qtile.currentScreen.index, self.name)
         index = int(self.name)
         screenindex = qtile.currentScreen.index
         if screenindex > 0:
@@ -179,7 +179,8 @@ class RaiseWindowOrSpawn(object):
                 else:
                     window.hide()
             logging.error("Hidden: %s %s", window.hidden, window.window.wid)
-            execute_once("transet-df %s -i %s" % (self.alpha, window.window.wid))
+            execute_once(
+                "transet-df %s -i %s" % (self.alpha, window.window.wid))
         logging.error("Current group: %s",qtile.currentGroup.name)
         execute_once(self.cmd, self.cmd_match, qtile=qtile)
 
@@ -197,60 +198,3 @@ def check_restart(qtile):
         #signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         logging.info("restarting qtile ...")
         qtile.cmd_restart()
-
-
-def list_windows(qtile, current_group=False):
-    from plumbum.cmd import dmenu
-
-    def title_format(x):
-        return "[%s] %s" % (
-            x.group.name if x.group else '',
-            x.name)
-
-    if current_group:
-        window_titles = [
-            w.name for w in qtile.groupMap[qtile.currentGroup.name].windows
-            if w.name != "<no name>"
-        ]
-    else:
-        window_titles = [
-            title_format(w) for w in qtile.windowMap.values() if w.name != "<no name>"
-        ]
-    logging.info(window_titles)
-    from themes import dmenu_defaults
-    dmenu_defaults = dmenu_defaults.replace("'", "").split()
-
-    def process_selected(selected):
-        if not current_group:
-            group, selected = selected.split(']', 1)
-        selected = selected.strip()
-        logging.info("Switch to: %s", selected)
-        for window in qtile.windowMap.values():
-            try:
-                #logging.debug("window %s : %s", repr(window.name), repr(selected))
-                if window.group and str(window.name) == str(selected):
-                    #window.cmd_to_screen(qtile.currentScreen.index)
-                    #qtile.cmd_to_screen(window.
-                    logging.debug("raise %s:", window.group.screen)
-                    if window.group.screen:
-                        qtile.cmd_to_screen(window.group.screen.index)
-                    else:
-                        window.group.cmd_toscreen()
-                    #qtile.currentScreen.cmd_togglegroup(window.group.name)
-                    return True
-            except Exception as e:
-                logging.exception("error in group")
-        return True
-
-    try:
-        s = (dmenu[
-            "-i", "-p", "%s >>> " % ((
-                "[%s]" % qtile.currentGroup.name) if current_group else "[*]"),
-            ] << "\n".join(window_titles))(*dmenu_defaults)
-        process_selected(s)
-    except Exception as e:
-        logging.exception("error running dmenu")
-
-
-def list_windows_group(qtile):
-    return list_windows(qtile, current_group=True)

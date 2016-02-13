@@ -4,8 +4,8 @@ from libqtile.config import Key, Match, Rule
 from extra import (
     SwitchToWindowGroup, check_restart,
     terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchGroup,
-    RaiseWindowOrSpawn, list_windows, list_windows_group,
-    MoveToGroup, move_to_next_group, move_to_prev_group) 
+    RaiseWindowOrSpawn, MoveToGroup, move_to_next_group, move_to_prev_group)
+from dmenu import dmenu_run, list_windows, list_windows_group
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
@@ -119,7 +119,8 @@ def get_keys(mod, num_groups, num_monitors):
 
         # APP LAUNCHERS
         #([mod], "r", lazy.spawncmd()),
-        ([mod], "F2", lazy.spawn("dmenu-run-recent %s" % dmenu_defaults)),
+        ([mod], "F2", lazy.function(dmenu_run)),
+        #([mod], "F2", lazy.spawn("dmenu-run-recent %s" % dmenu_defaults)),
         ([mod], "o", lazy.spawn("orgcapture.py")),
         #([mod], "F2", lazy.spawn("dmenu_run %s" % dmenu_defaults)),
         ([mod], "F3", lazy.function(list_windows_group)),
@@ -196,6 +197,8 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "XF86KbdBrightnessDown", lazy.spawn("%s -k down" % samctl)),
         # Media controls
         ([], "XF86LaunchB", lazy.function(RaiseWindowOrSpawn(
+            wmclass='Pavucontrol', cmd='pavucontrol'))),
+        ([], "XF86Launch1", lazy.function(RaiseWindowOrSpawn(
             wmclass='Pavucontrol', cmd='pavucontrol'))),
         # ([], "XF86AudioMute", lazy.spawn("pavucontrol")),
         #([], "XF86AudioLowerVolume", lazy.spawn("samctl.py -v down")),

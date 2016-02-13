@@ -35,13 +35,22 @@ matrix_green = dict(
 )
 
 current_theme = dict(default_theme)
-current_theme.update(star_trek_blue)
-#current_theme.update(matrix_green)
+#current_theme.update(star_trek_blue)
+current_theme.update(matrix_green)
 log.debug("Current theme:%s", current_theme)
 #current_theme = matrix_green
+#dmenu_defaults = (
+#    "-w -f -l 40 "
+#    "-nb black -nf white "
+#    "-sb %(background)s -sf %(foreground)s "
+#    "-fn %(font)s"
+#) % current_theme
+
 dmenu_defaults = (
     "-w -f -l 40 "
     "-nb black -nf white "
-    "-sb %(background)s -sf %(foreground)s "
-    "-fn %(font)s"
+    "-bg black -fg %(foreground)s "
+    "-font '%(font)s %(fontsize)s' "
+    "-bgalt '#001400' "
+    "-location 1 "
 ) % current_theme

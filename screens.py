@@ -19,7 +19,6 @@ PRIMARY_MONITOR = 0
 SECONDARY_MONITOR = 1
 
 
-
 def get_screens(num_monitors, num_groups, groups):
     screens = []
     multi_monitor = num_monitors > 1
