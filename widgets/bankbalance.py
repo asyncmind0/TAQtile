@@ -1,16 +1,15 @@
 from os.path import expanduser
 import subprocess
-import logging
 try:
     from builtins import str
 except Exception as e:
     from future.builtins import str
 
 from libqtile.widget import base
+from libqtile.log_utils import logger as log
 
 from .bank import CommBank
 
-log = logging.getLogger("qtile_%s" % __file__)
 
 class BankBalance(base.ThreadedPollText):
     defaults = [
@@ -21,9 +20,11 @@ class BankBalance(base.ThreadedPollText):
         ('critical_foreground', '#FF0000', 'Warning Color - no updates.'),
         ('critical_background', '#FFffff', 'Critical Color - no updates.'),
         ('unavailable', '#ffffff', 'Unavailable Color - no updates.'),
-        ("account", "all", "Which account to show (all/0/1/2/...)"),
+        ("account", "debit", "Which account to show (all/0/1/2/...)"),
     ]
     fixed_upper_bound = False
+    amount = None
+    CACHE = {}
 
     def __init__(self, **config):
         # graph._Graph.__init__(self, **config)
@@ -34,16 +35,18 @@ class BankBalance(base.ThreadedPollText):
         try:
             foreground = self.foreground
             background = self.background
-            if float(self.text) <= self.warning:
-                background = self.warning_background
-                foreground = self.warning_foreground
-            elif float(self.text) <= self.critical:
+            if self.amount is None:
+                return
+            if float(self.amount) <= self.critical:
                 background = self.critical_background
                 foreground = self.critical_foreground
+            elif float(self.amount) <= self.warning:
+                background = self.warning_background
+                foreground = self.warning_foreground
             self.foreground = foreground
             self.background = background
         except ValueError as e:
-            pass
+            log.exception("Draw error")
         except Exception as e:
             log.exception("Draw error")
         base.ThreadedPollText.draw(self)
@@ -58,13 +61,18 @@ class BankBalance(base.ThreadedPollText):
             log.warning("BankBalance:%s", user)
             commbank = CommBank(user, password)
             self.data = data = commbank.data
-            credit = commbank.get_currency(
-                commbank.data['AccountGroups'][0]['ListAccount'][-2]['AvailableFunds']
+            if self.account == 'credit':
+                self.amount = commbank.get_currency(
+                    commbank.data['AccountGroups'][0]['ListAccount'][-2]['AvailableFunds']
+                )
+            else:
+                self.amount = commbank.get_currency(
+                    commbank.data['AccountGroups'][0]['ListAccount'][0]['AvailableFunds']
+                )
+            text = "%s%s" % (
+                self.amount,
+                'C' if self.account == 'credit' else 'D',
             )
-            debit = commbank.get_currency(
-                commbank.data['AccountGroups'][0]['ListAccount'][0]['AvailableFunds']
-            )
-            text = "%sC|%sD" % (credit, debit)
             log.warning("BankBalance:%s", text)
         except Exception as e:
             log.exception("BankBalance: %s %s", user, data)
