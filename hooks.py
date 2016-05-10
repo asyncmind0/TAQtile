@@ -1,16 +1,14 @@
 from __future__ import print_function
-import logging
 import os
+from random import randint
 from libqtile import hook
 from libqtile.layout import Slice
+from libqtile.log_utils import logger as log
 from system import get_hostconfig, get_num_monitors, execute_once
 
 
 num_monitors = get_num_monitors()
 prev_timestamp = 0
-log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
-log.error("INITIALIZING  hooks")
 
 
 @hook.subscribe.screen_change
@@ -81,7 +79,11 @@ def rules_shrapnel(client):
     if client_name == 'shrapnel':
         client.cmd_enable_floating()
         client.place(
-            500, 50, 800, 400, 1, None, above=True, force=True)#, '00C000')
+            randint(500, 550),
+            randint(50, 100),
+            800,
+            400,
+            1, None, above=True, force=True)#, '00C000')
         client.cmd_opacity(0.85)
 
 
@@ -109,19 +111,29 @@ def set_groups(*args, **kwargs):
     for client in hook.qtile.windowMap.values():
         for rule in hook.qtile.dgroups.rules:
             if rule.matches(client):
+                log.debug("hints:%s", dir(client))#.get_wm_normal_hints())
                 try:
                     if rule.float:
                         client.enablefloating()
-                    #else:
-                    #    client.disablefloating()
-                    if rule.group:
+                    elif getattr(client, 'disablefloating', None):
+                        client.disablefloating()
+                    if getattr(rule, 'fullscreen', None):
+                        if rule.fullscreen:
+                            client.enablemaximize()
+                        else:
+                            client.enablemaximize(state=4)
+                    if rule.group and getattr(client, 'togroup', None):
                         client.togroup(rule.group)
                 except Exception as e:
-                    logging.exception("error setting rules")
+                    log.exception("error setting rules")
     for w in hook.qtile.windowMap.values():
         for rule in extra_rules:
             rule(w)
 
+
+def urgent_hint_changed(*args, **kwargs):
+    log.debug("urgent_hint_changed called with %s %s", args, kwargs)
+    
 #hook.subscribe.window_name_change(set_groups)
 #hook.subscribe.client_name_updated(set_groups)
 #hook.subscribe.setgroup(set_groups)
@@ -129,3 +141,5 @@ hook.subscribe.client_new(set_groups)
 hook.subscribe.screen_change(set_groups)
 
 hook.subscribe.startup(set_groups)
+
+hook.subscribe.client_urgent_hint_changed(urgent_hint_changed)

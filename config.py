@@ -74,9 +74,6 @@ groups = generate_groups(
     num_groups, num_monitors, dgroups_app_rules, layouts)
 keys = get_keys(mod, num_groups, num_monitors)
 screens = get_screens(num_monitors, num_groups, groups)
-log_level = logging.WARNING
-log_path = os.path.expanduser("~/.qtile.log")
-mylog_path = os.path.expanduser("~/.qtile.my.log")
 
 
 class NoTimerFilter(logging.Filter):
@@ -85,10 +82,9 @@ class NoTimerFilter(logging.Filter):
 
 
 def main(self):
-    self.log = init_log(log_level=log_level, log_path=log_path)
-    #self.log.addFilter(NoTimerFilter())
-
-    self.mylog = init_log(log_level=logging.DEBUG, logger='myqtile', log_path=mylog_path)
+    self.log = init_log(
+        log_level=logging.WARNING,
+    )
 
 
 import hooks
