@@ -1,6 +1,8 @@
 from unittest import TestCase
-from dmenu import dmenu_run, list_executables
-from libqtile import sh, command
+from dmenu import dmenu_run, list_executables, RecentRunner
+from libqtile import sh, command, hook
+from extra import autossh_term
+from random import randint
 
 
 class QtileRunTest(TestCase):
@@ -11,3 +13,5 @@ class QtileRunTest(TestCase):
         self.assertIn("bash", list_executables())
         self.assertIn("python", list_executables())
     
+    def test_autossh_term(self):
+        print(autossh_term(title="shawk_left", port=9001))

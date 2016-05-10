@@ -3,10 +3,10 @@ import logging
 import os
 from os.path import expanduser, isdir, join, pathsep
 from py_compile import compile
+from subprocess import check_output
+from libqtile.log_utils import logger as log
 
 from system import execute_once
-
-log = logging.getLogger('myqtile')
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
 _terminal = "st -t {0} "
@@ -28,7 +28,7 @@ def terminal(title, cmd=None):
     return term
 
 
-class SwitchGroup(object):
+class SwitchToScreen(object):
     def __init__(self, group, preferred_screen=None):
         self.name = group
         self.preferred_screen = preferred_screen
@@ -55,9 +55,26 @@ class SwitchGroup(object):
             if screen.index >= 0:
                 index = index + (screen.index * 10)
             index = str(index)
-        log.debug("SwitchGroup: %s", index)
+        return screen, index
 
+
+class SwitchToScreenGroup(SwitchToScreen):
+    def __call__(self, qtile):
+        screen, index = super(SwitchToScreenGroup, self).__call__(qtile)
+        log.debug("SwitchGroup: %s", index)
         screen.cmd_togglegroup(index)
+
+
+class SwitchToScreenGroupUrgent(SwitchToScreenGroup):
+    def __call__(self, qtile):
+        screen, index = super(SwitchToScreenGroupUrgent, self).__call__(qtile)
+        cg = qtile.currentGroup
+        for group in qtile.groupMap.values():
+            if group == cg:
+                continue
+            if len([w for w in group.windows if w.urgent]) > 0:
+                qtile.currentScreen.setGroup(group)
+                return
 
 
 class MoveToGroup(object):
@@ -116,7 +133,7 @@ class SwitchToWindowGroup(object):
                 qtile.currentGroup.focus(window, False)
 
     def spawn_ifnot(self, qtile):
-        logging.debug(qtile.currentGroup)
+        log.debug(self.cmd)
         for window in qtile.windowMap.values():
             if window.group and window.match(wname=self.title):
                 return True
@@ -129,14 +146,16 @@ class SwitchToWindowGroup(object):
         self.spawn_ifnot(qtile)
         if self.screen > len(qtile.screens) - 1:
             self.screen = len(qtile.screens) - 1
-        if qtile.currentScreen.index != self.screen:
+        if qtile.currentScreen.index != self.screen: # and qtile.currentWindow.title != self.title:
             qtile.cmd_to_screen(self.screen)
-            return
+        # TODO if target window exists in current group raise it and exit
+        # elif qtile.currentWindow.title :
+        else:
+            try:
+                qtile.currentScreen.cmd_togglegroup(self.name)
+            except Exception as e:
+                log.exception("wierd")
         #self.raise_window(qtile)
-        try:
-            qtile.currentScreen.cmd_togglegroup(self.name)
-        except Exception as e:
-            log.exception("wierd")
 
 
 class RaiseWindowOrSpawn(object):
@@ -192,9 +211,28 @@ def check_restart(qtile):
             # log.debug(pyfile)
             compile(pyfile, doraise=True)
     except Exception as e:
-        logging.exception("Syntax error")
+        log.exception("Syntax error")
     else:
         #import signal
         #signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         logging.info("restarting qtile ...")
         qtile.cmd_restart()
+
+
+def autossh_term(
+        title="autossh", port=22, host='localhost',
+        session="default"):
+    autossh_py = "/home/steven/.local/bin/autossh.py"
+    cmd = " ".join(
+        [
+            "st",
+            "-t",
+            title,
+            "-e",
+            autossh_py,
+            "%s:%s" % (host, port),
+            "outer",
+            title
+        ]
+    )
+    return cmd
