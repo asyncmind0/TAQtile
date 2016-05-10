@@ -31,39 +31,33 @@ def get_screens(num_monitors, num_groups, groups):
     groupbox_params = default_params(
         urgent_alert_method='text',
         rounded=False,
-        padding=-1,
-        border_width=1,
-        borderwidth=1,
         border_focus='#FFFFFF',
-        linewidth=1,
+        is_line=False,
+    )
+    tasklist_params = default_params(
+        selected=("[", "]"),
+        rounded=False,
+        border=themes.current_theme['border_focus'],
+        #foreground=themes.current_theme['foreground'],
     )
 
-    prompt_params = default_params()
+    #prompt_params = default_params()
     systray_params = default_params()
     current_layout_params = default_params(
-        name="default", padding=2)
+        name="default", border='#000000')
     #windowname_params = default_params
     systray_params = default_params()
     clock_params = default_params(padding=2, format='%Y-%m-%d %a %H:%M')
     pacman_params = default_params()
     notify_params = default_params()
     bitcointicker_params = default_params()
-    batteryicon_params = default_params()
-    batteryicon_params['battery_name'] = "BAT1"
-    batteryicon_params['format'] = "{percent:5.0%}"
-    windowtabs_params = default_params(selected=("[", "]"), separator='|')
-    tasklist_params = default_params(
-        fontsize=12,
-        selected=("[", "]"),
-        separator='|',
-        rounded=False,
-        padding_x=2,
-        padding_y=0,
-        margin_y=0,
-        margin_x=0,
-        border=themes.current_theme['border_focus'],
-        #foreground=themes.current_theme['foreground'],
+    batteryicon_params = default_params(
+        charge_char='^',
+        discharge_char='v',
+        battery_name="BAT1",
+        format="{char}{percent:1.0%}",
     )
+    windowtabs_params = default_params(selected=("[", "]"), separator='|')
 
     graph_defaults = {k[0]: k[1] for k in[
         ("graph_color", "18BAEB.6", "Graph color"),
@@ -87,7 +81,13 @@ def get_screens(num_monitors, num_groups, groups):
     memgraph_params['fill_color'] = "80FF00.3"
     memgraph_params['type'] = "linefill"
     netgraph_params = dict(graph_defaults)
-    sep_params = default_params(padding=2, fontsize=9, height_percent=60)
+    sep_params = default_params(padding=2, fontsize=9, height_percent=90)
+    graph_label_defaults = dict(
+        margin=0,
+        padding_x=0,
+        padding_y=2,
+    )
+
     # netgraph_params['fill_color'] = "80FF00.3"
 
     group_splits = ((num_groups / num_monitors) if multi_monitor else num_groups,)
@@ -109,37 +109,55 @@ def get_screens(num_monitors, num_groups, groups):
         #widget.GroupBox(**groupbox_params),
         MultiScreenGroupBox(
             namemap=mon_map[PRIMARY_SCREEN], **groupbox_params),
-        widget.Sep(**sep_params),
-        widget.Prompt(**prompt_params),
+        #widget.Sep(**sep_params),
+        #widget.Prompt(**prompt_params),
         widget.Sep(**sep_params),
         TaskList2(**tasklist_params),
         # widget.WindowName(**windowname_params),
         # widget.TextBox(**layout_textbox_params),
         widget.Sep(**sep_params),
         widget.CurrentLayout(**current_layout_params),
-        widget.Sep(**sep_params),
+        #widget.Sep(**sep_params),
         # widget.BitcoinTicker(**bitcointicker_params),
         # widget.Sep(**sep_params),
         #ThreadedPacman(**pacman_params),
-        widget.Sep(**sep_params),
+        #widget.Sep(**sep_params),
         widget.DF(**default_params()),
         widget.Sep(**sep_params),
         BankBalance(account='credit', **default_params()),
         widget.Sep(**sep_params),
         BankBalance(account='debit', **default_params()),
-        widget.Sep(**sep_params),
+        #widget.Sep(**sep_params),
         #PriorityNotify(**default_params()),
         # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
         widget.Sep(**sep_params),
-        widget.TextBox("c:", **default_params()),
+        widget.TextBox(
+            "c",
+            **default_params(
+                foreground=cpugraph_params['graph_color'],
+                **graph_label_defaults
+            )
+        ),
         widget.CPUGraph(**cpugraph_params),
-        # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/media-flash-memory-stick.png"),
-        widget.TextBox("m:", **default_params()),
+        #widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/media-flash-memory-stick.png"),
+        widget.TextBox(
+            "m",
+            **default_params(
+                foreground=memgraph_params['graph_color'],
+                **graph_label_defaults
+            )
+        ),
         widget.MemoryGraph(**memgraph_params),
         # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/network-wired.png"),
-        widget.TextBox("n:", **default_params()),
+        widget.TextBox(
+            "n",
+            **default_params(
+                foreground=netgraph_params['graph_color'],
+                **graph_label_defaults
+            )
+        ),
         widget.NetGraph(**netgraph_params),
-        # widget.Sep(**sep_params),
+        widget.Sep(**sep_params),
         # widget.Notify(width=30, **notify_params),
         widget.Sep(**sep_params)
     ]
@@ -161,7 +179,7 @@ def get_screens(num_monitors, num_groups, groups):
         CalClock(**clock_params),
     ]
     bar_map = {0: primary_bar, 1: secondary_bar}
-    bar_height = groupbox_params.get('bar_height', 10)
+    bar_height = groupbox_params.get('bar_height', 7)
     screens.append(Screen(bar.Bar(bar_map[PRIMARY_SCREEN], bar_height)))
     if num_monitors > 1:
         screens.append(Screen(bar.Bar(bar_map[SECONDARY_SCREEN], bar_height)))

@@ -3,11 +3,13 @@ import logging as log
 
 default_theme = dict(
     fontsize=14,
-    padding=0,
-    font="Inconsolata",
-    #font="Terminus",
+    padding=2,
+    margin=0,
+    linewidth=1,
+    #font="Inconsolata",
+    font="Terminus",
     borderwidth=1,
-    bar_height=20
+    bar_height=19
 )
 
 star_trek_blue = dict(
@@ -18,6 +20,9 @@ star_trek_blue = dict(
     border_normal="#0000A0",
     foreground="#06B4E7",
     background="#010F2C",
+    background_alt="#010F2C",
+    hl_foreground="#06B4E7",
+    hl_background="#011846",
     active="#8CC3DF",
     this_current_screen_border="#5981B9",
     highlight_method="block",
@@ -25,18 +30,22 @@ star_trek_blue = dict(
 )
 
 matrix_green = dict(
-    border="#1AF03E",
-    border_focus="#1AF03E",
+    border="#00FD00",
+    border_focus="#00FD00",
     foreground="#00FD00",
     background="#125B29",
+    background_alt="#1AF03E",
+    hl_foreground="#418200",
+    hl_background="#125B29",
     active="#00FD00",
-    this_current_screen_border="#1AF03E",
+    #highlight_method="block",
+    this_current_screen_border="#00FD00",
     bar_height=18
 )
 
 current_theme = dict(default_theme)
-#current_theme.update(star_trek_blue)
-current_theme.update(matrix_green)
+current_theme.update(star_trek_blue)
+#current_theme.update(matrix_green)
 log.debug("Current theme:%s", current_theme)
 #current_theme = matrix_green
 #dmenu_defaults = (
@@ -46,11 +55,25 @@ log.debug("Current theme:%s", current_theme)
 #    "-fn %(font)s"
 #) % current_theme
 
-dmenu_defaults = (
-    "-w -f -l 40 "
-    "-nb black -nf white "
-    "-bg black -fg %(foreground)s "
+#dmenu_defaults = (
+#    "-w -f -l 40 "
+#    "-nb #000000 -nf #FFFFFF "
+#    "-bg #000000 -fg %(foreground)s "
+#    "-font '%(font)s %(fontsize)s' "
+#    "-bgalt '#001400' "
+#    "-location 1 "
+#) % current_theme
+
+rofi_defaults = (
+    "-w -f -l 30 -bw 1 "
+    "-separator-style solid "
+    "-color-window '%(background)s,%(foreground)s' "
+    "-color-normal '%(background)s,%(foreground)s,"
+    "%(background_alt)s,%(hl_background)s,%(hl_foreground)s' "
     "-font '%(font)s %(fontsize)s' "
-    "-bgalt '#001400' "
-    "-location 1 "
+    #"-location 1 "
+    "-hide-scrollbar "
+    "-width 30 "
+    "-monitor -2 "
 ) % current_theme
+dmenu_defaults = rofi_defaults
