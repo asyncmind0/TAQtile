@@ -32,27 +32,28 @@ class BankBalance(base.ThreadedPollText):
         self.add_defaults(BankBalance.defaults)
 
     def draw(self):
+        foreground = self.foreground
+        background = self.background
+        if self.amount is None:
+            return
         try:
-            foreground = self.foreground
-            background = self.background
-            if self.amount is None:
-                return
             if float(self.amount) <= self.critical:
                 background = self.critical_background
                 foreground = self.critical_foreground
             elif float(self.amount) <= self.warning:
                 background = self.warning_background
                 foreground = self.warning_foreground
-            self.foreground = foreground
-            self.background = background
         except ValueError as e:
             log.exception("Draw error")
         except Exception as e:
             log.exception("Draw error")
+        self.foreground = foreground
+        self.background = background
         base.ThreadedPollText.draw(self)
 
     def poll(self, data=None):
         text = "$$$$"
+        user = None
         try:
             user = subprocess.check_output(
                 ['pass', "financial/commbank/debit/user"]).strip().decode('utf8')
@@ -80,5 +81,13 @@ class BankBalance(base.ThreadedPollText):
         return str(text)
 
     def button_press(self, x, y, button):
-        user = subprocess.check_output(
-            ['python', expanduser("~/.bin/bank.py")]).strip().decode('utf8')
+        subprocess.check_output(
+            'notify-send %s' %
+            str(
+                subprocess.check_output(
+                    [
+                        'python',
+                        expanduser("~/.bin/bank.py"),
+                    ]).strip().decode('utf8')
+            )
+        )
