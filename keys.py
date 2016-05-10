@@ -3,8 +3,9 @@ from libqtile.command import lazy
 from libqtile.config import Key, Match, Rule
 from extra import (
     SwitchToWindowGroup, check_restart,
-    terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchGroup,
-    RaiseWindowOrSpawn, MoveToGroup, move_to_next_group, move_to_prev_group)
+    terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchToScreenGroup,
+    RaiseWindowOrSpawn, MoveToGroup, move_to_next_group, move_to_prev_group,
+    autossh_term)
 from dmenu import dmenu_run, list_windows, list_windows_group
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
@@ -16,10 +17,6 @@ from hooks import set_groups
 
 log = logging.getLogger('myqtile')
 log.setLevel(logging.DEBUG)
-
-cmd_autossh_iress = (
-    "st -t iress{2}_{0} -e /home/steven/.local/bin/autossh.py localhost:330{1} outer {0}"
-)
 samctl = "sudo /home/steven/.bin/samctl.py"
 
 
@@ -35,20 +32,22 @@ def get_keys(mod, num_groups, num_monitors):
             [mod], "k",
             lazy.layout.up().when('stack'),
             lazy.layout.up().when('max'),
-            lazy.layout.up().when('tile'),
-            lazy.layout.up().when('slice'),
-            lazy.layout.previous().when('monadtall'),
-            lazy.group.prev_window().when("floating"),
+            #lazy.layout.up().when('tile'),
+            #lazy.layout.up().when('slice'),
+            #lazy.layout.previous().when('monadtall'),
+            lazy.group.prev_window().when('floating'),
+            lazy.window.bring_to_front().when("floating"),
         ),
         (
             [mod], "j",
             #lazy.layout.next(),
             lazy.layout.down().when('stack'),
             lazy.layout.down().when('max'),
-            lazy.layout.down().when('tile'),
-            lazy.layout.down().when('slice'),
-            lazy.layout.next().when('monadtall'),
-            lazy.group.next_window().when("floating"),
+            #lazy.layout.down().when('tile'),
+            #lazy.layout.down().when('slice'),
+            #lazy.layout.next().when('monadtall'),
+            lazy.group.next_window().when('floating'),
+            lazy.window.bring_to_front().when("floating"),
         ),
 
         #([mod], "k", lazy.layout.up()),
@@ -124,14 +123,14 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "o", lazy.spawn("orgcapture.py")),
         #([mod], "F2", lazy.spawn("dmenu_run %s" % dmenu_defaults)),
         ([mod], "F3", lazy.function(list_windows_group)),
-        ([mod], "F4", lazy.function(list_windows)),
-        #([mod], "F5", lazy.spawn('st -t {0} -e {0}'.format('ncmpcpp'))),
+        #([mod], "f5", lazy.spawn('st -t {0} -e {0}'.format('ncmpcpp'))),
         ([mod], "r", lazy.spawncmd()),
         ([mod], "Return", lazy.spawn("st -t shrapnel")),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         #([mod, "shift"], "b", lazy.spawn("google-chrome-stable")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "shift"], "p", lazy.function(passmenu, dmenu_defaults)),
+        ([mod, "shift"], "c", lazy.spawn("spectacle")),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
         ([mod, "control"], "s", lazy.spawn("surf")),
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
@@ -151,8 +150,8 @@ def get_keys(mod, num_groups, num_monitors):
             'krusader', 'krusader', screen=SECONDARY_SCREEN,
             spawn="krusader"))),
         # Switch groups
-        ([], "F1", lazy.function(SwitchGroup("1"))),
-        ([], "F2", lazy.function(SwitchGroup("2"))),
+        ([], "F1", lazy.function(SwitchToScreenGroup("1"))),
+        ([], "F2", lazy.function(SwitchToScreenGroup("2"))),
 
         #([], "Menu", lazy.function(SwitchToWindowGroup(
         #    'monitor', 'monitor', screen=PRIMARY_SCREEN,
@@ -160,33 +159,100 @@ def get_keys(mod, num_groups, num_monitors):
         #([], "XF86Eject", lazy.function(SwitchToWindowGroup(
         #    'monitor', 'monitor', screen=PRIMARY_SCREEN,
         #    spawn=terminal_tmux('outer', 'monitor')))),
-        #([], "F10", lazy.function(SwitchGroup("mail"))),
+        #([], "F10", lazy.function(SwitchToScreenGroup("mail"))),
         ([], "F10", lazy.function(SwitchToWindowGroup(
             'mail', 'mail', screen=SECONDARY_SCREEN,
             spawn=terminal_tmux('inner', 'mail')))),
-        ([], "F6", lazy.function(SwitchGroup(
+        ([], "F6", lazy.function(SwitchToScreenGroup(
             "comm2", preferred_screen=SECONDARY_SCREEN))),
         ([], "F9", lazy.function(SwitchToWindowGroup(
             'comm1', 'comm1', screen=PRIMARY_SCREEN,
             spawn=terminal_tmux('inner', 'comm1')))),
-        ([], term1_key, lazy.function(SwitchToWindowGroup(
-            'term1', 'left', screen=PRIMARY_SCREEN,
-            spawn=terminal_tmux('outer', 'left')))),
-        ([], term2_key, lazy.function(SwitchToWindowGroup(
-            'term2', 'right', screen=SECONDARY_SCREEN,
-            spawn=terminal_tmux('outer', 'right')))),
-        ([mod], term1_key, lazy.function(SwitchToWindowGroup(
-            'term1', 'iress_right', screen=PRIMARY_SCREEN,
-            spawn=cmd_autossh_iress.format("right", "7", "")))),
-        ([mod], term2_key, lazy.function(SwitchToWindowGroup(
-            'term2', 'iress_left', screen=SECONDARY_SCREEN,
-            spawn=cmd_autossh_iress.format("left", "7", "")))),
-        ([mod, "shift"], term1_key, lazy.function(SwitchToWindowGroup(
-            'term1', 'iress2_right', screen=PRIMARY_SCREEN,
-            spawn=cmd_autossh_iress.format("right", "8", "2")))),
-        ([mod, "shift"], term2_key, lazy.function(SwitchToWindowGroup(
-            'term2', 'iress2_left', screen=SECONDARY_SCREEN,
-            spawn=cmd_autossh_iress.format("left", "8", "2")))),
+        (
+            [],
+            term1_key,
+            lazy.function(
+                SwitchToWindowGroup(
+                    'term1',
+                    title='left',
+                    screen=PRIMARY_SCREEN,
+                    spawn=terminal_tmux(
+                        'outer', 'left'
+                        )
+
+                    )
+                )
+        ),
+        (
+            [],
+            term2_key,
+            lazy.function(
+                SwitchToWindowGroup(
+                    'term2',
+                    title='right',
+                    screen=SECONDARY_SCREEN,
+                    spawn=terminal_tmux(
+                        'outer', 'right'
+                        )
+                    )
+                )
+        ),
+        (
+            [mod],
+            term1_key,
+            lazy.function(
+                SwitchToWindowGroup(
+                    'term1',
+                    title='shawk_left',
+                    screen=PRIMARY_SCREEN,
+                    spawn=autossh_term(
+                        title="shawk_left",
+                        host="salt.streethawk.com",
+                        session="left"
+                        )
+                    )
+                )
+        ),
+        (
+            [mod],
+            term2_key,
+            lazy.function(
+                SwitchToWindowGroup(
+                    'term2', title='shawk_right', screen=SECONDARY_SCREEN,
+                    spawn=autossh_term(
+                        title="shawk_right",
+                        host="salt.streethawk.com",
+                        session="right"
+                        )
+                    )
+                )
+        ),
+        #(
+        #    [mod, "shift"],
+        #    term1_key,
+        #    lazy.function(
+        #        SwitchToWindowGroup(
+        #            'term1', 'iress2_right', screen=PRIMARY_SCREEN,
+        #            spawn=autossh_term(
+        #                title="prod_right",
+        #                port=9008,
+        #            )
+        #        )
+        #    )
+        #),
+        #(
+        #    [mod, "shift"],
+        #    term2_key,
+        #    lazy.function(
+        #        SwitchToWindowGroup(
+        #            'term2', 'iress2_left', screen=SECONDARY_SCREEN,
+        #            spawn=autossh_term(
+        #                title="prod_left",
+        #                host="api.streethawk.com",
+        #                )
+        #            )
+        #        )
+        #),
     ]
 
     laptop_keys = [
@@ -209,11 +275,15 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "XF86AudioNext", lazy.spawn("mpc next")),
         ([], "XF86WLAN", lazy.spawn(
             expanduser("~/.bin/mobilenet"))),
-        ([mod], "F5", lazy.function(RaiseWindowOrSpawn(
-            wmname='ncmpcpp',
-            cmd='st -t {0} -e {0}'.format('ncmpcpp'),
-            toggle=True,
-            cmd_match="st -t ncmpcpp", floating=True))),
+        ([mod], "F5", lazy.function(list_windows)),
+        ([mod], "F4", lazy.function(SwitchToWindowGroup(
+            'htop', 'htop', screen=SECONDARY_SCREEN,
+            spawn=terminal('htop', 'htop')))),
+        #([mod], "F5", lazy.function(RaiseWindowOrSpawn(
+        #    wmname='ncmpcpp',
+        #    cmd='st -t {0} -e {0}'.format('ncmpcpp'),
+        #    toggle=True,
+        #    cmd_match="st -t ncmpcpp", floating=True))),
     ]
 
     desktop_keys = [
@@ -240,6 +310,6 @@ def get_keys(mod, num_groups, num_monitors):
         keys.extend(desktop_keys)
 
     for i in range(1, 11):
-        keys.append(([mod], str(i)[-1], lazy.function(SwitchGroup(i))))
+        keys.append(([mod], str(i)[-1], lazy.function(SwitchToScreenGroup(i))))
         keys.append(([mod, "shift"], str(i)[-1], lazy.function(MoveToGroup(i))))
     return [Key(*k) for k in keys]
