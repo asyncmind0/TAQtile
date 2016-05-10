@@ -118,7 +118,10 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         ),
         Rule(
             Match(
-                title=[re.compile(r"^Hangouts$")]
+                title=[
+                    re.compile(r"^Hangouts$"),
+                    re.compile(r".*slack.*uzbl.*", re.I),
+                ]
             ),
             group="comm2",
             break_on_match=False
@@ -136,6 +139,22 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 title=[re.compile(r"^(\[\d*\])*scudcloud$", re.I)]
             ),
             group="comm2",
+            break_on_match=False
+        ),
+        Rule(
+            Match(
+                wm_class=[re.compile(".*slack.*", re.I)],
+                wm_instance_class=[re.compile(".*slack.*", re.I)]
+            ),
+            group="comm2",
+            break_on_match=False
+        ),
+        Rule(
+            Match(
+                wm_class=[re.compile(".*insync\.py.*", re.I)],
+                wm_instance_class=[re.compile(".*insync\.py.*", re.I)]
+            ),
+            float=True,
             break_on_match=False
         ),
     ])
@@ -198,13 +217,13 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             screen_affinity=PRIMARY_SCREEN,
             exclusive=False,
             init=True,
-            matches=terminal_matches([r".*_right$", r"^left$"])
+            matches=terminal_matches([r".*_left$", r"^left$"])
         ),
         'term2': dict(
             screen_affinity=SECONDARY_SCREEN,
             exclusive=False,
             init=True,
-            matches=terminal_matches([r".*_left$", r"^right$"])
+            matches=terminal_matches([r".*_right$", r"^right$"])
         ),
         'krusader': dict(
             screen_affinity=SECONDARY_SCREEN,
