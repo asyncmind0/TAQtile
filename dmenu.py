@@ -1,16 +1,15 @@
 import os
-import sqlite3
 from os.path import expanduser, isdir, join, pathsep
 from plumbum.cmd import dmenu
 import logging
-
-log = logging.getLogger('myqtile')
+from recent_runner import RecentRunner
 
 
 def dmenu_show(title, items):
     from themes import dmenu_defaults
     import shlex
     dmenu_defaults = shlex.split(dmenu_defaults)
+    logging.info("DMENU: %s", dmenu_defaults)
     try:
         return (dmenu[
             "-i", "-p", "[%s] >>> " % title
@@ -53,6 +52,10 @@ def list_windows(qtile, current_group=False):
                         qtile.cmd_to_screen(window.group.screen.index)
                     else:
                         window.group.cmd_toscreen()
+                    floating = window.floating
+                    window.cmd_bring_to_front()
+                    if not floating:
+                        window.cmd_disable_floating()
                     #qtile.currentScreen.cmd_togglegroup(window.group.name)
                     return True
             except Exception as e:
@@ -79,19 +82,12 @@ def list_executables():
     return set(executables)
 
 
-def get_recent_runs():
-    conn = sqlite3.connect(expanduser("~/.qtile_run.db"))
-    c = conn.cursor()
-    try:
-        # Create table
-        c.execute('''CREATE TABLE qtile_run
-            (date text, executable text, count integer)''')
-    except Exception as e:
-        log.exception("error creating table")
-
-
 def dmenu_run(qtile):
-    selected = dmenu_show("Run", list_executables())
+    recent_runner = RecentRunner()
+    selected = dmenu_show("Run", recent_runner.list(list_executables()))
     print(selected)
-    log.debug((dir(qtile)))
+    if not selected:
+        return
+    logging.debug((dir(qtile)))
     qtile.cmd_spawn(selected)
+    recent_runner.insert(selected)
