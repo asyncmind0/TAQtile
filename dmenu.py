@@ -83,11 +83,11 @@ def list_executables():
 
 
 def dmenu_run(qtile):
-    recent_runner = RecentRunner()
-    selected = dmenu_show("Run", recent_runner.list(list_executables()))
+    recent = RecentRunner('qtile_run')
+    selected = dmenu_show("Run", recent.list(list_executables()))
     print(selected)
     if not selected:
         return
     logging.debug((dir(qtile)))
     qtile.cmd_spawn(selected)
-    recent_runner.insert(selected)
+    recent.insert(selected)

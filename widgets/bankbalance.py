@@ -30,6 +30,14 @@ class BankBalance(base.ThreadedPollText):
         # graph._Graph.__init__(self, **config)
         base.ThreadedPollText.__init__(self, **config)
         self.add_defaults(BankBalance.defaults)
+        try:
+            user = subprocess.check_output(
+                ['pass', "financial/commbank/debit/user"], timeout=5).strip().decode('utf8')
+            password = subprocess.check_output(
+                ['pass', "financial/commbank/debit/pass"], timeout=5).strip().decode('utf8')
+            self.commbank = CommBank(user, password)
+        except:
+            log.exception("Failed to get pasword")
 
     def draw(self):
         foreground = self.foreground
@@ -54,21 +62,19 @@ class BankBalance(base.ThreadedPollText):
     def poll(self, data=None):
         text = "$$$$"
         user = None
+        if not self.commbank:
+            return str(text)
         try:
-            user = subprocess.check_output(
-                ['pass', "financial/commbank/debit/user"]).strip().decode('utf8')
-            password = subprocess.check_output(
-                ['pass', "financial/commbank/debit/pass"]).strip().decode('utf8')
             log.warning("BankBalance:%s", user)
-            commbank = CommBank(user, password)
-            self.data = data = commbank.data
+            self.commbank.update()
+            self.data = data = self.commbank.data
             if self.account == 'credit':
-                self.amount = commbank.get_currency(
-                    commbank.data['AccountGroups'][0]['ListAccount'][-2]['AvailableFunds']
+                self.amount = self.commbank.get_currency(
+                    self.commbank.data['AccountGroups'][1]['ListAccount'][-2]['AvailableFunds']
                 )
             else:
-                self.amount = commbank.get_currency(
-                    commbank.data['AccountGroups'][0]['ListAccount'][0]['AvailableFunds']
+                self.amount = self.commbank.get_currency(
+                    self.commbank.data['AccountGroups'][1]['ListAccount'][0]['AvailableFunds']
                 )
             text = "%s%s" % (
                 self.amount,
