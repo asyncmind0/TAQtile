@@ -22,7 +22,7 @@ laptop_autostart = dict(common_autostart)
 laptop_autostart.update({
     'blueman-applet': None,
     'redshift-gtk': None,
-    'slack': None,
+    'scudcloud': None,
     'insync start': None,
     'parcellite': None,
 })
