@@ -32,9 +32,13 @@ class BankBalance(base.ThreadedPollText):
         self.add_defaults(BankBalance.defaults)
         try:
             user = subprocess.check_output(
-                ['pass', "financial/commbank/debit/user"], timeout=5).strip().decode('utf8')
+                ['pass', "financial/commbank/debit/user"]
+            ).strip().decode('utf8')
+            if not user:
+                return
             password = subprocess.check_output(
-                ['pass', "financial/commbank/debit/pass"], timeout=5).strip().decode('utf8')
+                ['pass', "financial/commbank/debit/pass"],
+            ).strip().decode('utf8')
             self.commbank = CommBank(user, password)
         except:
             log.exception("Failed to get pasword")
