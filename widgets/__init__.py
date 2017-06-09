@@ -5,7 +5,7 @@ import threading
 from libqtile import widget
 
 
-log = logging.getLogger(__file__)
+from log import logger
 
 
 class ThreadedPacman(widget.Pacman):
@@ -24,7 +24,7 @@ class ThreadedPacman(widget.Pacman):
         return "N/A"
 
     def wx_updater(self):
-        log.warn('adding WX Pacman widget timer')
+        logger.warn('adding WX Pacman widget timer')
         import gobject
 
         def worker():

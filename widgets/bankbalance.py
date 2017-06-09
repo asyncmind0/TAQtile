@@ -6,7 +6,7 @@ except Exception as e:
     from future.builtins import str
 
 from libqtile.widget import base
-from libqtile.log_utils import logger as log
+from log import logger
 
 from .bank import CommBank
 
@@ -41,7 +41,7 @@ class BankBalance(base.ThreadedPollText):
             ).strip().decode('utf8')
             self.commbank = CommBank(user, password)
         except:
-            log.exception("Failed to get pasword")
+            logger.exception("Failed to get pasword")
 
     def draw(self):
         foreground = self.foreground
@@ -56,9 +56,9 @@ class BankBalance(base.ThreadedPollText):
                 background = self.warning_background
                 foreground = self.warning_foreground
         except ValueError as e:
-            log.exception("Draw error")
+            logger.exception("Draw error")
         except Exception as e:
-            log.exception("Draw error")
+            logger.exception("Draw error")
         self.foreground = foreground
         self.background = background
         base.ThreadedPollText.draw(self)
@@ -69,7 +69,7 @@ class BankBalance(base.ThreadedPollText):
         if not self.commbank:
             return str(text)
         try:
-            log.warning("BankBalance:%s", user)
+            logger.warning("BankBalance:%s", user)
             self.commbank.update()
             self.data = data = self.commbank.data
             if self.account == 'credit':
@@ -84,9 +84,9 @@ class BankBalance(base.ThreadedPollText):
                 self.amount,
                 'C' if self.account == 'credit' else 'D',
             )
-            log.warning("BankBalance:%s", text)
+            logger.warning("BankBalance:%s", text)
         except Exception as e:
-            log.exception("BankBalance: %s %s", user, data)
+            logger.exception("BankBalance: %s %s", user, data)
         # text = commbank.net_position
         return str(text)
 

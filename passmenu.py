@@ -4,7 +4,7 @@ import os
 from os.path import dirname, join
 from dmenu import dmenu_show
 from recent_runner import RecentRunner
-from libqtile.log_utils import logger as log
+from log import logger
 from plumbum import local
 from time import sleep
 
@@ -34,4 +34,4 @@ def passmenu(qtile, args):
         )
         recent.insert(selection)
     except:
-        log.exception("Error getting pass")
+        logger.exception("Error getting pass")

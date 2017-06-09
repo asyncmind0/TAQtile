@@ -3,9 +3,9 @@ import os
 from random import randint
 from libqtile import hook
 from libqtile.layout import Slice
-from libqtile.log_utils import logger as log
 from system import get_hostconfig, get_num_monitors, execute_once
 
+from log import logger
 
 num_monitors = get_num_monitors()
 prev_timestamp = 0
@@ -33,8 +33,8 @@ def startup():
         # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         commands = get_hostconfig('autostart-once')
         num_mons = get_num_monitors()
-        log.debug("Num MONS:%s", num_mons)
-        # log.debug("Num DeSKTOPS:%s", len(qtile.screens))
+        logger.debug("Num MONS:%s", num_mons)
+        # logger.debug("Num DeSKTOPS:%s", len(qtile.screens))
         if num_mons > 1:
             commands[os.path.expanduser("dualmonitor")] = None
         elif num_mons == 1:
@@ -43,7 +43,7 @@ def startup():
         for command, process_filter in commands.items():
             execute_once(command, process_filter, hook.qtile)
     except Exception as e:
-        log.exception("error in startup hook")
+        logger.exception("error in startup hook")
 
 
 @hook.subscribe.startup
@@ -63,15 +63,7 @@ def dbus_register():
             'string:qtile',
             'string:' + x])
     except Exception as e:
-        log.exception("error in dbus_register")
-
-
-def rules_dunst(client):
-    client_name = client.window.get_name()
-    cliclass = client.window.get_wm_class()
-    if client_name == 'Dunst' or (
-            cliclass and cliclass[0] == 'Dunst'):
-        client.static(0)
+        logger.exception("error in dbus_register")
 
 
 def rules_shrapnel(client):

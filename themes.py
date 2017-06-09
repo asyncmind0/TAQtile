@@ -1,4 +1,5 @@
-import logging as log
+from log import logger
+
 
 
 default_theme = dict(
@@ -46,7 +47,7 @@ matrix_green = dict(
 current_theme = dict(default_theme)
 current_theme.update(star_trek_blue)
 #current_theme.update(matrix_green)
-log.debug("Current theme:%s", current_theme)
+logger.debug("Current theme:%s", current_theme)
 #current_theme = matrix_green
 #dmenu_defaults = (
 #    "-w -f -l 40 "
@@ -65,7 +66,7 @@ log.debug("Current theme:%s", current_theme)
 #) % current_theme
 
 rofi_defaults = (
-    "-w -f -l 30 -bw 1 "
+    "-w -f -l 10 -bw 1 "
     "-separator-style solid "
     "-color-window '%(background)s,%(foreground)s' "
     "-color-normal '%(background)s,%(foreground)s,"

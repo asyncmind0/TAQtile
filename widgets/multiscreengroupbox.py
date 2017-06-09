@@ -1,5 +1,5 @@
-from libqtile.log_utils import logger as log
 from libqtile import widget
+from log import logger
 
 
 class MultiScreenGroupBox(widget.GroupBox):
@@ -25,7 +25,7 @@ class MultiScreenGroupBox(widget.GroupBox):
         offset = 0
         for i, g in enumerate(self.groups):
             gtext = self.get_label(g.name)
-            #log.debug(gtext)
+            #logger.debug(gtext)
             if not gtext:
                 continue
             to_highlight = False

@@ -2,7 +2,7 @@ import sqlite3
 from os.path import expanduser, isdir, join, pathsep
 import datetime
 import time
-from libqtile.log_utils import logger as log
+from log import logger
 
 
 def adapt_datetime(ts):
@@ -26,7 +26,7 @@ class RecentRunner:
                 self.dbname
             )
         except Exception as e:
-            log.exception("error creating table")
+            logger.exception("error creating table")
 
     def list(self, items, limit=100):
         sql = (
@@ -42,7 +42,7 @@ class RecentRunner:
         for i, item in enumerate(res, 1):
             itemslist[item] = i
         ret = [x[0] for x in sorted(itemslist.items(), key=lambda x: x[1])]
-        #log.error(ret)
+        #logger.error(ret)
         return reversed(ret)
 
     def recent(self, command=''):

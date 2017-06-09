@@ -1,7 +1,7 @@
 # TODO handle MultiScreenGroupBox clicks and events
 import logging
-from libqtile.log_utils import init_log
 import os
+from os.path import expanduser
 
 from libqtile import layout
 from libqtile.command import lazy
@@ -12,12 +12,10 @@ from keys import get_keys
 from screens import get_screens
 from system import get_num_monitors
 from themes import current_theme
-
+from log import init_log
 
 mod = "mod4"
 num_monitors = get_num_monitors()
-logging.debug("Num Desktops:%s", num_monitors)
-
 
 layouts = [
     layout.Max(**current_theme),
@@ -82,8 +80,8 @@ class NoTimerFilter(logging.Filter):
 
 
 def main(self):
-    self.log = init_log(
-        log_level=logging.WARNING,
+    self.logger = init_log(
+        log_level=logging.DEBUG,
     )
 
 

@@ -4,8 +4,8 @@ import os
 from libqtile import hook, xcbq
 import json
 from plumbum import local
+from log import logger
 
-log = logging.getLogger("qtile")
 use_selection = 'CLIPBOARD'
 blacklist = []
 blacklist_text = "*********"
@@ -52,8 +52,8 @@ def hook_change(name, selection):
 
         count_call += 1
         previous_clip = text
-        log.error("CLIPBOARD %s" % text)
-        log.error("count_call %s" % count_call)
+        logger.error("CLIPBOARD %s" % text)
+        logger.error("count_call %s" % count_call)
         history = []
         if os.path.isfile(history_file):
             with open(history_file, 'r') as qfile:
@@ -64,7 +64,7 @@ def hook_change(name, selection):
         with open(history_file, 'w+') as qfile:
             json.dump(history, qfile)
     except Exception as e:
-         log.exception("Error getting selection")
+        logger.exception("Error getting selection")
 
 
 def dmenu_xclip(qtile, args):
@@ -72,7 +72,6 @@ def dmenu_xclip(qtile, args):
     echo = local['echo']
     xclip = local['xclip']
 
-    logging.basicConfig(level=logging.DEBUG)
     history = []
     args = args.split(' ')
     args.extend(['-p', 'Clip:'])

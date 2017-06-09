@@ -5,8 +5,9 @@ import platform
 from plumbum import local
 import subprocess
 from os.path import expanduser
+from log import logger
 
-log = logging.getLogger('qtile')
+logger = logging.getLogger(__name__)
 
 mod = "mod4"
 
@@ -111,7 +112,7 @@ def get_num_monitors():
             shell=True, stdout=subprocess.PIPE).communicate()[0]
 
         displays = output.strip().decode('utf8').split('\n')
-        log.debug(displays)
+        logger.debug(displays)
         return len(displays)
     except Exception:
         logging.exception("failed to get number of monitors")
@@ -130,16 +131,16 @@ def execute_once(process, process_filter=None, qtile=None):
         pid = local['pgrep']("-f", process_filter)
         pid.wait()
     except Exception as e:
-        log.error("CalledProcessError")
+        logger.debug("Not running: %s", process_filter)
     if not pid:
         # spawn the process using a shell command with subprocess.Popen
-        log.debug("Starting: %s", cmd)
+        logger.debug("Starting: %s", cmd)
         try:
             if qtile:
                 qtile.cmd_spawn(process)
             else:
                 cmd = local[process]
                 cmd()
-            log.info("Started: %s: %s", cmd, pid)
+            logger.info("Started: %s: %s", cmd, pid)
         except Exception as e:
-            log.error("Error running %s", cmd)
+            logger.error("Error running %s", cmd)
