@@ -79,59 +79,44 @@ def rules_shrapnel(client):
         client.cmd_opacity(0.85)
 
 
-def rules_conkeror(client):
-    cliclass = client.window.get_wm_class()
-    if not cliclass:
-        return
-    if cliclass[1] == 'Conkeror':
-        client.cmd_disable_floating()
-        client.cmd_disable_fullscreen()
-
-
-extra_rules = [
-    rules_shrapnel, rules_dunst, rules_conkeror
-    ]
-
-
-@hook.subscribe.client_new
-def client_new(client, *args, **kwargs):
-    for rule in extra_rules:
-        rule(client)
-
-
+@hook.subscribe.client_managed
 def set_groups(*args, **kwargs):
     for client in hook.qtile.windowMap.values():
         for rule in hook.qtile.dgroups.rules:
             if rule.matches(client):
-                log.debug("hints:%s", dir(client))#.get_wm_normal_hints())
                 try:
-                    if rule.float:
-                        client.enablefloating()
-                    elif getattr(client, 'disablefloating', None):
-                        client.disablefloating()
+                    client.floating = rule.float
                     if getattr(rule, 'fullscreen', None):
                         if rule.fullscreen:
                             client.enablemaximize()
                         else:
                             client.enablemaximize(state=4)
+                    if getattr(rule, 'static', False):
+                        client.static(0)
+                    if getattr(rule, 'opacity', False):
+                        client.cmd_opacity(rule.opacity)
                     if rule.group and getattr(client, 'togroup', None):
                         client.togroup(rule.group)
+                    front = getattr(rule, 'front', False)
+                    if front and hasattr(
+                            client, 'cmd_bring_to_front'):
+                        logger.error("to front %s", client.window.get_name())
+                        client.cmd_bring_to_front()
+                    center = getattr(rule, 'center', False)
+                    if center:
+                        logger.debug(dir(hook.qtile.currentScreen))
+                        client.tweak_float(
+                            x=(hook.qtile.currentScreen.width/2) - (client.width/2),
+                            y=(hook.qtile.currentScreen.height/2) - (client.height/2)
+                        )
+                    #current_screen = getattr(rule, 'current_screen', False)
+                    #if current_screen:
+                    #    client.to_group(hook.qtile.currentScreen.group)
+                    if rule.break_on_match:
+                        break
                 except Exception as e:
-                    log.exception("error setting rules")
-    for w in hook.qtile.windowMap.values():
-        for rule in extra_rules:
-            rule(w)
+                    logger.exception("error setting rules")
 
-
+@hook.subscribe.client_urgent_hint_changed
 def urgent_hint_changed(*args, **kwargs):
-    log.debug("urgent_hint_changed called with %s %s", args, kwargs)
-    
-#hook.subscribe.window_name_change(set_groups)
-#hook.subscribe.client_name_updated(set_groups)
-#hook.subscribe.setgroup(set_groups)
-hook.subscribe.client_new(set_groups)
-hook.subscribe.screen_change(set_groups)
-
-hook.subscribe.startup(set_groups)
-
-hook.subscribe.client_urgent_hint_changed(urgent_hint_changed)
+    logger.debug("urgent_hint_changed called with %s %s", args, kwargs)

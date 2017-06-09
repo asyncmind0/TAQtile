@@ -31,7 +31,7 @@ def is_blacklisted(owner_id):
                 return True
 
 
-@hook.subscribe.selection_change
+#@hook.subscribe.selection_change
 def hook_change(name, selection):
     try:
         global previous_clip

@@ -5,8 +5,8 @@ from extra import (
     SwitchToWindowGroup, check_restart,
     terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchToScreenGroup,
     RaiseWindowOrSpawn, MoveToGroup, move_to_next_group, move_to_prev_group,
-    autossh_term)
-from dmenu import dmenu_run, list_windows, list_windows_group
+    autossh_term, show_mail)
+from dmenu import dmenu_run, list_windows, list_windows_group, dmenu_org
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
@@ -14,17 +14,20 @@ from clipboard import dmenu_xclip
 from passmenu import passmenu
 from os.path import expanduser
 from hooks import set_groups
+from log import logger
+import re
 
-log = logging.getLogger('myqtile')
-log.setLevel(logging.DEBUG)
+
 samctl = "sudo /home/steven/.bin/samctl.py"
 
 
 def get_keys(mod, num_groups, num_monitors):
-    log.debug(dmenu_defaults)
+    logger.debug(dmenu_defaults)
     is_laptop = get_hostconfig('laptop')
     term1_key = get_hostconfig('term1_key')
     term2_key = get_hostconfig('term2_key')
+    term3_key = get_hostconfig('term3_key')
+    term4_key = get_hostconfig('term4_key')
 
     keys = [
         # Switch between windows in current stack pane
@@ -105,6 +108,7 @@ def get_keys(mod, num_groups, num_monitors):
         # Key([mod, "control"], "r", lazy.restart()),
         ([mod, "control"], "r", lazy.function(check_restart)),
         ([mod, "shift"], "r", lazy.function(set_groups)),
+        ([mod, "shift"], "m", lazy.function(show_mail)),
         ([mod], "Right", lazy.screen.next_group()),
         ([mod], "Left", lazy.screen.prev_group()),
 
@@ -120,7 +124,7 @@ def get_keys(mod, num_groups, num_monitors):
         #([mod], "r", lazy.spawncmd()),
         ([mod], "F2", lazy.function(dmenu_run)),
         #([mod], "F2", lazy.spawn("dmenu-run-recent %s" % dmenu_defaults)),
-        ([mod], "o", lazy.spawn("orgcapture.py")),
+        ([mod], "o", lazy.function(dmenu_org)),
         #([mod], "F2", lazy.spawn("dmenu_run %s" % dmenu_defaults)),
         ([mod], "F3", lazy.function(list_windows_group)),
         #([mod], "f5", lazy.spawn('st -t {0} -e {0}'.format('ncmpcpp'))),
@@ -136,7 +140,8 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
         ([mod], "F1", lazy.spawn(expanduser("~/.bin/blank"))),
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
-        ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
+        ([mod, "shift"], "s", lazy.spawn("spectacle")),
+        ([mod, "shift"], "m", lazy.spawn("kmag")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
         ([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_defaults)),
         ([mod, "control"], "v", lazy.function(dmenu_xclip, dmenu_defaults)),
@@ -159,15 +164,60 @@ def get_keys(mod, num_groups, num_monitors):
         #([], "XF86Eject", lazy.function(SwitchToWindowGroup(
         #    'monitor', 'monitor', screen=PRIMARY_SCREEN,
         #    spawn=terminal_tmux('outer', 'monitor')))),
-        #([], "F10", lazy.function(SwitchToScreenGroup("mail"))),
-        ([], "F10", lazy.function(SwitchToWindowGroup(
-            'mail', 'mail', screen=SECONDARY_SCREEN,
-            spawn=terminal_tmux('inner', 'mail')))),
         ([], "F6", lazy.function(SwitchToScreenGroup(
-            "comm2", preferred_screen=SECONDARY_SCREEN))),
+            "6", preferred_screen=SECONDARY_SCREEN))),
+        ([], "F7", lazy.function(SwitchToScreenGroup(
+            "7", preferred_screen=SECONDARY_SCREEN))),
         ([], "F9", lazy.function(SwitchToWindowGroup(
             'comm1', 'comm1', screen=PRIMARY_SCREEN,
             spawn=terminal_tmux('inner', 'comm1')))),
+        (
+            [],
+            "F10",
+            lazy.function(
+                SwitchToWindowGroup(
+                    'mail',
+                    title=re.compile('Inbox .*$'),
+                    screen=PRIMARY_SCREEN,
+                    spawn=[
+                        {
+                            'cmd': 'google-chrome-stable --app="https://inbox.google.com/u/0/"',
+                            'match': re.compile(r"^Inbox .* melit.stevenjoseph@gmail.com$"),
+                        }, {
+                            'cmd': 'google-chrome-stable --app="https://inbox.google.com/u/1/"',
+                            'match': re.compile(r"^Inbox .* steven@streethawk.co$"),
+                        }, {
+                            'cmd': 'google-chrome-stable --app="https://inbox.google.com/u/2/"',
+                            'match': re.compile(r"^Inbox .* stevenjose@gmail.com$"),
+                        }, {
+                            'cmd': 'google-chrome-stable --app="https://inbox.google.com/u/3/"',
+                            'match': re.compile(r"^Inbox .* steven@stevenjoseph.in$"),
+                        }
+                    ]
+                )
+            )
+        ),
+        (
+            [mod],
+            "0",
+            lazy.function(
+                SwitchToWindowGroup(
+                    'cal',
+                    title=re.compile('.* Calendar .*$'),
+                    screen=PRIMARY_SCREEN,
+                    spawn=[
+                        {
+                            "cmd": 'google-chrome-stable --app="https://calendar.google.com/calendar/b/1/"',
+                            "match": re.compile(r'StreetHawk - Calendar .*$'),
+                        },
+                        {
+                            "cmd": 'google-chrome-stable --app="https://calendar.google.com/calendar/b/0/"',
+                            "match": re.compile(r'Google Calendar .*$'),
+                        },
+                    ]
+                )
+            )
+        ),
         (
             [],
             term1_key,
@@ -223,6 +273,54 @@ def get_keys(mod, num_groups, num_monitors):
                         title="shawk_right",
                         host="salt.streethawk.com",
                         session="right"
+                        )
+                    )
+                )
+        ),
+        (
+            [mod],
+            term3_key,
+            lazy.function(
+                SwitchToWindowGroup(
+                    'azure_left',
+                    title='azure_left',
+                    screen=PRIMARY_SCREEN,
+                    spawn=autossh_term(
+                        title="azure_left",
+                        host="salt-streethawk.cloudapp.net",
+                        session="left"
+                        )
+                    )
+                )
+        ),
+        (
+            [mod],
+            term4_key,
+            lazy.function(
+                SwitchToWindowGroup(
+                    'azure_right',
+                    title='azure_right',
+                    screen=SECONDARY_SCREEN,
+                    spawn=autossh_term(
+                        title="azure_right",
+                        host="salt-streethawk.cloudapp.net",
+                        session="right"
+                    )
+                )
+            )
+        ),
+        (
+            [mod],
+            'F8',
+            lazy.function(
+                SwitchToWindowGroup(
+                    'staging',
+                    title='staging',
+                    screen=PRIMARY_SCREEN,
+                    spawn=autossh_term(
+                            title="staging",
+                            host="staging.streethawk.com",
+                            session="right"
                         )
                     )
                 )
@@ -309,7 +407,7 @@ def get_keys(mod, num_groups, num_monitors):
     else:
         keys.extend(desktop_keys)
 
-    for i in range(1, 11):
+    for i in range(1, 10):
         keys.append(([mod], str(i)[-1], lazy.function(SwitchToScreenGroup(i))))
         keys.append(([mod, "shift"], str(i)[-1], lazy.function(MoveToGroup(i))))
     return [Key(*k) for k in keys]

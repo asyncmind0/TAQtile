@@ -6,9 +6,11 @@ from libqtile import bar, widget
 from libqtile.config import Screen
 from widgets import CalClock
 from widgets.bankbalance import BankBalance
+from widgets.mail import NotmuchCount
 from widgets.multiscreengroupbox import MultiScreenGroupBox
 from widgets.priority_notify import PriorityNotify
 from widgets.tasklist2 import TaskList2
+from log import logger
 
 
 log = logging.getLogger('qtile')
@@ -42,7 +44,6 @@ def get_screens(num_monitors, num_groups, groups):
     )
 
     #prompt_params = default_params()
-    systray_params = default_params()
     current_layout_params = default_params(
         name="default", border='#000000')
     #windowname_params = default_params
@@ -81,7 +82,7 @@ def get_screens(num_monitors, num_groups, groups):
     memgraph_params['fill_color'] = "80FF00.3"
     memgraph_params['type'] = "linefill"
     netgraph_params = dict(graph_defaults)
-    sep_params = default_params(padding=2, fontsize=9, height_percent=90)
+    sep_params = default_params(padding=2, fontsize=9, size_percent=90)
     graph_label_defaults = dict(
         margin=0,
         padding_x=0,
@@ -130,6 +131,8 @@ def get_screens(num_monitors, num_groups, groups):
         #widget.Sep(**sep_params),
         #PriorityNotify(**default_params()),
         # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
+        widget.Sep(**sep_params),
+        NotmuchCount(**default_params()),
         widget.Sep(**sep_params),
         widget.TextBox(
             "c",

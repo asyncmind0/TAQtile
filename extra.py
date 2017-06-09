@@ -1,12 +1,20 @@
 import glob
+import six
 import logging
 import os
 from os.path import expanduser, isdir, join, pathsep
 from py_compile import compile
 from subprocess import check_output
-from libqtile.log_utils import logger as log
-
+import notmuch
+import re
 from system import execute_once
+
+from log import logger
+try:
+    import notify2
+except:
+    pass
+
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
 _terminal = "st -t {0} "
@@ -34,7 +42,7 @@ class SwitchToScreen(object):
         self.preferred_screen = preferred_screen
 
     def __call__(self, qtile):
-        logging.debug(
+        logger.debug(
             "SwitchGroup:%s:%s", qtile.currentScreen.index, self.name)
         max_screen = len(qtile.screens) - 1
         if(self.preferred_screen is not None and
@@ -61,8 +69,9 @@ class SwitchToScreen(object):
 class SwitchToScreenGroup(SwitchToScreen):
     def __call__(self, qtile):
         screen, index = super(SwitchToScreenGroup, self).__call__(qtile)
-        log.debug("SwitchGroup: %s", index)
-        screen.cmd_togglegroup(index)
+        logger.debug("SwitchGroup: %s", index)
+        if index and screen:
+            screen.cmd_toggle_group(index)
 
 
 class SwitchToScreenGroupUrgent(SwitchToScreenGroup):
@@ -111,7 +120,7 @@ class MoveToOtherScreenGroup(object):
         self.direction = -1 if prev else 1
 
     def __call__(self, qtile):
-        logging.error("MoveToOtherScreenGroup:%s", qtile.currentScreen.index)
+        logger.error("MoveToOtherScreenGroup:%s", qtile.currentScreen.index)
         otherscreen = (qtile.screens.index(qtile.currentScreen)
                        + self.direction) % len(qtile.screens)
         othergroup = qtile.screens[otherscreen].group.name
@@ -123,26 +132,41 @@ class SwitchToWindowGroup(object):
     def __init__(
             self, name, title=None, spawn=None, screen=0, matches=None):
         self.name = name
-        self.title = title
-        self.cmd = spawn
+        self.title = re.compile(title) if isinstance(title, six.string_types) else title
         self.screen = screen
+        if spawn:
+            self.cmd = spawn if isinstance(spawn, (tuple, list)) else [spawn]
+        else:
+            self.cmd = []
 
     def raise_window(self, qtile):
         for window in qtile.windowMap.values():
             if window.group and window.match(wname=self.title):
                 qtile.currentGroup.focus(window, False)
 
-    def spawn_ifnot(self, qtile):
-        log.debug(self.cmd)
-        for window in qtile.windowMap.values():
-            if window.group and window.match(wname=self.title):
+    def window_exists(self, qtile, regex):
+        for window in qtile.cmd_windows():
+            if regex.match(window['name']):
                 return True
-        qtile.cmd_spawn(self.cmd)
+
+    def spawn_ifnot(self, qtile):
+        cmds = []
+        try:
+            for cmd in self.cmd:
+                if isinstance(cmd, dict):
+                    if not self.window_exists(qtile, cmd['match']):
+                        cmds.append(cmd['cmd'])
+                else:
+                    if not self.window_exists(qtile, self.title):
+                        cmds.append(cmd)
+            for cmd in cmds:
+                logger.debug(cmd)
+                qtile.cmd_spawn(cmd)
+        except Exception as e:
+            logger.exception("wierd")
         return False
 
     def __call__(self, qtile):
-        logging.debug("currentScreen:%s", qtile.currentScreen.index)
-        logging.debug(self.screen)
         self.spawn_ifnot(qtile)
         if self.screen > len(qtile.screens) - 1:
             self.screen = len(qtile.screens) - 1
@@ -152,9 +176,9 @@ class SwitchToWindowGroup(object):
         # elif qtile.currentWindow.title :
         else:
             try:
-                qtile.currentScreen.cmd_togglegroup(self.name)
+                qtile.currentScreen.cmd_toggle_group(self.name)
             except Exception as e:
-                log.exception("wierd")
+                logger.exception("wierd")
         #self.raise_window(qtile)
 
 
@@ -181,7 +205,7 @@ class RaiseWindowOrSpawn(object):
             if window.group and window.match(
                     wname=self.wmname, wmclass=self.wmclass):
                 #window.cmd_to_screen(qtile.currentScreen.index)
-                logging.debug("Match: %s", self.wmname)
+                logger.debug("Match: %s", self.wmname)
                 #window.cmd_togroup(qtile.currentGroup.name)
                 self.window = window
                 break
@@ -197,25 +221,25 @@ class RaiseWindowOrSpawn(object):
                     window.unhide()
                 else:
                     window.hide()
-            logging.error("Hidden: %s %s", window.hidden, window.window.wid)
+            logger.error("Hidden: %s %s", window.hidden, window.window.wid)
             execute_once(
                 "transet-df %s -i %s" % (self.alpha, window.window.wid))
-        logging.error("Current group: %s",qtile.currentGroup.name)
+        logger.error("Current group: %s",qtile.currentGroup.name)
         execute_once(self.cmd, self.cmd_match, qtile=qtile)
 
 
 def check_restart(qtile):
-    logging.info("check_restart qtile ...")
+    logger.info("check_restart qtile ...")
     try:
         for pyfile in glob.glob(os.path.expanduser('~/.config/qtile/*.py')):
             # log.debug(pyfile)
             compile(pyfile, doraise=True)
     except Exception as e:
-        log.exception("Syntax error")
+        logger.exception("Syntax error")
     else:
         #import signal
         #signal.signal(signal.SIGCHLD, signal.SIG_DFL)
-        logging.info("restarting qtile ...")
+        logger.info("restarting qtile ...")
         qtile.cmd_restart()
 
 
@@ -236,3 +260,41 @@ def autossh_term(
         ]
     )
     return cmd
+
+
+def show_mail(qtile):
+    from collections import OrderedDict
+    queries = OrderedDict()
+    queries["inbox"] = "(tag:INBOX or tag:inbox) and not (tag:misc) and date:30d..0s and tag:unread and tag:me"
+    queries["pullrequests"] = "tag:pullrequests and tag:unread"
+    queries["drafts"] = "tag:draft"
+    queries["Other"] = "tag:INBOX and tag:unread"
+    try:
+        db = notmuch.Database()
+        message = []
+        for mbox, query in queries.items():
+            query = db.create_query(query)
+            message.append("%s: %s" % (mbox, query.count_messages()))
+        notification = notify2.Notification(
+            "Mail",
+            "<br>".join(message),
+            #icon=user_icon
+        )
+        notification.show()
+    except Exception as e:
+        logger.exception("Error querying notmuch")
+
+
+def start_inboxes(qtile):
+    inboxes = {
+        'google-chrome-stable --app="https://inbox.google.com/u/0/"': r"^Inbox .* melit.stevenjoseph@gmail.com$",
+        'google-chrome-stable --app="https://inbox.google.com/u/1/"': r"^Inbox .* steven@streethawk.co$",
+        'google-chrome-stable --app="https://inbox.google.com/u/2/"': r"^Inbox .* stevenjose@gmail.com$",
+        'google-chrome-stable --app="https://inbox.google.com/u/3/"': r"^Inbox .* steven@stevenjoseph.in$",
+    }
+    for inbox, regex in inboxes.items():
+        for window in qtile.cmd_windows():
+            if re.match(regex, window['name']):
+                continue
+            else:
+                qtile.spawn(inbox)

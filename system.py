@@ -23,9 +23,9 @@ laptop_autostart = dict(common_autostart)
 laptop_autostart.update({
     'blueman-applet': None,
     'redshift-gtk': None,
-    'scudcloud': None,
     'insync start': None,
     'parcellite': None,
+    'slack': None,
 })
 
 desktop_autostart = dict(common_autostart)
@@ -58,16 +58,23 @@ platform_specific = {
         'autostart-once': laptop_autostart,
         'screen_affinity': {
             'mail': 1,
-            },
+            'emulator': 2,
+        },
         'group_affinity': {
+            'emulator': 3,
             'mail': 1,
             'browser': 11,
             'transgui': 1,
+            'devtools': 2,
             'rdesktop': 15,
             'virtualbox': 4,
+            'slack': 6,
+            'hangouts': 7,
         },
         'term1_key': 'F11',
         'term2_key': 'F12',
+        'term3_key': 'F9',
+        'term4_key': 'F10',
     },
     'sydsjoseph-pc1': iress_config,
     'au02-sjosephpc2': iress_config,

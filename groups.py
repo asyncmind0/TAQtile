@@ -2,15 +2,30 @@ import logging
 import re
 
 from libqtile import layout
-from libqtile.config import Group, Match, Rule
+from libqtile.config import Group, Match, Rule as QRule
 
 from system import get_hostconfig, get_group_affinity, get_screen_affinity
 from themes import current_theme
 from collections import OrderedDict
 from screens import SECONDARY_SCREEN, PRIMARY_SCREEN
 
+from log import logger
 
-log = logging.getLogger('qtile.config')
+
+class Rule(QRule):
+    def __init__(
+            self, match, front=False, fullscreen=False,
+            static=False, opacity=None, center=False,
+            current_screen=False,
+            **kwargs
+            ):
+        super(Rule, self).__init__(match, **kwargs)
+        self.front = front
+        self.fullscreen = fullscreen
+        self.static = static
+        self.opacity = opacity
+        self.center = center
+        self.current_screen = current_screen
 
 
 def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
@@ -18,6 +33,24 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
 
     # dgroup rules that not belongs to any group
     dgroups_app_rules.extend([
+        Rule(
+            Match(
+                wm_class=[re.compile(".*dunst.*", re.I)],
+            ),
+            group="1",
+            break_on_match=True,
+            static=True,
+        ),
+        Rule(
+            Match(
+                title=["pinentry-qt"],
+            ),
+            break_on_match=True,
+            float=True,
+            intrusive=True,
+            front=True,
+            center=True,
+        ),
         # Everything i want to be float, but don't want to change group
         Rule(
             Match(
@@ -26,7 +59,10 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                     'Guake.py', 'Exe', 'Onboard', 'Florence',
                     'Terminal', 'Gpaint', 'Kolourpaint', 'Wrapper',
                     'Gcr-prompter', 'Ghost',
-                    re.compile('Gnome-keyring-prompt.*?')
+                    re.compile('Gnome-keyring-prompt.*?'),
+                    "SshAskpass",
+                    "ssh-askpass",
+                    "zoom",
                 ],
             ),
             float=True,
@@ -53,7 +89,19 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                     "Torbrowser-launcher",
                 ]
             ),
-            float=True),
+            float=True
+        ),
+        Rule(
+            Match(
+                title=[
+                    re.compile("^Android Emulator.*"),
+                    re.compile("^Emulator.*"),
+                ]
+            ),
+            float=True,
+            intrusive=True,
+            group=get_group_affinity('emulator'),
+        ),
         Rule(
             Match(
                 wm_class=["Screenkey"]
@@ -64,13 +112,6 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         Rule(
             Match(
                 title=[re.compile(".*Org Select.*")]
-            ),
-            float=True,
-            intrusive=True
-        ),
-        Rule(
-            Match(
-                title=['pinentry']
             ),
             float=True,
             intrusive=True
@@ -96,15 +137,24 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                     re.compile(r".*wealth management support.*conkeror$"),
                 ]
             ),
-            group="11"
+            group="11",
+            fullscreen=False,
+            float=False,
         ),
         Rule(
             Match(
                 title=[
-                    re.compile(r"^Developer.*"),
-                    re.compile(r"^Devtools.*"),
-                    re.compile(r"^Inspector.*")
+                    re.compile(r"^Developer.*", re.I),
+                    re.compile(r"^Devtools.*", re.I),
+                    re.compile(r"^Inspector.*", re.I),
+                    re.compile(r"^chrome-devtools.*", re.I)
                 ],
+            ),
+            group=get_group_affinity("devtools"),
+            break_on_match=True,
+        ),
+        Rule(
+            Match(
                 wm_class=["Transgui"],
             ),
             group=get_group_affinity('transgui'),
@@ -120,35 +170,30 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             Match(
                 title=[
                     re.compile(r"^Hangouts$"),
-                    re.compile(r".*slack.*uzbl.*", re.I),
+                    re.compile(r".*whatsi.*", re.I),
                 ]
             ),
-            group="comm2",
-            break_on_match=False
+            group=get_group_affinity("hangouts"),
+            break_on_match=False,
         ),
         Rule(
             Match(
                 wm_class=[re.compile("^crx_.*")],
                 wm_instance_class=[re.compile("^crx_.*")]
             ),
-            group="comm2",
+            group=get_group_affinity("hangouts"),
             break_on_match=False
         ),
         Rule(
             Match(
-                title=[re.compile(r"^(\[\d*\])*scudcloud$", re.I)]
+                title=[re.compile(r"slack.*", re.I)]
+                #wm_class=[re.compile(".*slack.*", re.I)],
+                #wm_instance_class=[re.compile(".*slack.*", re.I)]
             ),
-            group="comm2",
-            break_on_match=False
+            group=get_group_affinity("slack"),
+            break_on_match=False,
         ),
-        Rule(
-            Match(
-                wm_class=[re.compile(".*slack.*", re.I)],
-                wm_instance_class=[re.compile(".*slack.*", re.I)]
-            ),
-            group="comm2",
-            break_on_match=False
-        ),
+
         Rule(
             Match(
                 wm_class=[re.compile(".*insync\.py.*", re.I)],
@@ -156,6 +201,15 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             ),
             float=True,
             break_on_match=False
+        ),
+        Rule(
+            Match(
+                title="shrapnel",
+            ),
+            group="1",
+            break_on_match=False,
+            float=True,
+            opacity=0.85,
         ),
     ])
 
@@ -167,7 +221,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             )
         ]
 
-    log.debug("num_groups:%s", num_groups)
+    logger.debug("num_groups:%s", num_groups)
     groups = []
     # map og group and prefered screen
     group_args = OrderedDict({
@@ -184,46 +238,62 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             #        fallback=layout.Tile(**current_theme))
             #]
         ),
-        'comm2': dict(
-            screen_affinity=SECONDARY_SCREEN,
-            #layout="slice",
-            #layouts=[
-            #    # layout.Slice('right', 256, role='buddy_list',
-            #    #             fallback=layout.Tile(**current_theme)),
-            #    # a layout for hangouts
-            #    layout.Slice(
-            #        'right', 356, wname="Hangouts", role="pop-up",
-            #        fallback=layout.Tile(**current_theme))
-            #]
-        ),
         'monitor': dict(
             screen_affinity=PRIMARY_SCREEN,
             matches=terminal_matches([r"^monitor$"])
         ),
         'mail': dict(
-            screen_affinity=get_screen_affinity('mail'),
+            screen_affinity=PRIMARY_SCREEN, #get_screen_affinity('mail'),
+            exclusive=False,
             init=True,
             matches=[
                 Match(wm_class=["Kmail", "Kontact"]),
                 Match(
+                    title=[
+                        re.compile("^Inbox .*"),
+                    ]
+                ),
+                Match(
                     role=[
                         re.compile("^kmail-mainwindow.*"),
-                        re.compile("^kontact-mainwindow.*")
+                        re.compile("^kontact-mainwindow.*"),
                     ]
                 )
             ] + terminal_matches([r"^mail$"])
+        ),
+        'cal': dict(
+            screen_affinity=PRIMARY_SCREEN, #get_screen_affinity('mail'),
+            exclusive=False,
+            init=True,
+            matches=[
+                Match(
+                    wm_instance_class=[re.compile("calendar.google.com.*")]
+                )
+            ]
         ),
         'term1': dict(
             screen_affinity=PRIMARY_SCREEN,
             exclusive=False,
             init=True,
-            matches=terminal_matches([r".*_left$", r"^left$"])
+            matches=terminal_matches([r"left", r"^shawk_left$"])
         ),
         'term2': dict(
             screen_affinity=SECONDARY_SCREEN,
             exclusive=False,
             init=True,
-            matches=terminal_matches([r".*_right$", r"^right$"])
+            matches=terminal_matches([r"right", r"^shawk_right$"])
+        ),
+        'azure_left': dict(
+            screen_affinity=PRIMARY_SCREEN,
+            exclusive=False,
+            init=True,
+            matches=terminal_matches([r"^azure_left$", r"staging"])
+        ),
+        'azure_right': dict(
+            screen_affinity=SECONDARY_SCREEN,
+            exclusive=False,
+            init=True,
+            matches=terminal_matches([r"^azure_right$"])
         ),
         'krusader': dict(
             screen_affinity=SECONDARY_SCREEN,

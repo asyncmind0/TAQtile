@@ -1,21 +1,22 @@
 import os
 from os.path import expanduser, isdir, join, pathsep
-from plumbum.cmd import dmenu
-import logging
+from plumbum.cmd import dmenu, emacsclient
 from recent_runner import RecentRunner
+import threading
 
+from log import logger
 
 def dmenu_show(title, items):
     from themes import dmenu_defaults
     import shlex
     dmenu_defaults = shlex.split(dmenu_defaults)
-    logging.info("DMENU: %s", dmenu_defaults)
+    logger.info("DMENU: %s", dmenu_defaults)
     try:
         return (dmenu[
             "-i", "-p", "[%s] >>> " % title
             ] << "\n".join(items))(*dmenu_defaults).strip()
     except Exception as e:
-        logging.exception("error running dmenu")
+        logger.exception("error running dmenu")
 
 
 def list_windows(qtile, current_group=False):
@@ -34,32 +35,25 @@ def list_windows(qtile, current_group=False):
         window_titles = [
             title_format(w) for w in qtile.windowMap.values() if w.name != "<no name>"
         ]
-    logging.info(window_titles)
+    logger.info(window_titles)
 
     def process_selected(selected):
         if not current_group:
             group, selected = selected.split(']', 1)
         selected = selected.strip()
-        logging.info("Switch to: %s", selected)
+        logger.info("Switch to: %s", selected)
         for window in qtile.windowMap.values():
             try:
-                #logging.debug("window %s : %s", repr(window.name), repr(selected))
                 if window.group and str(window.name) == str(selected):
-                    #window.cmd_to_screen(qtile.currentScreen.index)
-                    #qtile.cmd_to_screen(window.
-                    logging.debug("raise %s:", window.group.screen)
+                    logger.debug("raise %s:", window)
                     if window.group.screen:
                         qtile.cmd_to_screen(window.group.screen.index)
                     else:
                         window.group.cmd_toscreen()
-                    floating = window.floating
-                    window.cmd_bring_to_front()
-                    if not floating:
-                        window.cmd_disable_floating()
-                    #qtile.currentScreen.cmd_togglegroup(window.group.name)
+                    qtile.currentGroup.focus(window, False)
                     return True
             except Exception as e:
-                logging.exception("error in group")
+                logger.exception("error in group")
         return True
 
     process_selected(dmenu_show(
@@ -88,6 +82,22 @@ def dmenu_run(qtile):
     print(selected)
     if not selected:
         return
-    logging.debug((dir(qtile)))
+    logger.debug((dir(qtile)))
     qtile.cmd_spawn(selected)
     recent.insert(selected)
+
+
+def dmenu_org(qtile):
+    org_categories = [
+        "todo",
+        "event",
+        "note",
+    ]
+    title = dmenu_show("Run", org_categories)
+    cmd_str = (
+        "emacsclient -f xdev -c org-protocol://capture://"
+        "url/%s/etext" % (
+            title,
+        )
+    )
+    qtile.cmd_spawn(cmd_str)
