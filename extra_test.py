@@ -1,5 +1,5 @@
 from unittest import TestCase
-from dmenu import dmenu_run, list_executables, RecentRunner
+from dmenu import dmenu_run, list_executables, RecentRunner, list_bluetooth
 from libqtile import sh, command, hook
 from extra import autossh_term, SwitchToWindowGroup
 from random import randint
@@ -18,10 +18,16 @@ class QtileRunTest(TestCase):
     def test_autossh_term(self):
         print(autossh_term(title="shawk_left", port=9001))
 
+
+class TestDmenuListBluetooth(TestCase):
+    def test_list_bluetooth(self):
+        client = command.Client()
+        list_bluetooth(client)
+
+
 class TestSwitchToWindowGroup(TestCase):
     def test_switch_group(self):
         client = command.Client()
-        windows = client.windows()
         sw = SwitchToWindowGroup(
             'mail',
             title=re.compile('Inbox .*$'),
@@ -34,5 +40,4 @@ class TestSwitchToWindowGroup(TestCase):
             ]
         )
         
-        import sj; sj.set_trace() ######## FIXME:REMOVE ME steven.joseph ################
         sw.window_exists(client, re.compile("^Inbox .* steven@stevenjoseph.in$"))

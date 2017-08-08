@@ -132,7 +132,7 @@ def get_screens(num_monitors, num_groups, groups):
         #PriorityNotify(**default_params()),
         # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
         widget.Sep(**sep_params),
-        NotmuchCount(**default_params()),
+        # NotmuchCount(**default_params()),
         widget.Sep(**sep_params),
         widget.TextBox(
             "c",

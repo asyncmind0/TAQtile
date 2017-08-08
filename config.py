@@ -86,4 +86,3 @@ def main(self):
 
 
 import hooks
-import clipboard

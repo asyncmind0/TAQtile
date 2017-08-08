@@ -42,8 +42,6 @@ class SwitchToScreen(object):
         self.preferred_screen = preferred_screen
 
     def __call__(self, qtile):
-        logger.debug(
-            "SwitchGroup:%s:%s", qtile.currentScreen.index, self.name)
         max_screen = len(qtile.screens) - 1
         if(self.preferred_screen is not None and
            self.preferred_screen <= max_screen):
@@ -69,7 +67,6 @@ class SwitchToScreen(object):
 class SwitchToScreenGroup(SwitchToScreen):
     def __call__(self, qtile):
         screen, index = super(SwitchToScreenGroup, self).__call__(qtile)
-        logger.debug("SwitchGroup: %s", index)
         if index and screen:
             screen.cmd_toggle_group(index)
 

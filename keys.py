@@ -6,11 +6,19 @@ from extra import (
     terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchToScreenGroup,
     RaiseWindowOrSpawn, MoveToGroup, move_to_next_group, move_to_prev_group,
     autossh_term, show_mail)
-from dmenu import dmenu_run, list_windows, list_windows_group, dmenu_org
+from dmenu import (
+    dmenu_run,
+    list_windows,
+    list_windows_group,
+    dmenu_org,
+    list_bluetooth,
+    list_inboxes,
+    list_calendars,
+    dmenu_clip,
+)
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
-from clipboard import dmenu_xclip
 from passmenu import passmenu
 from os.path import expanduser
 from hooks import set_groups
@@ -143,8 +151,9 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "shift"], "s", lazy.spawn("spectacle")),
         ([mod, "shift"], "m", lazy.spawn("kmag")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
-        ([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_defaults)),
-        ([mod, "control"], "v", lazy.function(dmenu_xclip, dmenu_defaults)),
+        #([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_defaults)),
+        #([mod, "control"], "v", lazy.function(dmenu_xclip, dmenu_defaults)),
+        (["shift", mod], "v", lazy.function(dmenu_clip)),
         #([], "XF86Launch1", lazy.function(
         #    RaiseWindowOrSpawn(
         #        wmname='tail', cmd='st -t tail -e sudo journalctl -xf',
@@ -166,6 +175,7 @@ def get_keys(mod, num_groups, num_monitors):
         #    spawn=terminal_tmux('outer', 'monitor')))),
         ([], "F6", lazy.function(SwitchToScreenGroup(
             "6", preferred_screen=SECONDARY_SCREEN))),
+        ([mod], "F6", lazy.function(list_bluetooth)),
         ([], "F7", lazy.function(SwitchToScreenGroup(
             "7", preferred_screen=SECONDARY_SCREEN))),
         ([], "F9", lazy.function(SwitchToWindowGroup(
@@ -174,49 +184,12 @@ def get_keys(mod, num_groups, num_monitors):
         (
             [],
             "F10",
-            lazy.function(
-                SwitchToWindowGroup(
-                    'mail',
-                    title=re.compile('Inbox .*$'),
-                    screen=PRIMARY_SCREEN,
-                    spawn=[
-                        {
-                            'cmd': 'google-chrome-stable --app="https://inbox.google.com/u/0/"',
-                            'match': re.compile(r"^Inbox .* melit.stevenjoseph@gmail.com$"),
-                        }, {
-                            'cmd': 'google-chrome-stable --app="https://inbox.google.com/u/1/"',
-                            'match': re.compile(r"^Inbox .* steven@streethawk.co$"),
-                        }, {
-                            'cmd': 'google-chrome-stable --app="https://inbox.google.com/u/2/"',
-                            'match': re.compile(r"^Inbox .* stevenjose@gmail.com$"),
-                        }, {
-                            'cmd': 'google-chrome-stable --app="https://inbox.google.com/u/3/"',
-                            'match': re.compile(r"^Inbox .* steven@stevenjoseph.in$"),
-                        }
-                    ]
-                )
-            )
+            lazy.function(list_inboxes),
         ),
         (
             [mod],
             "0",
-            lazy.function(
-                SwitchToWindowGroup(
-                    'cal',
-                    title=re.compile('.* Calendar .*$'),
-                    screen=PRIMARY_SCREEN,
-                    spawn=[
-                        {
-                            "cmd": 'google-chrome-stable --app="https://calendar.google.com/calendar/b/1/"',
-                            "match": re.compile(r'StreetHawk - Calendar .*$'),
-                        },
-                        {
-                            "cmd": 'google-chrome-stable --app="https://calendar.google.com/calendar/b/0/"',
-                            "match": re.compile(r'Google Calendar .*$'),
-                        },
-                    ]
-                )
-            )
+            lazy.function(list_calendars),
         ),
         (
             [],
@@ -249,36 +222,6 @@ def get_keys(mod, num_groups, num_monitors):
         ),
         (
             [mod],
-            term1_key,
-            lazy.function(
-                SwitchToWindowGroup(
-                    'term1',
-                    title='shawk_left',
-                    screen=PRIMARY_SCREEN,
-                    spawn=autossh_term(
-                        title="shawk_left",
-                        host="salt.streethawk.com",
-                        session="left"
-                        )
-                    )
-                )
-        ),
-        (
-            [mod],
-            term2_key,
-            lazy.function(
-                SwitchToWindowGroup(
-                    'term2', title='shawk_right', screen=SECONDARY_SCREEN,
-                    spawn=autossh_term(
-                        title="shawk_right",
-                        host="salt.streethawk.com",
-                        session="right"
-                        )
-                    )
-                )
-        ),
-        (
-            [mod],
             term3_key,
             lazy.function(
                 SwitchToWindowGroup(
@@ -287,7 +230,7 @@ def get_keys(mod, num_groups, num_monitors):
                     screen=PRIMARY_SCREEN,
                     spawn=autossh_term(
                         title="azure_left",
-                        host="salt-streethawk.cloudapp.net",
+                        host="salt0.streethawk.com",
                         session="left"
                         )
                     )
@@ -303,54 +246,12 @@ def get_keys(mod, num_groups, num_monitors):
                     screen=SECONDARY_SCREEN,
                     spawn=autossh_term(
                         title="azure_right",
-                        host="salt-streethawk.cloudapp.net",
+                        host="salt0.streethawk.com",
                         session="right"
                     )
                 )
             )
         ),
-        (
-            [mod],
-            'F8',
-            lazy.function(
-                SwitchToWindowGroup(
-                    'staging',
-                    title='staging',
-                    screen=PRIMARY_SCREEN,
-                    spawn=autossh_term(
-                            title="staging",
-                            host="staging.streethawk.com",
-                            session="right"
-                        )
-                    )
-                )
-        ),
-        #(
-        #    [mod, "shift"],
-        #    term1_key,
-        #    lazy.function(
-        #        SwitchToWindowGroup(
-        #            'term1', 'iress2_right', screen=PRIMARY_SCREEN,
-        #            spawn=autossh_term(
-        #                title="prod_right",
-        #                port=9008,
-        #            )
-        #        )
-        #    )
-        #),
-        #(
-        #    [mod, "shift"],
-        #    term2_key,
-        #    lazy.function(
-        #        SwitchToWindowGroup(
-        #            'term2', 'iress2_left', screen=SECONDARY_SCREEN,
-        #            spawn=autossh_term(
-        #                title="prod_left",
-        #                host="api.streethawk.com",
-        #                )
-        #            )
-        #        )
-        #),
     ]
 
     laptop_keys = [

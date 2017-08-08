@@ -4,6 +4,7 @@ from random import randint
 from libqtile import hook
 from libqtile.layout import Slice
 from system import get_hostconfig, get_num_monitors, execute_once
+from recent_runner import RecentRunner
 
 from log import logger
 
@@ -13,17 +14,17 @@ prev_timestamp = 0
 
 @hook.subscribe.screen_change
 def restart_on_randr(qtile, ev):
-    print("Screen change: %s", ev.__dict__)
-    global event_cntr, prev_timestamp
-    cur_timestamp = ev.timestamp
+    logger.debug("Screen change: %s", ev.__dict__)
+    #global event_cntr, prev_timestamp
+    #cur_timestamp = ev.timestamp
     # num_mons = get_num_monitors()
-    if abs(prev_timestamp - cur_timestamp) > 1000:
-        # if num_screens != get_num_monitors():
-        # signal.signal(signal.SIGCHLD, signal.SIG_DFL)
-        print("RESTART screen change")
-        qtile.cmd_restart()
-    else:
-        prev_timestamp = cur_timestamp
+    #if abs(prev_timestamp - cur_timestamp) > 1000:
+    #    # if num_screens != get_num_monitors():
+    #    # signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+    #    print("RESTART screen change")
+    qtile.cmd_restart()
+    #else:
+    #    prev_timestamp = cur_timestamp
 
 
 @hook.subscribe.startup
@@ -117,6 +118,20 @@ def set_groups(*args, **kwargs):
                 except Exception as e:
                     logger.exception("error setting rules")
 
+
 @hook.subscribe.client_urgent_hint_changed
 def urgent_hint_changed(*args, **kwargs):
     logger.debug("urgent_hint_changed called with %s %s", args, kwargs)
+
+
+@hook.subscribe.selection_change
+def selection_change(source, selection=None):
+    #logger.debug("selection_change called with %s %s", source, selection)
+    if source == 'CLIPBOARD' and selection['selection']:
+        recent = RecentRunner('qtile_clip')
+        recent.insert(selection['selection'])
+        #logger.debug("selection_change inserted %s",  selection)
+
+#@hook.subscribe.selection_notify
+#def selection_notify(*args, **kwargs):
+#    logger.debug("selection_notify called with %s %s", args, kwargs)

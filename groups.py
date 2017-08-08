@@ -8,6 +8,7 @@ from system import get_hostconfig, get_group_affinity, get_screen_affinity
 from themes import current_theme
 from collections import OrderedDict
 from screens import SECONDARY_SCREEN, PRIMARY_SCREEN
+from itertools import chain
 
 from log import logger
 
@@ -143,6 +144,12 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         ),
         Rule(
             Match(
+                wm_class=["Transgui"],
+            ),
+            group=get_group_affinity('transgui'),
+        ),
+        Rule(
+            Match(
                 title=[
                     re.compile(r"^Developer.*", re.I),
                     re.compile(r"^Devtools.*", re.I),
@@ -155,14 +162,9 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         ),
         Rule(
             Match(
-                wm_class=["Transgui"],
-            ),
-            group=get_group_affinity('transgui'),
-        ),
-        Rule(
-            Match(
                 role=[re.compile("^browser$")],
-                wm_class=["Google-chrome-stable"]),
+                #wm_class=["Google-chrome-stable"]
+            ),
             group=get_group_affinity('browser'),
             break_on_match=False
         ),
@@ -243,7 +245,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             matches=terminal_matches([r"^monitor$"])
         ),
         'mail': dict(
-            screen_affinity=PRIMARY_SCREEN, #get_screen_affinity('mail'),
+            screen_affinity=PRIMARY_SCREEN,
             exclusive=False,
             init=True,
             matches=[
@@ -334,7 +336,6 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             matches=terminal_matches([r"^ulog$"])
         )
 
-    from itertools import chain
     for i in chain(range(1, num_groups + 1), group_args.keys()):
         groups.append(
             Group(

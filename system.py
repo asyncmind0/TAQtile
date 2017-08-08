@@ -13,10 +13,10 @@ mod = "mod4"
 
 common_autostart = {
     #'xcompmgr': None,
-    'klipper': None,
-    'xscreensaver -nosplash': None,
+    #'klipper': None,
+    #'xscreensaver -nosplash': None,
     expanduser('~/.bin/xstartup'): None,
-    'setxkbmap -option \'ctrl:swapcaps\'': None,
+#    'setxkbmap -option \'ctrl:swapcaps\'': None,
 }
 
 laptop_autostart = dict(common_autostart)
