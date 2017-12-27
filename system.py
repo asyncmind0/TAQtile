@@ -94,8 +94,8 @@ platform_specific = {
 host = platform.node().split('.', 1)[0].lower()
 
 
-def get_hostconfig(key):
-    return platform_specific.get(host, {}).get(key, None)
+def get_hostconfig(key, default=None):
+    return platform_specific.get(host, {}).get(key, default)
 
 
 def get_screen(index):
