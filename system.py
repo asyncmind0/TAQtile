@@ -57,16 +57,14 @@ iress_config = {
     'term1_key': 'XF86Launch5',
     'term2_key': 'XF86Launch6',
 }
-
-platform_specific = {
-    'steven-series9': {
-        'screens': {0: 1, 1: 0},
-        'battery': True,
-        'laptop': True,
-        'autostart-once': laptop_autostart,
-        'screen_affinity': {
-            'mail': 1,
-            'emulator': 2,
+series9_config = {
+    'screens': {0: 1, 1: 0},
+    'battery': True,
+    'laptop': True,
+    'autostart-once': laptop_autostart,
+    'screen_affinity': {
+        'mail': 1,
+        'emulator': 2,
         },
         'group_affinity': {
             'emulator': 3,
@@ -79,12 +77,15 @@ platform_specific = {
             'slack': 6,
             'hangouts': 7,
             'discord': 8,
-        },
-        'term1_key': 'F11',
-        'term2_key': 'F12',
-        'term3_key': 'F9',
-        'term4_key': 'F10',
-    },
+            },
+            'term1_key': 'F11',
+            'term2_key': 'F12',
+            'term3_key': 'F9',
+            'term4_key': 'F10',
+    }
+
+platform_specific = {
+    'steven-series9': series9_config,
     'sydsjoseph-pc1': iress_config,
     'au02-sjosephpc2': iress_config,
 }

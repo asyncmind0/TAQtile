@@ -32,7 +32,7 @@ def startup():
     try:
         # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
         # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
-        commands = get_hostconfig('autostart-once')
+        commands = get_hostconfig('autostart-once') or {}
         num_mons = get_num_monitors()
         logger.debug("Num MONS:%s", num_mons)
         # logger.debug("Num DeSKTOPS:%s", len(qtile.screens))
