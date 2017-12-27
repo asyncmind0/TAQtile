@@ -1,6 +1,11 @@
 from libqtile.widget import base
 from log import logger
-import notmuch
+try:
+    import notmuch
+except ImportError:
+    logger.debug("Notmuch not available")
+    notmuch = False
+    pass
 
 
 class NotmuchCount(base.ThreadedPollText):
@@ -10,6 +15,8 @@ class NotmuchCount(base.ThreadedPollText):
         self.update_interval = 5
 
     def poll(self):
+        if not notmuch:
+            return ''
         db = notmuch.Database()
         query = db.create_query(self.query)
         try:
