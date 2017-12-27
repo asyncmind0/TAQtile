@@ -5,9 +5,8 @@ import os
 from os.path import expanduser, isdir, join, pathsep
 from py_compile import compile
 from subprocess import check_output
-import notmuch
 import re
-from system import execute_once
+from system import execute_once, window_exists
 
 from log import logger
 try:
@@ -139,26 +138,24 @@ class SwitchToWindowGroup(object):
     def raise_window(self, qtile):
         for window in qtile.windowMap.values():
             if window.group and window.match(wname=self.title):
+                logger.debug("Raise window %s", window)
                 qtile.currentGroup.focus(window, False)
-
-    def window_exists(self, qtile, regex):
-        for window in qtile.cmd_windows():
-            if regex.match(window['name']):
-                return True
 
     def spawn_ifnot(self, qtile):
         cmds = []
         try:
             for cmd in self.cmd:
+                logger.debug("Spawn %s", cmd)
                 if isinstance(cmd, dict):
-                    if not self.window_exists(qtile, cmd['match']):
+                    if not window_exists(qtile, cmd['match']):
                         cmds.append(cmd['cmd'])
                 else:
-                    if not self.window_exists(qtile, self.title):
+                    if not window_exists(qtile, self.title):
                         cmds.append(cmd)
             for cmd in cmds:
                 logger.debug(cmd)
                 qtile.cmd_spawn(cmd)
+                return True
         except Exception as e:
             logger.exception("wierd")
         return False
@@ -176,7 +173,13 @@ class SwitchToWindowGroup(object):
                 qtile.currentScreen.cmd_toggle_group(self.name)
             except Exception as e:
                 logger.exception("wierd")
-        #self.raise_window(qtile)
+        self.raise_window(qtile)
+
+
+class ToggleApplication(SwitchToWindowGroup):
+    def __call__(self, qtile):
+        self.spawn_ifnot(qtile)
+
 
 
 class RaiseWindowOrSpawn(object):
@@ -220,9 +223,11 @@ class RaiseWindowOrSpawn(object):
                     window.hide()
             logger.error("Hidden: %s %s", window.hidden, window.window.wid)
             execute_once(
-                "transet-df %s -i %s" % (self.alpha, window.window.wid))
-        logger.error("Current group: %s",qtile.currentGroup.name)
-        execute_once(self.cmd, self.cmd_match, qtile=qtile)
+                "transet-df %s -i %s" % (self.alpha, window.window.wid),
+                qtile=qtile
+            )
+        logger.error("Current group: %s", qtile.currentGroup.name)
+        execute_once(self.cmd, process_filter=self.cmd_match, qtile=qtile)
 
 
 def check_restart(qtile):
@@ -261,6 +266,7 @@ def autossh_term(
 
 def show_mail(qtile):
     from collections import OrderedDict
+    import notmuch
     queries = OrderedDict()
     queries["inbox"] = "(tag:INBOX or tag:inbox) and not (tag:misc) and date:30d..0s and tag:unread and tag:me"
     queries["pullrequests"] = "tag:pullrequests and tag:unread"
