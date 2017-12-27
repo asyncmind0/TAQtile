@@ -1,6 +1,6 @@
 import os
 from os.path import expanduser, isdir, join, pathsep
-from plumbum.cmd import dmenu, emacsclient, bluetoothctl
+from plumbum.cmd import dmenu, bluetoothctl
 from recent_runner import RecentRunner
 import threading
 import re
@@ -229,7 +229,8 @@ def dmenu_clip(qtile):
         r.withdraw()
         r.clipboard_clear()
         r.clipboard_append(selected)
-        r.update() # now it stays on the clipboard after the window is closed
-        r.destroy()
+        r.after(500, r.destroy)
+        #r.update() # now it stays on the clipboard after the window is closed
+        #r.destroy()
     except Exception as e:
         logger.exception("error in clip access")
