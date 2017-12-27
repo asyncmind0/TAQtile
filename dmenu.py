@@ -1,15 +1,12 @@
 import os
-from os.path import expanduser, isdir, join, pathsep
-from plumbum.cmd import dmenu, bluetoothctl
-from recent_runner import RecentRunner
-import threading
 import re
-import time
-from screens import SECONDARY_SCREEN, PRIMARY_SCREEN
-from libqtile.command import lazy
+from os.path import isdir, join, pathsep
+
+from plumbum.cmd import dmenu, bluetoothctl
 
 from log import logger
-from dbus_bluetooth import get_devices
+from recent_runner import RecentRunner
+from screens import PRIMARY_SCREEN
 
 
 def dmenu_show(title, items):
