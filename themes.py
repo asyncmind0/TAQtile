@@ -67,7 +67,7 @@ logger.debug("Current theme:%s", current_theme)
 #) % current_theme
 
 rofi_defaults = (
-    "-w -f -l 10 -bw 1 "
+    "-f -l 10 -bw 1 "
     "-separator-style solid "
     "-color-window '%(background)s,%(foreground)s' "
     "-color-normal '%(background)s,%(foreground)s,"
