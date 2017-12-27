@@ -37,12 +37,12 @@ def startup():
         logger.debug("Num MONS:%s", num_mons)
         # logger.debug("Num DeSKTOPS:%s", len(qtile.screens))
         if num_mons > 1:
-            commands[os.path.expanduser("dualmonitor")] = None
+            commands["dualmonitor"] = None
         elif num_mons == 1:
-            commands[os.path.expanduser("rightmonitor")] = None
+            commands["rightmonitor"] = None
 
-        for command, process_filter in commands.items():
-            execute_once(command, process_filter, hook.qtile)
+        for command, kwargs in commands.items():
+            execute_once(command, qtile=hook.qtile, **(kwargs if kwargs else {}))
     except Exception as e:
         logger.exception("error in startup hook")
 
@@ -113,6 +113,15 @@ def set_groups(*args, **kwargs):
                     #current_screen = getattr(rule, 'current_screen', False)
                     #if current_screen:
                     #    client.to_group(hook.qtile.currentScreen.group)
+                    geometry = getattr(rule, 'geometry', False)
+                    if geometry:
+                        client.place(
+                            geometry['x'],
+                            geometry['y'],
+                            geometry['width'],
+                            geometry['height'],
+                            1, None, above=True, force=True)#, '00C000')
+                        
                     if rule.break_on_match:
                         break
                 except Exception as e:
