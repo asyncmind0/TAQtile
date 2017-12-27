@@ -39,7 +39,12 @@ laptop_autostart.update({
 desktop_autostart = dict(common_autostart)
 desktop_autostart.update({
     'jabberel-tray.py': None})
-
+default_config = {
+    'term1_key': 'F11',
+    'term2_key': 'F12',
+    'term3_key': 'F9',
+    'term4_key': 'F10',
+}
 iress_config = {
     'screens': {0: 0, 1: 1},
     'battery': False,
@@ -65,24 +70,24 @@ series9_config = {
     'screen_affinity': {
         'mail': 1,
         'emulator': 2,
-        },
-        'group_affinity': {
-            'emulator': 3,
-            'mail': 1,
-            'browser': 11,
-            'transgui': 1,
-            'devtools': 2,
-            'rdesktop': 15,
-            'virtualbox': 4,
-            'slack': 6,
-            'hangouts': 7,
-            'discord': 8,
-            },
-            'term1_key': 'F11',
-            'term2_key': 'F12',
-            'term3_key': 'F9',
-            'term4_key': 'F10',
-    }
+    },
+    'group_affinity': {
+        'emulator': 3,
+        'mail': 1,
+        'browser': 11,
+        'transgui': 1,
+        'devtools': 2,
+        'rdesktop': 15,
+        'virtualbox': 4,
+        'slack': 6,
+        'hangouts': 7,
+        'discord': 8,
+    },
+    'term1_key': 'F11',
+    'term2_key': 'F12',
+    'term3_key': 'F9',
+    'term4_key': 'F10',
+}
 
 platform_specific = {
     'steven-series9': series9_config,
@@ -95,7 +100,7 @@ host = platform.node().split('.', 1)[0].lower()
 
 
 def get_hostconfig(key, default=None):
-    return platform_specific.get(host, {}).get(key, default)
+    return platform_specific.get(host, default_config).get(key, default)
 
 
 def get_screen(index):
@@ -115,8 +120,6 @@ def get_group_affinity(app):
     if ret > 9 and get_num_monitors() < 2:
         ret -= 10
     return str(ret)
-
-
 
 
 def get_num_monitors():
