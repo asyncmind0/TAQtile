@@ -100,18 +100,18 @@ def get_hostconfig(key):
 
 def get_screen(index):
     """Get platform specific screen """
-    monitors  = get_num_monitors()
+    monitors = get_num_monitors()
     if monitors == 1:
         return 0
-    return get_hostconfig('screens')[index]
+    return get_hostconfig('screens', {}).get(index, 0)
 
 
 def get_screen_affinity(app):
-    return get_hostconfig('screen_affinity').get(app, 0)
+    return get_hostconfig('screen_affinity', {}).get(app, 0)
 
 
 def get_group_affinity(app):
-    ret = get_hostconfig('group_affinity').get(app, 0)
+    ret = get_hostconfig('group_affinity', {}).get(app, 0)
     if ret > 9 and get_num_monitors() < 2:
         ret -= 10
     return str(ret)
