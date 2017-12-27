@@ -4,10 +4,12 @@ import logging
 import platform
 from plumbum import local
 import subprocess
+import signal
 from os.path import expanduser
 from log import logger
+import os
+import re
 
-logger = logging.getLogger(__name__)
 
 mod = "mod4"
 
@@ -24,8 +26,14 @@ laptop_autostart.update({
     'blueman-applet': None,
     'redshift-gtk': None,
     'insync start': None,
-    'parcellite': None,
+    #'parcellite': None,
+    '/opt/trinity/bin/klipper': None,
     'slack': None,
+    #'discord-canary': None,
+    'feh --bg-scale ~/.wallpaper': None,
+    'google-chrome-stable  --app="https://web.whatsapp.com/"': dict(
+        process_filter="whatsapp",
+    )
 })
 
 desktop_autostart = dict(common_autostart)
@@ -70,6 +78,7 @@ platform_specific = {
             'virtualbox': 4,
             'slack': 6,
             'hangouts': 7,
+            'discord': 8,
         },
         'term1_key': 'F11',
         'term2_key': 'F12',
@@ -130,7 +139,20 @@ def get_num_monitors():
     #    print "Width:" + width + ",height:" + height
 
 
-def execute_once(process, process_filter=None, qtile=None):
+def window_exists(qtile, regex):
+    for window in qtile.windowMap.values():
+        if regex.match(window.name):
+            return True
+        wm_class = window.window.get_wm_class()
+        logger.debug(wm_class)
+        if wm_class and any(map(regex.match, wm_class)):
+            return True
+    return False
+
+
+def execute_once(
+        process, process_filter=None, qtile=None,
+        toggle=False, window_regex=None):
     cmd = process.split()
     process_filter = process_filter or cmd[0]
     pid = None
@@ -140,6 +162,9 @@ def execute_once(process, process_filter=None, qtile=None):
     except Exception as e:
         logger.debug("Not running: %s", process_filter)
     if not pid:
+        if window_regex and window_exists(qtile, window_regex):
+            assert not toggle, "cannot toggle no pid"
+            return
         # spawn the process using a shell command with subprocess.Popen
         logger.debug("Starting: %s", cmd)
         try:
@@ -151,3 +176,5 @@ def execute_once(process, process_filter=None, qtile=None):
             logger.info("Started: %s: %s", cmd, pid)
         except Exception as e:
             logger.error("Error running %s", cmd)
+    elif toggle:
+        os.kill(int(pid), signal.SIGKILL)
