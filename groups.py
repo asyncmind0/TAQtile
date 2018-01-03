@@ -45,6 +45,9 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         Rule(
             Match(
                 title=["pinentry-qt"],
+                wm_class=[
+                    "Ksnapshot",
+                ]
             ),
             break_on_match=True,
             float=True,
