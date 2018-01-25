@@ -145,17 +145,16 @@ class SwitchToWindowGroup(object):
         cmds = []
         try:
             for cmd in self.cmd:
-                logger.debug("Spawn %s", cmd)
+                logger.debug("Check %s", cmd)
                 if isinstance(cmd, dict):
-                    if not window_exists(qtile, cmd['match']):
+                    if not window_exists(qtile, re.compile(cmd['match'])):
                         cmds.append(cmd['cmd'])
                 else:
                     if not window_exists(qtile, self.title):
                         cmds.append(cmd)
             for cmd in cmds:
-                logger.debug(cmd)
+                logger.debug("Spawn %s", cmd)
                 qtile.cmd_spawn(cmd)
-                return True
         except Exception as e:
             logger.exception("wierd")
         return False
