@@ -4,7 +4,7 @@ import system
 import themes
 from libqtile import bar, widget
 from libqtile.config import Screen
-from widgets import CalClock
+from widgets import CalClock, Clock
 from widgets.bankbalance import BankBalance
 from widgets.mail import NotmuchCount
 from widgets.multiscreengroupbox import MultiScreenGroupBox
@@ -35,6 +35,7 @@ def get_screens(num_monitors, num_groups, groups):
         rounded=False,
         border_focus='#FFFFFF',
         is_line=False,
+        center_aligned=True,
     )
     tasklist_params = default_params(
         selected=("[", "]"),
@@ -47,8 +48,11 @@ def get_screens(num_monitors, num_groups, groups):
     current_layout_params = default_params(
         name="default", border='#000000')
     #windowname_params = default_params
-    systray_params = default_params()
-    clock_params = default_params(padding=2, format='%Y-%m-%d %a %H:%M')
+    systray_params = default_params(icon_size=15)
+    clock_params = default_params(
+        padding=2,
+        format='%Y-%m-%d %a %H:%M'
+    )
     pacman_params = default_params()
     notify_params = default_params()
     bitcointicker_params = default_params()
@@ -82,7 +86,7 @@ def get_screens(num_monitors, num_groups, groups):
     memgraph_params['fill_color'] = "80FF00.3"
     memgraph_params['type'] = "linefill"
     netgraph_params = dict(graph_defaults)
-    sep_params = default_params(padding=2, fontsize=9, size_percent=90)
+    sep_params = default_params(padding=4, fontsize=9)#, size_percent=90)
     graph_label_defaults = dict(
         margin=0,
         padding_x=0,
@@ -183,7 +187,44 @@ def get_screens(num_monitors, num_groups, groups):
     ]
     bar_map = {0: primary_bar, 1: secondary_bar}
     bar_height = groupbox_params.get('bar_height', 7)
-    screens.append(Screen(bar.Bar(bar_map[PRIMARY_SCREEN], bar_height)))
+
+    def make_clocks(*timezones):
+        widgets = []
+        for timezone in timezones:
+            widgets.append(
+                widget.TextBox(
+                    "%s:" % timezone,
+                    **default_params()
+                )
+            )
+            widgets.append(
+                Clock(
+                    timezone=timezone,
+                    **clock_params
+                )
+            )
+            widgets.append(
+                widget.Sep(**default_params(padding=8, fontsize=9)),
+            )
+        return widgets
+
+    clock_bar = bar.Bar(
+        make_clocks(
+            "UTC",
+            "US/Eastern",
+            "Asia/Calcutta",
+            "Asia/Ho_Chi_Minh",
+            "Asia/Riyadh",
+        ),
+        size=bar_height
+    )
+    #clock_bar.size = 0
+    screens.append(
+        Screen(
+            top=bar.Bar(bar_map[PRIMARY_SCREEN], bar_height),
+            bottom=clock_bar,
+        )
+    )
     if num_monitors > 1:
         screens.append(Screen(bar.Bar(bar_map[SECONDARY_SCREEN], bar_height)))
     return screens
