@@ -9,6 +9,7 @@ from os.path import expanduser
 from log import logger
 import os
 import re
+import glob
 
 
 mod = "mod4"
@@ -141,6 +142,14 @@ def get_num_monitors():
     #    width = values[0]
     #    height = values[1]
     #    print "Width:" + width + ",height:" + height
+
+
+def hdmi_connected():
+    for hdmi in glob.glob("/sys/class/drm/card0/*HDMI-A-1/status"):
+        if open(hdmi).read().strip() == "connected":
+            logger.info("HDMI connected")
+            return True
+    return False
 
 
 def window_exists(qtile, regex):
