@@ -18,6 +18,7 @@ class Rule(QRule):
             self, match, front=False, fullscreen=False,
             static=False, opacity=None, center=False,
             current_screen=False,
+            geometry=None,
             **kwargs
             ):
         super(Rule, self).__init__(match, **kwargs)
@@ -27,6 +28,7 @@ class Rule(QRule):
         self.opacity = opacity
         self.center = center
         self.current_screen = current_screen
+        self.geometry = geometry
 
 
 def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
