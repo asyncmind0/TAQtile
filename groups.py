@@ -230,9 +230,11 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
     groups = []
     # map og group and prefered screen
     group_args = OrderedDict({
-        'comm1': dict(
+        'comm': dict(
             screen_affinity=PRIMARY_SCREEN,
-            matches=terminal_matches([r"^comm1$"])
+            matches=terminal_matches([r"^comm$"]) + [
+                Match(title=[re.compile(r'System Monitor', re.I)])
+            ],
             # matches=terminal_matches([r"^comm$"]) + [
             #    Match(wm_class=[re.compile(r'psi.*', re.I)])],
             # layouts=[
@@ -292,13 +294,13 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             screen_affinity=PRIMARY_SCREEN,
             exclusive=False,
             init=True,
-            matches=terminal_matches([r"^azure_left$", r"staging"])
+            matches=terminal_matches([r"^azure_left$", r"zebra_left"])
         ),
         'azure_right': dict(
             screen_affinity=SECONDARY_SCREEN,
             exclusive=False,
             init=True,
-            matches=terminal_matches([r"^azure_right$"])
+            matches=terminal_matches([r"^azure_right$", r"zebra_right"])
         ),
         'krusader': dict(
             screen_affinity=SECONDARY_SCREEN,

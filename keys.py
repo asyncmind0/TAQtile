@@ -2,7 +2,9 @@ import logging
 from libqtile.command import lazy
 from libqtile.config import Key, Match, Rule
 from extra import (
-    SwitchToWindowGroup, check_restart,
+    SwitchToWindowGroup,
+    ToggleApplication,
+    check_restart,
     terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchToScreenGroup,
     RaiseWindowOrSpawn, MoveToGroup, move_to_next_group, move_to_prev_group,
     autossh_term, show_mail)
@@ -142,15 +144,16 @@ def get_keys(mod, num_groups, num_monitors):
         #([mod, "shift"], "b", lazy.spawn("google-chrome-stable")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "shift"], "p", lazy.function(passmenu, dmenu_defaults)),
-        ([mod, "shift"], "c", lazy.spawn("spectacle")),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
         ([mod, "control"], "s", lazy.spawn("surf")),
-        ([mod, "control"], "l", lazy.spawn("xscreensaver-command -lock")),
+        ([mod, "control"], "l", lazy.spawn(expanduser("~/.bin/lock"))),
         ([mod], "F1", lazy.spawn(expanduser("~/.bin/blank"))),
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
-        ([mod, "shift"], "s", lazy.spawn("spectacle")),
+        ([mod, "shift"], "c", lazy.spawn("ksnapshot")),
+        ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "m", lazy.spawn("kmag")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
+        #(["control"], "Escape", lazy.spawn("ksysguard")),
         #([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_defaults)),
         #([mod, "control"], "v", lazy.function(dmenu_xclip, dmenu_defaults)),
         (["shift", mod], "v", lazy.function(dmenu_clip)),
@@ -178,9 +181,16 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "F6", lazy.function(list_bluetooth)),
         ([], "F7", lazy.function(SwitchToScreenGroup(
             "7", preferred_screen=SECONDARY_SCREEN))),
-        ([], "F9", lazy.function(SwitchToWindowGroup(
-            'comm1', 'comm1', screen=PRIMARY_SCREEN,
-            spawn=terminal_tmux('inner', 'comm1')))),
+        (
+            [], "F9", lazy.function(
+                SwitchToWindowGroup(
+                    'comm',
+                    'comm',
+                    screen=PRIMARY_SCREEN,
+                    spawn=terminal_tmux('outer', 'comm')
+                )
+            )
+        ),
         (
             [],
             "F10",
@@ -228,13 +238,26 @@ def get_keys(mod, num_groups, num_monitors):
                     'azure_left',
                     title='azure_left',
                     screen=PRIMARY_SCREEN,
-                    spawn=autossh_term(
-                        title="azure_left",
-                        host="salt0.streethawk.com",
-                        session="left"
+                    spawn=[
+                        dict(
+                            cmd=autossh_term(
+                                title="azure_left",
+                                host="salt.streethawk.com",
+                                session="left"
+                            ),
+                            match="azure_left",
+                        ),
+                        dict(
+                            cmd=autossh_term(
+                                title="zebra_left",
+                                host="salt.streethawk.com",
+                                session="left"
+                            ),
+                            match="zebra_left"
                         )
-                    )
+                    ]
                 )
+            )
         ),
         (
             [mod],
@@ -244,14 +267,42 @@ def get_keys(mod, num_groups, num_monitors):
                     'azure_right',
                     title='azure_right',
                     screen=SECONDARY_SCREEN,
-                    spawn=autossh_term(
-                        title="azure_right",
-                        host="salt0.streethawk.com",
-                        session="right"
-                    )
+                    spawn=[
+                        dict(
+                            cmd=autossh_term(
+                                title="azure_right",
+                                host="salt.streethawk.com",
+                                session="right"
+                            ),
+                            match="azure_right"
+                        ),
+                        dict(
+                            cmd=autossh_term(
+                                title="zebra_right",
+                                host="salt.streethawk.com",
+                                session="right"
+                            ),
+                            match="zebra_right"
+                        ),
+                    ]
                 )
             )
         ),
+        (['control'], "Escape", lazy.function(SwitchToWindowGroup(
+            'comm1',
+            title='System Monitor',
+            screen=PRIMARY_SCREEN,
+            spawn="ksysguard"))),
+        #(
+        #    ['control'],
+        #    'Escape',
+        #    lazy.function(
+        #        RaiseWindowOrSpawn(
+        #            wmname="System Monitor",
+        #            cmd="ksysguard",
+        #        )
+        #    )
+        #),
     ]
 
     laptop_keys = [
