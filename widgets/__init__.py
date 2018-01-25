@@ -3,6 +3,10 @@ import subprocess
 import threading
 
 from libqtile import widget
+from extra import RaiseWindowOrSpawn
+from pytz import timezone
+from datetime import datetime
+from system import execute_once
 
 
 from log import logger
@@ -35,11 +39,32 @@ class ThreadedPacman(widget.Pacman):
         return True
 
 
-class CalClock(widget.Clock):
+class Clock(widget.Clock):
+    def poll(self):
+        # We use None as a sentinel here because C's strftime defaults to UTC
+        # if TZ=''.
+        if self.timezone is not None:
+            zoneinfo = timezone("UTC")
+            return zoneinfo.localize(
+                datetime.utcnow() + self.DELTA
+            ).astimezone(timezone(self.timezone)).strftime(self.format)
+        else:
+            return self._get_time()
+
+
+class CalClock(Clock):
     # def button_release(self, x, y, button):
 
     def button_press(self, x, y, button):
-        self.qtile.cmd_spawn("calendar_applet.py")
+        #self.qtile.cmd_spawn("calendar_applet.py")
+        try:
+            self.qtile.currentScreen.bottom.show(
+                not self.qtile.currentScreen.bottom.is_show())
+        except:
+            logger.exception("error")
+        execute_once("kworldclock", qtile=self.qtile, toggle=True)
+        #rws = RaiseWindowOrSpawn(wmname="TDE World Clock", cmd="/opt/trinity/bin/kworldclock")
+        #rws(self.qtile)
 
 
 class GraphHistory(widget.NetGraph):
