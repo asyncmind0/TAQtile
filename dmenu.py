@@ -7,6 +7,7 @@ from plumbum.cmd import dmenu, bluetoothctl
 from log import logger
 from recent_runner import RecentRunner
 from screens import PRIMARY_SCREEN
+from dbus_bluetooth import get_devices
 
 
 def dmenu_show(title, items):
