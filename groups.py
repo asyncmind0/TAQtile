@@ -36,6 +36,13 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
     dgroups_app_rules.extend([
         Rule(
             Match(
+                title=["TDE World Clock"],
+            ),
+            break_on_match=True,
+            float=True,
+        ),
+        Rule(
+            Match(
                 wm_class=[re.compile(".*dunst.*", re.I)],
             ),
             group="1",
@@ -165,8 +172,10 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         ),
         Rule(
             Match(
-                role=[re.compile("^browser$")],
-                #wm_class=["Google-chrome-stable"]
+                role=[
+                    re.compile("^browser$"),
+                ],
+                wm_class=["webmacs"]
             ),
             group=get_group_affinity('browser'),
             break_on_match=False
@@ -175,7 +184,6 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             Match(
                 title=[
                     re.compile(r"^Hangouts$"),
-                    re.compile(r".*whatsi.*", re.I),
                 ]
             ),
             group=get_group_affinity("hangouts"),
@@ -198,14 +206,24 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             group=get_group_affinity("slack"),
             break_on_match=False,
         ),
+        Rule(
+            Match(
+                title=[re.compile(r".*discord.*", re.I)]
+                #wm_class=[re.compile(".*slack.*", re.I)],
+                #wm_instance_class=[re.compile(".*slack.*", re.I)]
+            ),
+            group=get_group_affinity("discord"),
+            break_on_match=False,
+        ),
 
         Rule(
             Match(
-                wm_class=[re.compile(".*insync\.py.*", re.I)],
-                wm_instance_class=[re.compile(".*insync\.py.*", re.I)]
+                wm_class=[re.compile("insync.*", re.I)],
+                wm_instance_class=[re.compile("insync.*", re.I)]
             ),
-            float=True,
-            break_on_match=False
+            #float=True,
+            static=True,
+            break_on_match=True
         ),
         Rule(
             Match(
