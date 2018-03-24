@@ -17,6 +17,7 @@ except:
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
 _terminal = "st -t {0} "
+#_terminal = "alacritty -t {0} "
 
 
 def terminal_tmux(level, session):
@@ -251,6 +252,7 @@ def autossh_term(
     cmd = " ".join(
         [
             "st",
+            #"alacritty",
             "-t",
             title,
             "-e",

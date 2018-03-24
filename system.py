@@ -30,10 +30,12 @@ laptop_autostart.update({
     #'parcellite': None,
     '/opt/trinity/bin/klipper': None,
     'slack': None,
+    'yakyak': None,
     #'discord-canary': None,
     'feh --bg-scale ~/.wallpaper': None,
-    'google-chrome-stable  --app="https://web.whatsapp.com/"': dict(
+    'whatsapp-web-desktop': dict(
         process_filter="whatsapp",
+        window_regex=re.compile(r".*whatsapp.*", re.I),
     )
 })
 

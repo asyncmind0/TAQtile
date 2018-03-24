@@ -186,6 +186,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             Match(
                 title=[
                     re.compile(r"^Hangouts$"),
+                    re.compile(r"^yakyak$", re.I),
                 ]
             ),
             group=get_group_affinity("hangouts"),
