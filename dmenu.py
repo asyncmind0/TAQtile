@@ -141,7 +141,7 @@ def list_calendars(qtile):
         if not selected:
             return
         recent.insert(selected)
-        match = re.compile(inboxes[selected])
+        match = re.compile(inboxes[selected], re.I)
         if qtile.currentScreen.index != PRIMARY_SCREEN:
             logger.debug("cmd_to_screen")
             qtile.cmd_to_screen(PRIMARY_SCREEN)
