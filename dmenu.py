@@ -158,7 +158,7 @@ def list_calendars(qtile):
                 break
         else:
             cmd = (
-                'google-chrome-stable --app="https://calendar.google.com/calendar/b/%s/"' %
+                'chromium --app="https://calendar.google.com/calendar/b/%s/"' %
                 selected
             )
 
@@ -199,7 +199,7 @@ def list_inboxes(qtile):
                 break
         else:
             cmd = (
-                'google-chrome-stable --app="https://inbox.google.com/u/%s/"' %
+                'chromium --app="https://inbox.google.com/u/%s/"' %
                 selected
             )
 

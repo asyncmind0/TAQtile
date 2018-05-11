@@ -291,10 +291,10 @@ def show_mail(qtile):
 
 def start_inboxes(qtile):
     inboxes = {
-        'google-chrome-stable --app="https://inbox.google.com/u/0/"': r"^Inbox .* melit.stevenjoseph@gmail.com$",
-        'google-chrome-stable --app="https://inbox.google.com/u/1/"': r"^Inbox .* steven@streethawk.co$",
-        'google-chrome-stable --app="https://inbox.google.com/u/2/"': r"^Inbox .* stevenjose@gmail.com$",
-        'google-chrome-stable --app="https://inbox.google.com/u/3/"': r"^Inbox .* steven@stevenjoseph.in$",
+        'chromium --app="https://inbox.google.com/u/0/"': r"^Inbox .* melit.stevenjoseph@gmail.com$",
+        'chromium --app="https://inbox.google.com/u/1/"': r"^Inbox .* steven@streethawk.co$",
+        'chromium --app="https://inbox.google.com/u/2/"': r"^Inbox .* stevenjose@gmail.com$",
+        'chromium --app="https://inbox.google.com/u/3/"': r"^Inbox .* steven@stevenjoseph.in$",
     }
     for inbox, regex in inboxes.items():
         for window in qtile.cmd_windows():
