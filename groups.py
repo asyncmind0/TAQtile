@@ -211,6 +211,22 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
         ),
         Rule(
             Match(
+                title=[re.compile(r"whatsapp.*", re.I)],
+                wm_class=[re.compile("^whats-app.*", re.I)],
+            ),
+            group=get_group_affinity("whatsapp"),
+            break_on_match=False,
+        ),
+        Rule(
+            Match(
+                title=[re.compile(r"klipper", re.I)],
+            ),
+            group="3",
+            break_on_match=False,
+        ),
+
+        Rule(
+            Match(
                 title=[re.compile(r".*discord.*", re.I)]
                 #wm_class=[re.compile(".*slack.*", re.I)],
                 #wm_instance_class=[re.compile(".*slack.*", re.I)]

@@ -85,6 +85,7 @@ series9_config = {
         'slack': 6,
         'hangouts': 7,
         'discord': 8,
+        'whatsapp': 8,
     },
     'term1_key': 'F11',
     'term2_key': 'F12',
