@@ -30,7 +30,7 @@ laptop_autostart.update({
     #'parcellite': None,
     '/opt/trinity/bin/klipper': None,
     'slack': None,
-    'yakyak': None,
+    #'yakyak': None,
     #'discord-canary': None,
     'feh --bg-scale ~/.wallpaper': None,
     'whatsapp-web-desktop': dict(
