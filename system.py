@@ -25,7 +25,7 @@ common_autostart = {
 laptop_autostart = dict(common_autostart)
 laptop_autostart.update({
     'blueman-applet': None,
-    'redshift-gtk': None,
+    #'redshift-gtk': None,
     'insync start': None,
     #'parcellite': None,
     '/opt/trinity/bin/klipper': None,
@@ -94,7 +94,7 @@ series9_config = {
 }
 
 platform_specific = {
-    'steven-series9': series9_config,
+    'series9': series9_config,
     'sydsjoseph-pc1': iress_config,
     'au02-sjosephpc2': iress_config,
 }
