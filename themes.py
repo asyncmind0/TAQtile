@@ -23,7 +23,7 @@ star_trek_blue = dict(
     foreground="#06B4E7",
     background="#010F2C",
     background_alt="#010F2C",
-    hl_foreground="#06B4E7",
+    hl_foreground="#FFFFFF",
     hl_background="#011846",
     active="#8CC3DF",
     this_current_screen_border="#5981B9",
@@ -75,7 +75,9 @@ rofi_defaults = (
     "-font '%(font)s %(fontsize)s' "
     #"-location 1 "
     "-hide-scrollbar "
-    "-width 30 "
+    "-width 50 "
     "-monitor -2 "
 ) % current_theme
-dmenu_defaults = rofi_defaults
+
+def dmenu_defaults():
+    return rofi_defaults
