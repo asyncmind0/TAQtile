@@ -1,24 +1,24 @@
 import os
 import re
-from os.path import isdir, join, pathsep
+import shlex
+from os.path import isdir, join, pathsep, dirname
 
-from plumbum.cmd import dmenu, bluetoothctl
+from plumbum.cmd import dmenu, bluetoothctl, clipmenu, xdotool
 
 from log import logger
 from recent_runner import RecentRunner
 from screens import PRIMARY_SCREEN
 from dbus_bluetooth import get_devices
+from themes import dmenu_defaults
 
 
 def dmenu_show(title, items):
-    from themes import dmenu_defaults
-    import shlex
-    dmenu_defaults = shlex.split(dmenu_defaults)
-    logger.info("DMENU: %s", dmenu_defaults)
+    dmenu_args = shlex.split(dmenu_defaults())
+    logger.info("DMENU: %s", dmenu_args)
     try:
         return (dmenu[
             "-i", "-p", "%s " % title
-            ] << "\n".join(items))(*dmenu_defaults).strip()
+            ] << "\n".join(items))(*dmenu_args).strip()
     except Exception as e:
         logger.exception("error running dmenu")
 
@@ -48,7 +48,7 @@ def list_windows(qtile, current_group=False):
         logger.info("Switch to: %s", selected)
         for window in qtile.windowMap.values():
             try:
-                if window.group and str(window.name) == str(selected):
+                if window.group and str(window.name.decode('utf8')) == str(selected):
                     logger.debug("raise %s:", window)
                     if window.group.screen:
                         qtile.cmd_to_screen(window.group.screen.index)
@@ -190,7 +190,7 @@ def list_inboxes(qtile):
             logger.debug("cmd_toggle_group")
             qtile.currentScreen.cmd_toggle_group(group)
         for window in qtile.cmd_windows():
-            if match.match(window['name']):
+            if match.match(str(window['name'])):
                 logger.debug("Matched" + str(window))
                 window = qtile.windowMap.get(window['id'])
                 qtile.currentGroup.layout.current = window
@@ -211,24 +211,17 @@ def list_inboxes(qtile):
 
 
 def dmenu_clip(qtile):
+    title = "Clipboard: "
+    dmenu_args = shlex.split(dmenu_defaults())
+    logger.info("DMENU: %s", dmenu_args)
     try:
-        recent = RecentRunner('qtile_clip')
-        selected = dmenu_show("Clip:", recent.recent())
-        #logger.debug("CLIP selected %s" % selected)
-        #logger.debug("env  %s" % os.environ['XAUTHORITY'])
-        #import clipboard
-        #clipboard.copy(selected)
-
-        try:
-            from Tkinter import Tk
-        except ImportError:
-            from tkinter import Tk
-        r = Tk()
-        r.withdraw()
-        r.clipboard_clear()
-        r.clipboard_append(selected)
-        r.after(500, r.destroy)
-        #r.update() # now it stays on the clipboard after the window is closed
-        #r.destroy()
+        xdotool(
+            "type",
+            "--clearmodifiers",
+            "--",
+            clipmenu[
+                "-i", "-p", "%s" % title
+            ](*dmenu_args).strip()
+        )
     except Exception as e:
         logger.exception("error in clip access")
