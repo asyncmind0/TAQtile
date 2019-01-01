@@ -19,6 +19,10 @@ PRIMARY_SCREEN = system.get_screen(0)
 SECONDARY_SCREEN = system.get_screen(1)
 PRIMARY_MONITOR = 0
 SECONDARY_MONITOR = 1
+try:
+    localtimezone = check_output('tzupdate -p -s 5').decode().strip()
+except:
+    localtimezone = 'Asia/Kolkata'
 
 
 def get_screens(num_monitors, num_groups, groups):
@@ -51,7 +55,7 @@ def get_screens(num_monitors, num_groups, groups):
     systray_params = default_params(icon_size=15)
     clock_params = default_params(
         padding=2,
-        format='%Y-%m-%d %a %H:%M'
+        format='%Y-%m-%d %a %H:%M',
     )
     pacman_params = default_params()
     notify_params = default_params()
@@ -59,7 +63,7 @@ def get_screens(num_monitors, num_groups, groups):
     batteryicon_params = default_params(
         charge_char='^',
         discharge_char='v',
-        battery_name="BAT1",
+        battery_name=system.get_hostconfig("battery"),
         format="{char}{percent:1.0%}",
     )
     windowtabs_params = default_params(selected=("[", "]"), separator='|')
@@ -135,8 +139,10 @@ def get_screens(num_monitors, num_groups, groups):
         #widget.Sep(**sep_params),
         #PriorityNotify(**default_params()),
         # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
-        widget.Sep(**sep_params),
+        #widget.Sep(**sep_params),
         # NotmuchCount(**default_params()),
+        widget.Sep(**sep_params),
+        widget.Volume(**default_params()),
         widget.Sep(**sep_params),
         widget.TextBox(
             "c",
@@ -166,13 +172,18 @@ def get_screens(num_monitors, num_groups, groups):
         widget.NetGraph(**netgraph_params),
         widget.Sep(**sep_params),
         # widget.Notify(width=30, **notify_params),
-        widget.Sep(**sep_params)
+        widget.Sep(**sep_params),
     ]
     if system.get_hostconfig('battery'):
         primary_bar.append(widget.Battery(**batteryicon_params))
         primary_bar.append(widget.Sep(**sep_params))
     primary_bar.append(widget.Systray(**systray_params))
-    primary_bar.append(CalClock(**clock_params))
+    primary_bar.append(
+        CalClock(
+            timezone=localtimezone,
+            **clock_params
+        )
+    )
 
     secondary_bar = [
         #widget.GroupBox(**groupbox_params),
@@ -183,7 +194,10 @@ def get_screens(num_monitors, num_groups, groups):
         widget.Sep(**sep_params),
         widget.CurrentLayout(**current_layout_params),
         widget.Sep(**sep_params),
-        CalClock(**clock_params),
+        CalClock(
+            timezone=localtimezone,
+            **clock_params
+        ),
     ]
     bar_map = {0: primary_bar, 1: secondary_bar}
     bar_height = groupbox_params.get('bar_height', 7)
@@ -191,6 +205,8 @@ def get_screens(num_monitors, num_groups, groups):
     def make_clocks(*timezones):
         widgets = []
         for timezone in timezones:
+            if timezone == localtimezone:
+                continue
             widgets.append(
                 widget.TextBox(
                     "%s:" % timezone,
@@ -208,14 +224,20 @@ def get_screens(num_monitors, num_groups, groups):
             )
         return widgets
 
-    clock_bar = bar.Bar(
-        make_clocks(
+    clock_bar = make_clocks(
             "UTC",
             "US/Eastern",
-            "Asia/Calcutta",
+            "Australia/Sydney",
+            "Asia/Kolkata",
             "Asia/Ho_Chi_Minh",
             "Asia/Riyadh",
-        ),
+    )
+    clock_bar.extend([
+        widget.Sep(**sep_params),
+        widget.Pomodoro(**groupbox_params),
+    ])
+    clock_bar = bar.Bar(
+        clock_bar,
         size=bar_height
     )
     #clock_bar.size = 0
