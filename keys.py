@@ -1,4 +1,5 @@
 import logging
+from libqtile import extension
 from libqtile.command import lazy
 from libqtile.config import Key, Match, Rule
 from extra import (
@@ -26,10 +27,65 @@ from os.path import expanduser
 from hooks import set_groups
 from log import logger
 import re
+from subprocess import check_output
+import six
+import shlex
+
+re_vol = re.compile('\[(\d?\d?\d?)%\]')
+re_touchpad = re.compile(".*TouchpadOff\s*= 1", re.DOTALL)
 
 
-samctl = "sudo /home/steven/.bin/samctl.py"
+def brightness_cmd(qtile, cmd):
+    check_output(shlex.split(cmd))
+    check_output(["dunstify", "-t", "1000", "-r", "1999990",
+                  "Brightness: %s" %
+                  check_output(["xbacklight", "-get"]).decode().strip()])
 
+def get_current_volume():
+    current_volume = 0
+    mixer_out = check_output(["amixer", "sget", "Master"])
+    if six.PY3:
+        mixer_out = mixer_out.decode()
+    if '[off]' in mixer_out:
+        current_volume = "Muted"
+    else:
+        volgroups = re_vol.search(mixer_out)
+        if volgroups:
+            current_volume = int(volgroups.groups()[0])
+        else:
+            # this shouldn't happen
+            current_volume = -1
+    return current_volume
+
+def volume_cmd(qtile, cmd):
+    check_output(shlex.split(cmd))
+    check_output(["dunstify", "-t", "1000", "-r", "1999990", "Volume: %s" % get_current_volume()])
+    check_output(["pactl", "play-sample", "audio-volume-change"])
+
+
+def volume_mute(qtile):
+    check_output(["amixer", "-q", "sset", "Master",  "toggle"])
+    check_output(["dunstify", "-t", "1000", "-r", "1999990", "Volume: %s" % get_current_volume()])
+
+def touchpad_toggle(qtile):
+    touchpad_state = check_output(["synclient", "-l"])
+    if six.PY3:
+        touchpad_state = touchpad_state.decode()
+    touchpad_state = bool(re_touchpad.search(touchpad_state))
+    if touchpad_state:
+        check_output(["synclient", "TouchpadOff=0"])
+    else:
+        check_output(["synclient", "TouchpadOff=1"])
+    check_output(["dunstify", "-t", "1000",
+                    "-r", "1999990", "Touch Pad %s" % (
+                  "On" if touchpad_state else "Off")
+                  ])
+
+def notify_spawn(qtile, cmd):
+    qtile.cmd_spawn(
+        "sh -c 'notify-send %s;pactl play-sample audio-volume-change ;%s'" %
+        cmd
+    )
 
 def get_keys(mod, num_groups, num_monitors):
     logger.debug(dmenu_defaults)
@@ -147,16 +203,17 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
         ([mod, "control"], "s", lazy.spawn("surf")),
         ([mod, "control"], "l", lazy.spawn(expanduser("~/.bin/lock"))),
-        ([mod], "F1", lazy.spawn(expanduser("~/.bin/blank"))),
+        ([mod], "F1", lazy.spawn("sh -c 'sleep 5;xset dpms force off'")),
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
-        ([mod, "shift"], "c", lazy.spawn("ksnapshot")),
-        ([mod, "shift"], "s", lazy.spawn("ksnapshot")),
+        ([mod, "shift"], "c", lazy.spawn("spectacle")),
+        ([mod, "shift"], "s", lazy.spawn("spectacle")),
         ([mod, "shift"], "m", lazy.spawn("kmag")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
         #(["control"], "Escape", lazy.spawn("ksysguard")),
         #([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_defaults)),
         #([mod, "control"], "v", lazy.function(dmenu_xclip, dmenu_defaults)),
-        (["shift", mod], "v", lazy.function(dmenu_clip)),
+        (["mod1", "control"], "v", lazy.spawn("clipmenu")),
+        #(["shift", mod], "v", lazy.function(dmenu_clip)),
         #([], "XF86Launch1", lazy.function(
         #    RaiseWindowOrSpawn(
         #        wmname='tail', cmd='st -t tail -e sudo journalctl -xf',
@@ -307,25 +364,43 @@ def get_keys(mod, num_groups, num_monitors):
 
     laptop_keys = [
         # laptop keys
-        ([], "XF86MonBrightnessUp", lazy.spawn("%s -s up" % samctl)),
-        ([], "XF86MonBrightnessDown", lazy.spawn("%s -s down" % samctl)),
-        ([], "XF86KbdBrightnessUp", lazy.spawn("%s -k up" % samctl)),
-        ([], "XF86KbdBrightnessDown", lazy.spawn("%s -k down" % samctl)),
+        ([], "XF86MonBrightnessUp", lazy.function(
+            brightness_cmd,
+            get_hostconfig('brightness_up'))),
+        ([], "XF86MonBrightnessDown", lazy.function(
+            brightness_cmd,
+            get_hostconfig('brightness_down'))),
+        ([], "XF86KbdBrightnessUp", lazy.spawn(
+            get_hostconfig('kbd_brightness_up'))),
+        ([], "XF86KbdBrightnessDown", lazy.spawn(
+            get_hostconfig('kbd_brightness_down'))),
         # Media controls
+        ([], "XF86TouchpadToggle", lazy.function(
+            touchpad_toggle
+            )),
+        ([], "XF86AudioLowerVolume", lazy.function(
+            volume_cmd,
+            get_hostconfig("volume_down"))),
+        ([], "XF86AudioRaiseVolume", lazy.function(
+            volume_cmd,
+            get_hostconfig("volume_up"))),
         ([], "XF86LaunchB", lazy.function(RaiseWindowOrSpawn(
             wmclass='Pavucontrol', cmd='pavucontrol'))),
         ([], "XF86Launch1", lazy.function(RaiseWindowOrSpawn(
             wmclass='Pavucontrol', cmd='pavucontrol'))),
-        # ([], "XF86AudioMute", lazy.spawn("pavucontrol")),
-        #([], "XF86AudioLowerVolume", lazy.spawn("samctl.py -v down")),
-        #([], "XF86AudioRaiseVolume", lazy.spawn("samctl.py -v up")),
+        ([], "XF86AudioMute", lazy.function(volume_mute)),
         ([], "XF86AudioPlay", lazy.spawn("mpc toggle")),
         ([], "XF86AudioPause", lazy.spawn("mpc toggle")),
         ([], "XF86AudioPrev", lazy.spawn("mpc prev")),
         ([], "XF86AudioNext", lazy.spawn("mpc next")),
         ([], "XF86WLAN", lazy.spawn(
             expanduser("~/.bin/mobilenet"))),
-        ([mod], "F5", lazy.function(list_windows)),
+        ([mod], "F5", lazy.run_extension(
+           extension.WindowList(
+               command='rofi -dmenu',
+               dmenu_lines=10,
+               background=current_theme['background'],
+            ))),
         ([mod], "F4", lazy.function(SwitchToWindowGroup(
             'htop', 'htop', screen=SECONDARY_SCREEN,
             spawn=terminal('htop', 'htop')))),
