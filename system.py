@@ -24,14 +24,12 @@ common_autostart = {
 
 laptop_autostart = dict(common_autostart)
 laptop_autostart.update({
+    'wicd-client': None,
     'blueman-applet': None,
     'redshift-gtk': None,
     'insync start': None,
     #'parcellite': None,
-    '/opt/trinity/bin/klipper': None,
     'slack': None,
-    #'yakyak': None,
-    #'discord-canary': None,
     'feh --bg-scale ~/.wallpaper': None,
     'whatsapp-web-desktop': dict(
         process_filter="whatsapp",
@@ -47,33 +45,9 @@ default_config = {
     'term2_key': 'F12',
     'term3_key': 'F9',
     'term4_key': 'F10',
-}
-iress_config = {
-    'screens': {0: 0, 1: 1},
-    'battery': False,
-    'laptop': False,
-    'autostart-once': common_autostart,
-    'screen_affinity': {
-        'mail': 1,
-        },
-    'group_affinity': {
-        'mail': 1,
-        'browser': 1,
-        'virtualbox': 4,
-        'rdesktop': 5,
-    },
-    'term1_key': 'XF86Launch5',
-    'term2_key': 'XF86Launch6',
-}
-series9_config = {
-    'screens': {0: 1, 1: 0},
-    'battery': True,
-    'laptop': True,
+    'volume_up': 'pactl set-sink-volume @DEFAULT_SINK@ +5000',
+    'volume_down': 'pactl set-sink-volume @DEFAULT_SINK@ -5000',
     'autostart-once': laptop_autostart,
-    'screen_affinity': {
-        'mail': 1,
-        'emulator': 2,
-    },
     'group_affinity': {
         'emulator': 3,
         'mail': 1,
@@ -87,16 +61,32 @@ series9_config = {
         'discord': 8,
         'whatsapp': 8,
     },
-    'term1_key': 'F11',
-    'term2_key': 'F12',
-    'term3_key': 'F9',
-    'term4_key': 'F10',
+    'screen_affinity': {
+        'mail': 1,
+        'emulator': 2,
+    },
+}
+series9_config = {
+    'screens': {0: 1, 1: 0},
+    'laptop': True,
+    'brightness_up': "sudo /home/steven/.bin/samctl.py -s up",
+    'brightness_down': "sudo /home/steven/.bin/samctl.py -s down",
+    'kbd_brightness_up': "sudo /home/steven/.bin/samctl.py -k up",
+    'kbd_brightness_down': "sudo /home/steven/.bin/samctl.py -skdown",
+    'battery': 'BAT1',
+}
+zenbook1=  {
+    'laptop': True,
+    'battery': 'BAT0',
+    'brightness_up': "xbacklight -inc 10",
+    'brightness_down': "xbacklight -dec 10",
+    'kbd_brightness_up': "asus-kbd-backlight up",
+    'kbd_brightness_down': "asus-kbd-backlight down",
 }
 
 platform_specific = {
+    'zenbook1': zenbook1,
     'steven-series9': series9_config,
-    'sydsjoseph-pc1': iress_config,
-    'au02-sjosephpc2': iress_config,
 }
 
 
@@ -104,7 +94,9 @@ host = platform.node().split('.', 1)[0].lower()
 
 
 def get_hostconfig(key, default=None):
-    return platform_specific.get(host, default_config).get(key, default)
+    config = dict(default_config)
+    config.update(platform_specific.get(host, default_config))
+    return config.get(key, default)
 
 
 def get_screen(index):
