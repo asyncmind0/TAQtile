@@ -65,6 +65,8 @@ default_config = {
         'mail': 1,
         'emulator': 2,
     },
+    'dual_monitor': "xrandr --output eDP-1 --noprimary --mode 1600x900 --output HDMI-1 --mode 1920x1080 --left-of eDP-1 --rotate normal",
+    'single_monitor': "xrandr --output eDP-1 --mode 1600x900 --output HDMI-1 --off",
 }
 series9_config = {
     'screens': {0: 1, 1: 0},

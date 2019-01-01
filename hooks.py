@@ -56,9 +56,9 @@ def startup():
         logger.debug("Num MONS:%s", num_mons)
         # logger.debug("Num DeSKTOPS:%s", len(qtile.screens))
         if num_mons > 1:
-            commands["dualmonitor"] = None
+            commands[get_hostconfig('dual_monitor')] = None
         elif num_mons == 1:
-            commands["rightmonitor"] = None
+            commands[get_hostconfig('single_monitor')] = None
 
         for command, kwargs in commands.items():
             execute_once(command, qtile=hook.qtile, **(kwargs if kwargs else {}))
