@@ -39,7 +39,7 @@ floating_layout = layout.Floating(
         {'wname': 'shrapnel'},
         {'wname': 'Copying'},
         {'wmclass': 'Kgpg'},
-        {'wmclass': 'Insync.py'},
+        #{'wmclass': 'Insync.py'},
     ],
     auto_float_types=[
         "notification",
@@ -78,10 +78,9 @@ class NoTimerFilter(logging.Filter):
     def filter(self, record):
         return 'timer' not in record.getMessage()
 
-
 def main(self):
     self.logger = init_log(
-        log_level=logging.DEBUG,
+        log_level=logging.INFO,
     )
 
 

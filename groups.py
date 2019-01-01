@@ -234,16 +234,6 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             group=get_group_affinity("discord"),
             break_on_match=False,
         ),
-
-        Rule(
-            Match(
-                wm_class=[re.compile("insync.*", re.I)],
-                wm_instance_class=[re.compile("insync.*", re.I)]
-            ),
-            #float=True,
-            static=True,
-            break_on_match=True
-        ),
         Rule(
             Match(
                 title="shrapnel",
