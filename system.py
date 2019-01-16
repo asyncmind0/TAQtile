@@ -24,7 +24,7 @@ common_autostart = {
 
 laptop_autostart = dict(common_autostart)
 laptop_autostart.update({
-    'wicd-client': None,
+    "nm-applet": None,
     'blueman-applet': None,
     'redshift-gtk': None,
     'insync start': None,
@@ -56,7 +56,7 @@ default_config = {
         'devtools': 2,
         'rdesktop': 15,
         'virtualbox': 4,
-        'slack': 6,
+        'slack': 16,
         'hangouts': 7,
         'discord': 8,
         'whatsapp': 8,
@@ -65,8 +65,6 @@ default_config = {
         'mail': 1,
         'emulator': 2,
     },
-    'dual_monitor': "xrandr --output eDP-1 --noprimary --mode 1600x900 --output HDMI-1 --mode 1920x1080 --left-of eDP-1 --rotate normal",
-    'single_monitor': "xrandr --output eDP-1 --mode 1600x900 --output HDMI-1 --off",
 }
 series9_config = {
     'screens': {0: 1, 1: 0},
@@ -78,12 +76,15 @@ series9_config = {
     'battery': 'BAT1',
 }
 zenbook1=  {
+    'screens': {0: 1, 1: 0},
     'laptop': True,
     'battery': 'BAT0',
     'brightness_up': "xbacklight -inc 10",
     'brightness_down': "xbacklight -dec 10",
     'kbd_brightness_up': "asus-kbd-backlight up",
     'kbd_brightness_down': "asus-kbd-backlight down",
+    'dual_monitor': "xrandr --output eDP-1 --noprimary --mode 1600x900 --output HDMI-1 --mode 1920x1080 --left-of eDP-1 --rotate normal",
+    'single_monitor': "xrandr --output eDP-1 --mode 1600x900 --output HDMI-1 --off",
 }
 
 platform_specific = {
