@@ -11,6 +11,7 @@ from widgets.multiscreengroupbox import MultiScreenGroupBox
 from widgets.priority_notify import PriorityNotify
 from widgets.tasklist2 import TaskList2
 from log import logger
+from subprocess import check_output
 
 
 log = logging.getLogger('qtile')
@@ -19,10 +20,12 @@ PRIMARY_SCREEN = system.get_screen(0)
 SECONDARY_SCREEN = system.get_screen(1)
 PRIMARY_MONITOR = 0
 SECONDARY_MONITOR = 1
+
 try:
-    localtimezone = check_output('tzupdate -p -s 5').decode().strip()
+    localtimezone = check_output(['tzupdate', '-p', '-s', '5']).decode().strip()
 except:
-    localtimezone = 'Asia/Kolkata'
+    log.exception("Failed to automatically set timezone")
+    localtimezone = 'Australia/Sydney'
 
 
 def get_screens(num_monitors, num_groups, groups):
