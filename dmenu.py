@@ -7,7 +7,7 @@ from plumbum.cmd import dmenu, bluetoothctl, clipmenu, xdotool
 
 from log import logger
 from recent_runner import RecentRunner
-from screens import PRIMARY_SCREEN
+from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from dbus_bluetooth import get_devices
 from themes import dmenu_defaults
 
@@ -142,9 +142,9 @@ def list_calendars(qtile):
             return
         recent.insert(selected)
         match = re.compile(inboxes[selected], re.I)
-        if qtile.currentScreen.index != PRIMARY_SCREEN:
+        if qtile.currentScreen.index != SECONDARY_SCREEN:
             logger.debug("cmd_to_screen")
-            qtile.cmd_to_screen(PRIMARY_SCREEN)
+            qtile.cmd_to_screen(SECONDARY_SCREEN)
         if qtile.currentGroup.name != group:
             logger.debug("cmd_toggle_group")
             qtile.currentScreen.cmd_toggle_group(group)
@@ -183,9 +183,9 @@ def list_inboxes(qtile):
             return
         recent.insert(selected)
         match = re.compile(r"^Inbox .* %s$" % selected)
-        if qtile.currentScreen.index != PRIMARY_SCREEN:
+        if qtile.currentScreen.index != SECONDARY_SCREEN:
             logger.debug("cmd_to_screen")
-            qtile.cmd_to_screen(PRIMARY_SCREEN)
+            qtile.cmd_to_screen(SECONDARY_SCREEN)
         if qtile.currentGroup.name != group:
             logger.debug("cmd_toggle_group")
             qtile.currentScreen.cmd_toggle_group(group)
