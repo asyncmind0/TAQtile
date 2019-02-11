@@ -2,6 +2,10 @@
 import logging
 import os
 from os.path import expanduser
+from log import init_log
+logger = init_log(
+    log_level=logging.DEBUG,
+)
 
 from libqtile import layout
 from libqtile.command import lazy
@@ -12,24 +16,10 @@ from keys import get_keys
 from screens import get_screens
 from system import get_num_monitors
 from themes import current_theme
-from log import init_log
 
 mod = "mod4"
 num_monitors = get_num_monitors()
 
-layouts = [
-    layout.Max(**current_theme),
-    layout.Stack(**current_theme),
-    layout.xmonad.MonadTall(ratio=0.50, **current_theme),
-    layout.Tile(**current_theme),
-    layout.Zoomy(**current_theme),
-    # layout.TreeTab(),
-    # a layout just for gimp
-    # layout.Slice('left', 192, name='gimp', role='gimp-toolbox',
-    #             fallback=layout.Slice('right', 256, role='gimp-dock',
-    #                                   fallback=layout.Stack(
-    #                                       num_stacks=1, **border_args))),
-]
 
 # Automatically float these types. This overrides the default behavior (which
 # is to also float utility types), but the default behavior breaks our fancy
@@ -69,7 +59,7 @@ dgroups_app_rules = []
 num_groups = num_monitors * 10
 
 groups = generate_groups(
-    num_groups, num_monitors, dgroups_app_rules, layouts)
+    num_groups, num_monitors, dgroups_app_rules)
 keys = get_keys(mod, num_groups, num_monitors)
 screens = get_screens(num_monitors, num_groups, groups)
 
@@ -80,7 +70,7 @@ class NoTimerFilter(logging.Filter):
 
 def main(self):
     self.logger = init_log(
-        log_level=logging.INFO,
+        log_level=logging.ERROR,
     )
 
 

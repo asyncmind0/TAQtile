@@ -199,7 +199,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         #([mod, "shift"], "b", lazy.spawn("google-chrome-stable")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
-        ([mod, "shift"], "p", lazy.function(passmenu, dmenu_defaults)),
+        ([mod, "shift"], "p", lazy.function(passmenu, dmenu_defaults())),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
         ([mod, "control"], "s", lazy.spawn("surf")),
         ([mod, "control"], "l", lazy.spawn(expanduser("~/.bin/lock"))),
@@ -212,8 +212,8 @@ def get_keys(mod, num_groups, num_monitors):
         #(["control"], "Escape", lazy.spawn("ksysguard")),
         #([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_defaults)),
         #([mod, "control"], "v", lazy.function(dmenu_xclip, dmenu_defaults)),
-        (["mod1", "control"], "v", lazy.spawn("clipmenu")),
-        #(["shift", mod], "v", lazy.function(dmenu_clip)),
+        #(["mod1", "control"], "v", lazy.spawn("clipmenu")),
+        (["control", "mod1"], "v", lazy.function(dmenu_clip)),
         #([], "XF86Launch1", lazy.function(
         #    RaiseWindowOrSpawn(
         #        wmname='tail', cmd='st -t tail -e sudo journalctl -xf',

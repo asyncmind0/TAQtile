@@ -24,7 +24,8 @@ _terminal = "st -t {0} "
 def terminal_tmux(level, session):
     return "{0} -e {1} {2} {3}".format(
         _terminal.format(session),
-        expanduser("~/.local/bin/tmux.py"),
+        #expanduser("~/.local/bin/tmux.py"),
+        "tmuxpy",
         level,
         session
     )
@@ -166,6 +167,7 @@ class SwitchToWindowGroup(object):
         if self.screen > len(qtile.screens) - 1:
             self.screen = len(qtile.screens) - 1
         if qtile.currentScreen.index != self.screen: # and qtile.currentWindow.title != self.title:
+            logger.exception("cmd_to_screen: %s" % self.screen)
             qtile.cmd_to_screen(self.screen)
         # TODO if target window exists in current group raise it and exit
         # elif qtile.currentWindow.title :
@@ -249,7 +251,7 @@ def check_restart(qtile):
 def autossh_term(
         title="autossh", port=22, host='localhost',
         session="default"):
-    autossh_py = "/home/steven/.local/bin/autossh.py"
+    autossh_py = "autosshpy"
     cmd = " ".join(
         [
             "st",

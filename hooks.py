@@ -148,18 +148,18 @@ def set_groups(*args, **kwargs):
                     logger.exception("error setting rules")
 
 
-@hook.subscribe.client_urgent_hint_changed
-def urgent_hint_changed(*args, **kwargs):
-    logger.debug("urgent_hint_changed called with %s %s", args, kwargs)
+#@hook.subscribe.client_urgent_hint_changed
+#def urgent_hint_changed(*args, **kwargs):
+#    logger.debug("urgent_hint_changed called with %s %s", args, kwargs)
 
 
-@hook.subscribe.selection_change
-def selection_change(source, selection=None):
-    #logger.debug("selection_change called with %s %s", source, selection)
-    if source == 'CLIPBOARD' and selection['selection']:
-        recent = RecentRunner('qtile_clip')
-        recent.insert(selection['selection'])
-        #logger.debug("selection_change inserted %s",  selection)
+#@hook.subscribe.selection_change
+#def selection_change(source, selection=None):
+#    #logger.debug("selection_change called with %s %s", source, selection)
+#    if source == 'CLIPBOARD' and selection['selection']:
+#        recent = RecentRunner('qtile_clip', '~/.qtile_clip.db')
+#        recent.insert(selection['selection'])
+#    logger.debug("selection_change inserted %s %s",  selection, source)
 
 #@hook.subscribe.selection_notify
 #def selection_notify(*args, **kwargs):

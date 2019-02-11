@@ -26,7 +26,7 @@ laptop_autostart = dict(common_autostart)
 laptop_autostart.update({
     "nm-applet": None,
     'blueman-applet': None,
-    'redshift-gtk': None,
+    #'redshift-gtk': None,
     'insync start': None,
     #'parcellite': None,
     'slack': None,
@@ -90,6 +90,7 @@ zenbook1=  {
 platform_specific = {
     'zenbook1': zenbook1,
     'steven-series9': series9_config,
+    'series9': series9_config,
 }
 
 

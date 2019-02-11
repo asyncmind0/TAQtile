@@ -5,8 +5,10 @@ logger = logging.getLogger("libqtile")
 
 
 def init_log(**kwargs):
-    default_init_log(
+    global logger
+    logger = default_init_log(
         log_path='~/.%s.user.log',
         #logger=logger,
         **kwargs
     )
+    return logger
