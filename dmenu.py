@@ -10,6 +10,7 @@ from recent_runner import RecentRunner
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from dbus_bluetooth import get_devices
 from themes import dmenu_defaults
+from system import get_hostconfig
 
 
 def dmenu_show(title, items):
@@ -172,17 +173,12 @@ def list_inboxes(qtile):
     group = 'mail'
     try:
         recent = RecentRunner('qtile_inbox')
-        inboxes = [
-            'melit.stevenjoseph@gmail.com',
-            'steven@stevenjoseph.in',
-            'steven@streethawk.co',
-            'stevenjose@gmail.com',
-        ]
+        inboxes = get_hostconfig('google_accounts', [])
         selected = dmenu_show("Inboxes:", recent.list(inboxes))
         if not selected:
             return
         recent.insert(selected)
-        match = re.compile(r"^Inbox .* %s$" % selected)
+        match = re.compile(r"^Inbox .* %s .*$" % selected)
         if qtile.currentScreen.index != SECONDARY_SCREEN:
             logger.debug("cmd_to_screen")
             qtile.cmd_to_screen(SECONDARY_SCREEN)

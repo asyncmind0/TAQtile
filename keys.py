@@ -212,8 +212,8 @@ def get_keys(mod, num_groups, num_monitors):
         #(["control"], "Escape", lazy.spawn("ksysguard")),
         #([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_defaults)),
         #([mod, "control"], "v", lazy.function(dmenu_xclip, dmenu_defaults)),
-        #(["mod1", "control"], "v", lazy.spawn("clipmenu")),
-        (["control", "mod1"], "v", lazy.function(dmenu_clip)),
+        (["mod1", "control"], "v", lazy.spawn("clipmenu")),
+        #(["shift", mod], "v", lazy.function(dmenu_clip)),
         #([], "XF86Launch1", lazy.function(
         #    RaiseWindowOrSpawn(
         #        wmname='tail', cmd='st -t tail -e sudo journalctl -xf',

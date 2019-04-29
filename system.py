@@ -45,8 +45,19 @@ default_config = {
     'term2_key': 'F12',
     'term3_key': 'F9',
     'term4_key': 'F10',
+    'google_accounts': [
+        'melit.stevenjoseph@gmail.com',
+        'steven@stevenjoseph.in',
+        'steven@streethawk.co',
+        'stevenjose@gmail.com',
+    ],
     'volume_up': 'pactl set-sink-volume @DEFAULT_SINK@ +5000',
     'volume_down': 'pactl set-sink-volume @DEFAULT_SINK@ -5000',
+}
+series9_config = {
+    'screens': {0: 1, 1: 0},
+    'battery': True,
+    'laptop': True,
     'autostart-once': laptop_autostart,
     'group_affinity': {
         'emulator': 3,
@@ -75,7 +86,8 @@ series9_config = {
     'kbd_brightness_down': "sudo /home/steven/.bin/samctl.py -skdown",
     'battery': 'BAT1',
 }
-zenbook1=  {
+
+zenbook1 = {
     'screens': {0: 1, 1: 0},
     'laptop': True,
     'battery': 'BAT0',
@@ -88,9 +100,9 @@ zenbook1=  {
 }
 
 platform_specific = {
+    'series9': series9_config,
     'zenbook1': zenbook1,
     'steven-series9': series9_config,
-    'series9': series9_config,
 }
 
 
@@ -190,3 +202,4 @@ def execute_once(
             logger.error("Error running %s", cmd)
     elif toggle:
         os.kill(int(pid), signal.SIGKILL)
+

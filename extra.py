@@ -6,7 +6,7 @@ from os.path import expanduser, isdir, join, pathsep
 from py_compile import compile
 from subprocess import check_output
 import re
-from system import execute_once, window_exists
+from system import execute_once, window_exists, get_hostconfig
 
 from log import logger
 try:
@@ -294,14 +294,12 @@ def show_mail(qtile):
 
 def start_inboxes(qtile):
     inboxes = {
-        'chromium --app="https://inbox.google.com/u/0/"': r"^Inbox .* melit.stevenjoseph@gmail.com$",
-        'chromium --app="https://inbox.google.com/u/1/"': r"^Inbox .* steven@streethawk.co$",
-        'chromium --app="https://inbox.google.com/u/2/"': r"^Inbox .* stevenjose@gmail.com$",
-        'chromium --app="https://inbox.google.com/u/3/"': r"^Inbox .* steven@stevenjoseph.in$",
+        'chromium --app="https://inbox.google.com/u/%s/"': r"^Inbox .* %s - Gmail$" % (n, account)
+        for n, account in enumerate(get_hostconfig('google_accounts'))
     }
     for inbox, regex in inboxes.items():
         for window in qtile.cmd_windows():
-            if re.match(regex, window['name']):
+            if re.match(regex, window['name'], re.I):
                 continue
             else:
                 qtile.spawn(inbox)
