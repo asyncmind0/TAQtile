@@ -2,7 +2,7 @@ from log import logger
 
 
 default_theme = dict(
-    padding=1,
+    padding=0,
     margin=0,
     linewidth=1,
     fontsize=12,
@@ -11,7 +11,7 @@ default_theme = dict(
     #font="ProggySquareTTSZ",
     #font="pango:monospace",
     borderwidth=1,
-    bar_height=16
+    bar_height=15
 )
 
 star_trek_blue = dict(

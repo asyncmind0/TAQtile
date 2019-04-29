@@ -5,6 +5,8 @@ from libqtile import hook
 from libqtile.layout import Slice
 from system import get_hostconfig, get_num_monitors, execute_once, hdmi_connected
 from recent_runner import RecentRunner
+from os.path import splitext, basename
+from subprocess import check_output
 
 from log import logger
 
@@ -32,6 +34,18 @@ def restart_on_randr(qtile, ev):
         prev_timestamp = cur_timestamp
 
 
+def load_sounds():
+    for sound in [
+                "/usr/share/sounds/freedesktop/stereo/audio-volume-change.oga"
+                ]:
+        check_output([
+            "pactl",
+            "upload-sample",
+            sound,
+            splitext(basename(sound))[0]
+                      ]
+        )
+
 @hook.subscribe.startup
 def startup():
     try:
@@ -42,12 +56,13 @@ def startup():
         logger.debug("Num MONS:%s", num_mons)
         # logger.debug("Num DeSKTOPS:%s", len(qtile.screens))
         if num_mons > 1:
-            commands["dualmonitor"] = None
+            commands[get_hostconfig('dual_monitor')] = None
         elif num_mons == 1:
-            commands["rightmonitor"] = None
+            commands[get_hostconfig('single_monitor')] = None
 
         for command, kwargs in commands.items():
             execute_once(command, qtile=hook.qtile, **(kwargs if kwargs else {}))
+        load_sounds()
     except Exception as e:
         logger.exception("error in startup hook")
 

@@ -68,7 +68,6 @@ class NoTimerFilter(logging.Filter):
     def filter(self, record):
         return 'timer' not in record.getMessage()
 
-
 def main(self):
     self.logger = init_log(
         log_level=logging.ERROR,
