@@ -47,6 +47,12 @@ default_config = {
     'term2_key': 'F12',
     'term3_key': 'F9',
     'term4_key': 'F10',
+    'google_accounts': [
+        'melit.stevenjoseph@gmail.com',
+        'steven@stevenjoseph.in',
+        'steven@streethawk.co',
+        'stevenjose@gmail.com',
+    ]
 }
 iress_config = {
     'screens': {0: 0, 1: 1},
@@ -194,3 +200,4 @@ def execute_once(
             logger.error("Error running %s", cmd)
     elif toggle:
         os.kill(int(pid), signal.SIGKILL)
+
