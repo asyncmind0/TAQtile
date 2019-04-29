@@ -77,15 +77,13 @@ series9_config = {
         'mail': 1,
         'emulator': 2,
     },
-}
-series9_config = {
-    'screens': {0: 1, 1: 0},
-    'laptop': True,
     'brightness_up': "sudo /home/steven/.bin/samctl.py -s up",
     'brightness_down': "sudo /home/steven/.bin/samctl.py -s down",
     'kbd_brightness_up': "sudo /home/steven/.bin/samctl.py -k up",
     'kbd_brightness_down': "sudo /home/steven/.bin/samctl.py -skdown",
     'battery': 'BAT1',
+    'dual_monitor': 'xrandr --output LVDS1 --noprimary --mode 1600x900 --output HDMI1 --mode 1920x1080 --left-of LVDS1 --rotate normal',
+    'single_monitor': "xrandr --output LVDS1 --mode 1600x900 --output HDMI-1 --off",
 }
 
 zenbook1 = {
