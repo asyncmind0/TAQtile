@@ -53,12 +53,6 @@ default_config = {
     ],
     'volume_up': 'pactl set-sink-volume @DEFAULT_SINK@ +5000',
     'volume_down': 'pactl set-sink-volume @DEFAULT_SINK@ -5000',
-}
-series9_config = {
-    'screens': {0: 1, 1: 0},
-    'battery': True,
-    'laptop': True,
-    'autostart-once': laptop_autostart,
     'group_affinity': {
         'emulator': 3,
         'mail': 1,
@@ -73,6 +67,12 @@ series9_config = {
         'whatsapp': 8,
         'android-studio': 12
     },
+}
+series9_config = {
+    'screens': {0: 1, 1: 0},
+    'battery': True,
+    'laptop': True,
+    'autostart-once': laptop_autostart,
     'screen_affinity': {
         'mail': 1,
         'emulator': 2,
