@@ -19,8 +19,8 @@ def is_blacklisted(owner_id):
     if not blacklist:
         return False
 
-    if owner_id in hook.qtile.windowMap:
-        owner = hook.qtile.windowMap[owner_id].window
+    if owner_id in hook.qtile.windows_map:
+        owner = hook.qtile.windows_map[owner_id].window
     else:
         owner = xcbq.Window(hook.qtile.conn, owner_id)
 

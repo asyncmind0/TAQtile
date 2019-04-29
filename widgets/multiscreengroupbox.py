@@ -47,7 +47,7 @@ class MultiScreenGroupBox(widget.GroupBox):
                     text_color = self.this_current_screen_border
                 else:
                     if self.bar.screen.group.name == g.name:
-                        if self.qtile.currentScreen == self.bar.screen:
+                        if self.qtile.current_screen == self.bar.screen:
                             border = self.this_current_screen_border
                             to_highlight = True
                         else:

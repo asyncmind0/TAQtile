@@ -83,7 +83,7 @@ class NoTimerFilter(logging.Filter):
 
 def main(self):
     self.logger = init_log(
-        log_level=logging.ERROR,
+        log_level=logging.INFO,
     )
 
 

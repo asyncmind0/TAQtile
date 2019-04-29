@@ -29,7 +29,7 @@ def passmenu(qtile, args):
             [
                 join(dirname(__file__), "bin", "passinsert"),
                 selection,
-                str(qtile.currentWindow.window.wid),
+                str(qtile.current_window.window.wid),
             ]
         )
         recent.insert(selection)

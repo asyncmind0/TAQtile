@@ -91,11 +91,32 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             ),
             Rule(
                 Match(
+                    wm_class=["jetbrains-studio", ]
+                ),
+                group=get_group_affinity('android-studio'),
+                fullscreen=False,
+                #break_on_match=True,
+            ),
+            Rule(
+                Match(
+                    wm_class=["Screenkey"]
+                )
+            ),
+            Rule(
+                Match(
                     title=[re.compile("^Android Emulator.*"), re.compile("^Emulator.*")]
                 ),
                 float=True,
                 intrusive=True,
                 group=get_group_affinity("emulator"),
+            ),
+            Rule(
+                Match(
+                    wm_class=["jetbrains-studio", ]
+                ),
+                group=get_group_affinity('android-studio'),
+                fullscreen=False,
+                #break_on_match=True,
             ),
             Rule(Match(wm_class=["Screenkey"]), float=True, intrusive=True),
             Rule(

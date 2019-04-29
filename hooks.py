@@ -102,7 +102,7 @@ def rules_shrapnel(client):
 
 @hook.subscribe.client_managed
 def set_groups(*args, **kwargs):
-    for client in hook.qtile.windowMap.values():
+    for client in hook.qtile.windows_map.values():
         for rule in hook.qtile.dgroups.rules:
             if rule.matches(client):
                 try:
@@ -125,14 +125,14 @@ def set_groups(*args, **kwargs):
                         client.cmd_bring_to_front()
                     center = getattr(rule, 'center', False)
                     if center:
-                        logger.debug(dir(hook.qtile.currentScreen))
+                        logger.debug(dir(hook.qtile.current_screen))
                         client.tweak_float(
-                            x=(hook.qtile.currentScreen.width/2) - (client.width/2),
-                            y=(hook.qtile.currentScreen.height/2) - (client.height/2)
+                            x=(hook.qtile.current_screen.width/2) - (client.width/2),
+                            y=(hook.qtile.current_screen.height/2) - (client.height/2)
                         )
                     #current_screen = getattr(rule, 'current_screen', False)
                     #if current_screen:
-                    #    client.to_group(hook.qtile.currentScreen.group)
+                    #    client.to_group(hook.qtile.current_screen.group)
                     geometry = getattr(rule, 'geometry', False)
                     if geometry:
                         client.place(

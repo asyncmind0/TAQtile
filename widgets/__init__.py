@@ -58,8 +58,8 @@ class CalClock(Clock):
     def button_press(self, x, y, button):
         #self.qtile.cmd_spawn("calendar_applet.py")
         try:
-            self.qtile.currentScreen.bottom.show(
-                not self.qtile.currentScreen.bottom.is_show())
+            self.qtile.current_screen.bottom.show(
+                not self.qtile.current_screen.bottom.is_show())
         except:
             logger.exception("error")
         execute_once("kworldclock", qtile=self.qtile, toggle=True)

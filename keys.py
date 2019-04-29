@@ -19,6 +19,7 @@ from dmenu import (
     list_calendars,
     dmenu_clip,
 )
+from system import get_hostconfig, get_group_affinity, get_screen_affinity
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_defaults
@@ -234,10 +235,13 @@ def get_keys(mod, num_groups, num_monitors):
         #    'monitor', 'monitor', screen=PRIMARY_SCREEN,
         #    spawn=terminal_tmux('outer', 'monitor')))),
         ([], "F6", lazy.function(SwitchToScreenGroup(
-            "6", preferred_screen=SECONDARY_SCREEN))),
+            "6",
+            preferred_screen=PRIMARY_SCREEN))),
         ([mod], "F6", lazy.function(list_bluetooth)),
         ([], "F7", lazy.function(SwitchToScreenGroup(
             "7", preferred_screen=SECONDARY_SCREEN))),
+        ([], "F8", lazy.function(SwitchToScreenGroup(
+            "8", preferred_screen=SECONDARY_SCREEN))),
         (
             [], "F9", lazy.function(
                 SwitchToWindowGroup(

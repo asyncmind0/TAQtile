@@ -71,6 +71,7 @@ series9_config = {
         'hangouts': 7,
         'discord': 8,
         'whatsapp': 8,
+        'android-studio': 12
     },
     'screen_affinity': {
         'mail': 1,
@@ -164,7 +165,7 @@ def hdmi_connected():
 
 
 def window_exists(qtile, regex):
-    for window in qtile.windowMap.values():
+    for window in qtile.windows_map.values():
         if regex.match(window.name):
             return True
         wm_class = window.window.get_wm_class()

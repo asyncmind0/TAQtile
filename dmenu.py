@@ -33,12 +33,12 @@ def list_windows(qtile, current_group=False):
 
     if current_group:
         window_titles = [
-            w.name for w in qtile.groupMap[qtile.currentGroup.name].windows
+            w.name for w in qtile.groupMap[qtile.current_group.name].windows
             if w.name != "<no name>"
         ]
     else:
         window_titles = [
-            title_format(w) for w in qtile.windowMap.values() if w.name != "<no name>"
+            title_format(w) for w in qtile.windows_map.values() if w.name != "<no name>"
         ]
     logger.info(window_titles)
 
@@ -47,7 +47,7 @@ def list_windows(qtile, current_group=False):
             group, selected = selected.split(']', 1)
         selected = selected.strip()
         logger.info("Switch to: %s", selected)
-        for window in qtile.windowMap.values():
+        for window in qtile.windows_map.values():
             try:
                 if window.group and str(window.name.decode('utf8')) == str(selected):
                     logger.debug("raise %s:", window)
@@ -55,14 +55,14 @@ def list_windows(qtile, current_group=False):
                         qtile.cmd_to_screen(window.group.screen.index)
                     else:
                         window.group.cmd_toscreen()
-                    qtile.currentGroup.focus(window, False)
+                    qtile.current_group.focus(window, False)
                     return True
             except Exception as e:
                 logger.exception("error in group")
         return True
 
     process_selected(dmenu_show(
-        qtile.currentGroup.name if current_group else "*",
+        qtile.current_group.name if current_group else "*",
         window_titles,
     ))
 
@@ -143,19 +143,19 @@ def list_calendars(qtile):
             return
         recent.insert(selected)
         match = re.compile(inboxes[selected], re.I)
-        if qtile.currentScreen.index != SECONDARY_SCREEN:
+        if qtile.current_screen.index != SECONDARY_SCREEN:
             logger.debug("cmd_to_screen")
             qtile.cmd_to_screen(SECONDARY_SCREEN)
-        if qtile.currentGroup.name != group:
+        if qtile.current_group.name != group:
             logger.debug("cmd_toggle_group")
-            qtile.currentScreen.cmd_toggle_group(group)
+            qtile.current_screen.cmd_toggle_group(group)
         for window in qtile.cmd_windows():
             if match.match(window['name']):
                 logger.debug("Matched" + str(window))
-                window = qtile.windowMap.get(window['id'])
-                qtile.currentGroup.layout.current = window
+                window = qtile.windows_map.get(window['id'])
+                qtile.current_group.layout.current = window
                 logger.debug("layout.focus")
-                qtile.currentGroup.layout.focus(window)
+                qtile.current_group.layout.focus(window)
                 break
         else:
             cmd = (
@@ -179,23 +179,23 @@ def list_inboxes(qtile):
             return
         recent.insert(selected)
         match = re.compile(r"^Inbox .* %s .*$" % selected)
-        if qtile.currentScreen.index != SECONDARY_SCREEN:
+        if qtile.current_screen.index != SECONDARY_SCREEN:
             logger.debug("cmd_to_screen")
             qtile.cmd_to_screen(SECONDARY_SCREEN)
-        if qtile.currentGroup.name != group:
+        if qtile.current_group.name != group:
             logger.debug("cmd_toggle_group")
-            qtile.currentScreen.cmd_toggle_group(group)
+            qtile.current_screen.cmd_toggle_group(group)
         for window in qtile.cmd_windows():
             if match.match(str(window['name'])):
                 logger.debug("Matched" + str(window))
-                window = qtile.windowMap.get(window['id'])
-                qtile.currentGroup.layout.current = window
+                window = qtile.windows_map.get(window['id'])
+                qtile.current_group.layout.current = window
                 logger.debug("layout.focus")
-                qtile.currentGroup.layout.focus(window)
+                qtile.current_group.layout.focus(window)
                 break
         else:
             cmd = (
-                'chromium --app="https://inbox.google.com/u/%s/"' %
+                'chromium --app="https://mail.google.com/mail/u/%s/#inbox"' %
                 selected
             )
 
