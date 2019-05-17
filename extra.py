@@ -293,16 +293,3 @@ def show_mail(qtile):
         notification.show()
     except Exception:
         logger.exception("Error querying notmuch")
-
-
-def start_inboxes(qtile):
-    inboxes = {
-        'chromium --app="https://inbox.google.com/u/%s/"': r"^Inbox .* %s - Gmail$" % (n, account)
-        for n, account in enumerate(get_hostconfig('google_accounts'))
-    }
-    for inbox, regex in inboxes.items():
-        for window in qtile.cmd_windows():
-            if re.match(regex, window['name'], re.I):
-                continue
-            else:
-                qtile.spawn(inbox)
