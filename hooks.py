@@ -112,7 +112,7 @@ def set_groups(*args, **kwargs):
                             client.enablemaximize()
                         else:
                             client.enablemaximize(state=4)
-                    if getattr(rule, 'static', False):
+                    if getattr(client, 'static', False):
                         client.static(0)
                     if getattr(rule, 'opacity', False):
                         client.cmd_opacity(rule.opacity)

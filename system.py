@@ -15,11 +15,12 @@ import glob
 mod = "mod4"
 
 common_autostart = {
-    #'xcompmgr': None,
+    'xcompmgr': None,
     #'klipper': None,
-    #'xscreensaver -nosplash': None,
+    'xscreensaver -nosplash': None,
     expanduser('~/.bin/xstartup'): None,
-#    'setxkbmap -option \'ctrl:swapcaps\'': None,
+    'xset s off -dpms': None,
+    'setxkbmap -option \'ctrl:swapcaps\'': None,
 }
 
 laptop_autostart = dict(common_autostart)
@@ -39,7 +40,8 @@ laptop_autostart.update({
 
 desktop_autostart = dict(common_autostart)
 desktop_autostart.update({
-    'jabberel-tray.py': None})
+    'jabberel-tray.py': None
+})
 default_config = {
     'term1_key': 'F11',
     'term2_key': 'F12',
@@ -96,6 +98,7 @@ zenbook1 = {
     'kbd_brightness_down': "asus-kbd-backlight down",
     'dual_monitor': "xrandr --output eDP-1 --noprimary --mode 1600x900 --output HDMI-1 --mode 1920x1080 --left-of eDP-1 --rotate normal",
     'single_monitor': "xrandr --output eDP-1 --mode 1600x900 --output HDMI-1 --off",
+    'autostart-once': laptop_autostart,
 }
 
 platform_specific = {
