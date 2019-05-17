@@ -10,7 +10,7 @@ from recent_runner import RecentRunner
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from dbus_bluetooth import get_devices
 from themes import dmenu_defaults
-from system import get_hostconfig
+from system import get_hostconfig, window_exists
 
 
 def dmenu_show(title, items):
@@ -178,21 +178,18 @@ def list_inboxes(qtile):
         if not selected:
             return
         recent.insert(selected)
-        match = re.compile(r"^Inbox .* %s .*$" % selected)
         if qtile.current_screen.index != SECONDARY_SCREEN:
             logger.debug("cmd_to_screen")
             qtile.cmd_to_screen(SECONDARY_SCREEN)
         if qtile.current_group.name != group:
             logger.debug("cmd_toggle_group")
             qtile.current_screen.cmd_toggle_group(group)
-        for window in qtile.cmd_windows():
-            if match.match(str(window['name'])):
-                logger.debug("Matched" + str(window))
-                window = qtile.windows_map.get(window['id'])
-                qtile.current_group.layout.current = window
-                logger.debug("layout.focus")
-                qtile.current_group.layout.focus(window)
-                break
+        if window_exists(qtile, re.compile(r"mail.google.com__mail_u_%s" % selected, re.I)):
+            logger.debug("Matched" + str(window))
+            window = qtile.windows_map.get(window['id'])
+            qtile.current_group.layout.current = window
+            logger.debug("layout.focus")
+            qtile.current_group.layout.focus(window)
         else:
             cmd = (
                 'chromium --app="https://mail.google.com/mail/u/%s/#inbox"' %
