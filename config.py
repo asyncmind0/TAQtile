@@ -67,7 +67,7 @@ follow_mouse_focus = True
 bring_front_click = True
 cursor_warp = False
 auto_fullscreen = True
-widget_defaults = {}
+widget_defaults = current_theme
 dgroups_app_rules = []
 num_groups = num_monitors * 10
 

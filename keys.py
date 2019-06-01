@@ -297,16 +297,16 @@ def get_keys(mod, num_groups, num_monitors):
             lazy.function(
                 SwitchToWindowGroup(
                     'azure_left',
-                    title='azure_left',
+                    title='bison_left',
                     screen=PRIMARY_SCREEN,
                     spawn=[
                         dict(
                             cmd=autossh_term(
-                                title="azure_left",
+                                title="bison_left",
                                 host="salt.streethawk.com",
                                 session="left"
                             ),
-                            match="azure_left",
+                            match="bison_left",
                         ),
                         dict(
                             cmd=autossh_term(
@@ -326,16 +326,16 @@ def get_keys(mod, num_groups, num_monitors):
             lazy.function(
                 SwitchToWindowGroup(
                     'azure_right',
-                    title='azure_right',
+                    title='bison_right',
                     screen=SECONDARY_SCREEN,
                     spawn=[
                         dict(
                             cmd=autossh_term(
-                                title="azure_right",
+                                title="bison_right",
                                 host="salt.streethawk.com",
                                 session="right"
                             ),
-                            match="azure_right"
+                            match="bison_right"
                         ),
                         dict(
                             cmd=autossh_term(

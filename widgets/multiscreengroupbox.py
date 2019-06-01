@@ -1,4 +1,5 @@
 from libqtile import widget
+from system import get_current_screen
 from log import logger
 
 
@@ -47,7 +48,7 @@ class MultiScreenGroupBox(widget.GroupBox):
                     text_color = self.this_current_screen_border
                 else:
                     if self.bar.screen.group.name == g.name:
-                        if self.qtile.current_screen == self.bar.screen:
+                        if get_current_screen(self.qtile) == self.bar.screen:
                             border = self.this_current_screen_border
                             to_highlight = True
                         else:

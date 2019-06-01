@@ -144,8 +144,8 @@ def get_screens(num_monitors, num_groups, groups):
         # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
         #widget.Sep(**sep_params),
         # NotmuchCount(**default_params()),
-        widget.Sep(**sep_params),
-        widget.Volume(**default_params()),
+        #widget.Sep(**sep_params),
+        #widget.Volume(update_interval=1, **default_params()),
         widget.Sep(**sep_params),
         widget.TextBox(
             "c",

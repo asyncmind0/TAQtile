@@ -6,7 +6,7 @@ from os.path import expanduser, isdir, join, pathsep
 from py_compile import compile
 from subprocess import check_output
 import re
-from system import execute_once, window_exists, get_hostconfig
+from system import execute_once, window_exists, get_hostconfig, get_current_screen, get_current_window, get_current_group, get_windows_map
 
 from log import logger
 try:
@@ -48,12 +48,12 @@ class SwitchToScreen(object):
         if(self.preferred_screen is not None and
            self.preferred_screen <= max_screen):
             screen = qtile.screens[self.preferred_screen]
-            if self.preferred_screen != qtile.current_screen.index:
+            if self.preferred_screen != get_current_screen(qtile).index:
                 qtile.cmd_to_screen(self.preferred_screen)
-                if qtile.current_group.name == self.name:
+                if get_current_group(qtile).name == self.name:
                     return
         else:
-            screen = qtile.current_screen
+            screen = get_current_screen(qtile)
 
         try:
             index = int(self.name)
@@ -76,12 +76,12 @@ class SwitchToScreenGroup(SwitchToScreen):
 class SwitchToScreenGroupUrgent(SwitchToScreenGroup):
     def __call__(self, qtile):
         screen, index = super(SwitchToScreenGroupUrgent, self).__call__(qtile)
-        cg = qtile.current_group
+        cg = get_current_group(qtile)
         for group in qtile.groupMap.values():
             if group == cg:
                 continue
             if len([w for w in group.windows if w.urgent]) > 0:
-                qtile.current_screen.setGroup(group)
+                get_current_screen(qtile).setGroup(group)
                 return
 
 
@@ -91,27 +91,27 @@ class MoveToGroup(object):
 
     def __call__(self, qtile):
         logging.debug(
-            "MoveToGroup:%s:%s", qtile.current_screen.index, self.name)
+            "MoveToGroup:%s:%s", get_current_screen(qtile).index, self.name)
         index = int(self.name)
-        screenindex = qtile.current_screen.index
+        screenindex = get_current_screen(qtile).index
         if screenindex > 0:
             index = index + (screenindex * 10)
         index = str(index)
-        qtile.current_window.cmd_togroup(index)
+        get_current_window(qtile).cmd_togroup(index)
 
 
 def move_to_next_group(qtile):
-    index = qtile.groups.index(qtile.current_group) + 1
+    index = qtile.groups.index(get_current_group(qtile)) + 1
     if len(qtile.groups) == index:
         index = 0
-    qtile.current_window.cmd_togroup(qtile.groups[index].name)
+    get_current_window(qtile).cmd_togroup(qtile.groups[index].name)
 
 
 def move_to_prev_group(qtile):
-    index = qtile.groups.index(qtile.current_group) - 1
+    index = qtile.groups.index(get_current_group(qtile)) - 1
     if index < 0:
         index = len(qtile.groups) - 1
-    qtile.current_window.cmd_togroup(qtile.groups[index].name)
+    get_current_window(qtile).cmd_togroup(qtile.groups[index].name)
 
 
 class MoveToOtherScreenGroup(object):
@@ -119,12 +119,12 @@ class MoveToOtherScreenGroup(object):
         self.direction = -1 if prev else 1
 
     def __call__(self, qtile):
-        logger.error("MoveToOtherScreenGroup:%s", qtile.current_screen.index)
-        otherscreen = (qtile.screens.index(qtile.current_screen)
+        logger.error("MoveToOtherScreenGroup:%s", get_current_screen(qtile).index)
+        otherscreen = (qtile.screens.index(get_current_screen(qtile))
                        + self.direction) % len(qtile.screens)
         othergroup = qtile.screens[otherscreen].group.name
-        if qtile.current_window:
-            qtile.current_window.cmd_togroup(othergroup)
+        if get_current_window(qtile):
+            get_current_window(qtile).cmd_togroup(othergroup)
 
 
 class SwitchToWindowGroup(object):
@@ -139,10 +139,10 @@ class SwitchToWindowGroup(object):
             self.cmd = []
 
     def raise_window(self, qtile):
-        for window in qtile.windows_map.values():
+        for window in get_windows_map(qtile).values():
             if window.group and window.match(wname=self.title):
                 logger.debug("Raise window %s", window)
-                qtile.current_group.focus(window, False)
+                get_current_group(qtile).focus(window, False)
 
     def spawn_ifnot(self, qtile):
         cmds = []
@@ -166,7 +166,7 @@ class SwitchToWindowGroup(object):
         self.spawn_ifnot(qtile)
         if self.screen > len(qtile.screens) - 1:
             self.screen = len(qtile.screens) - 1
-        if qtile.current_screen.index != self.screen: # and qtile.currentWindow.title != self.title:
+        if get_current_screen(qtile).index != self.screen: # and qtile.currentWindow.title != self.title:
             try:
                 logger.info("cmd_to_screen: %s" % self.screen)
                 qtile.cmd_to_screen(self.screen)
@@ -176,7 +176,7 @@ class SwitchToWindowGroup(object):
         # elif qtile.currentWindow.title :
         else:
             try:
-                qtile.current_screen.cmd_toggle_group(self.name)
+                get_current_screen(qtile).cmd_toggle_group(self.name)
             except Exception as e:
                 logger.exception("wierd")
         self.raise_window(qtile)
@@ -207,12 +207,12 @@ class RaiseWindowOrSpawn(object):
 
     def __call__(self, qtile):
 
-        for window in qtile.windows_map.values():
+        for window in get_windows_map(qtile).values():
             if window.group and window.match(
                     wname=self.wmname, wmclass=self.wmclass):
-                #window.cmd_to_screen(qtile.current_screen.index)
+                #window.cmd_to_screen(get_current_screen(qtile).index)
                 logger.debug("Match: %s", self.wmname)
-                #window.cmd_togroup(qtile.current_group.name)
+                #window.cmd_togroup(get_current_group(qtile).name)
                 self.window = window
                 break
 
@@ -232,7 +232,7 @@ class RaiseWindowOrSpawn(object):
                 "transet-df %s -i %s" % (self.alpha, window.window.wid),
                 qtile=qtile
             )
-        logger.error("Current group: %s", qtile.current_group.name)
+        logger.error("Current group: %s", get_current_group(qtile).name)
         execute_once(self.cmd, process_filter=self.cmd_match, qtile=qtile)
 
 

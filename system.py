@@ -166,7 +166,7 @@ def hdmi_connected():
 
 
 def window_exists(qtile, regex):
-    for window in qtile.windows_map.values():
+    for window in get_windows_map(qtile).values():
         if regex.match(window.name):
             return True
         wm_class = window.window.get_wm_class()
@@ -205,3 +205,27 @@ def execute_once(
     elif toggle:
         os.kill(int(pid), signal.SIGKILL)
 
+
+def get_current_screen(qtile):
+    try:
+        return qtile.current_screen
+    except AttributeError:
+        return qtile.currentScreen
+
+def get_current_window(qtile):
+    try:
+        return qtile.current_window
+    except AttributeError:
+        return qtile.currentWindow
+
+def get_current_group(qtile):
+    try:
+        return qtile.current_group
+    except AttributeError:
+        return qtile.currentGroup
+
+def get_windows_map(qtile):
+    try:
+        return qtile.windows_map
+    except AttributeError:
+        return qtile.windowMap

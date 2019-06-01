@@ -5,11 +5,11 @@ default_theme = dict(
     padding=0,
     margin=0,
     linewidth=1,
-    fontsize=12,
-    font="Inconsolata",
+    fontsize=10,
+    #font="Inconsolata",
     #font="Terminus",
     #font="ProggySquareTTSZ",
-    #font="pango:monospace",
+    font="pango:monospace",
     borderwidth=1,
     bar_height=15
 )

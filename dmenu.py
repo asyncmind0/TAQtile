@@ -10,7 +10,7 @@ from recent_runner import RecentRunner
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from dbus_bluetooth import get_devices
 from themes import dmenu_defaults
-from system import get_hostconfig, window_exists
+from system import get_hostconfig, window_exists, get_windows_map, get_current_screen, get_current_group
 
 
 def dmenu_show(title, items):
@@ -33,12 +33,12 @@ def list_windows(qtile, current_group=False):
 
     if current_group:
         window_titles = [
-            w.name for w in qtile.groupMap[qtile.current_group.name].windows
+            w.name for w in qtile.groupMap[get_current_group(qtile).name].windows
             if w.name != "<no name>"
         ]
     else:
         window_titles = [
-            title_format(w) for w in qtile.windows_map.values() if w.name != "<no name>"
+            title_format(w) for w in get_windows_map(qtile).values() if w.name != "<no name>"
         ]
     logger.info(window_titles)
 
@@ -47,7 +47,7 @@ def list_windows(qtile, current_group=False):
             group, selected = selected.split(']', 1)
         selected = selected.strip()
         logger.info("Switch to: %s", selected)
-        for window in qtile.windows_map.values():
+        for window in get_windows_map(qtile).values():
             try:
                 if window.group and str(window.name.decode('utf8')) == str(selected):
                     logger.debug("raise %s:", window)
@@ -55,14 +55,14 @@ def list_windows(qtile, current_group=False):
                         qtile.cmd_to_screen(window.group.screen.index)
                     else:
                         window.group.cmd_toscreen()
-                    qtile.current_group.focus(window, False)
+                    get_current_group(qtile).focus(window, False)
                     return True
             except Exception as e:
                 logger.exception("error in group")
         return True
 
     process_selected(dmenu_show(
-        qtile.current_group.name if current_group else "*",
+        get_current_group(qtile).name if current_group else "*",
         window_titles,
     ))
 
@@ -143,19 +143,19 @@ def list_calendars(qtile):
             return
         recent.insert(selected)
         match = re.compile(inboxes[selected], re.I)
-        if qtile.current_screen.index != SECONDARY_SCREEN:
+        if get_current_screen(qtile).index != SECONDARY_SCREEN:
             logger.debug("cmd_to_screen")
             qtile.cmd_to_screen(SECONDARY_SCREEN)
-        if qtile.current_group.name != group:
+        if get_current_group(qtile).name != group:
             logger.debug("cmd_toggle_group")
-            qtile.current_screen.cmd_toggle_group(group)
+            get_current_screen(qtile).cmd_toggle_group(group)
         for window in qtile.cmd_windows():
             if match.match(window['name']):
                 logger.debug("Matched" + str(window))
-                window = qtile.windows_map.get(window['id'])
-                qtile.current_group.layout.current = window
+                window = get_windows_map(qtile).get(window['id'])
+                get_current_group(qtile).layout.current = window
                 logger.debug("layout.focus")
-                qtile.current_group.layout.focus(window)
+                get_current_group(qtile).layout.focus(window)
                 break
         else:
             cmd = (
@@ -178,18 +178,18 @@ def list_inboxes(qtile):
         if not selected:
             return
         recent.insert(selected)
-        if qtile.current_screen.index != SECONDARY_SCREEN:
+        if get_current_screen(qtile).index != SECONDARY_SCREEN:
             logger.debug("cmd_to_screen")
             qtile.cmd_to_screen(SECONDARY_SCREEN)
-        if qtile.current_group.name != group:
+        if get_current_group(qtile).name != group:
             logger.debug("cmd_toggle_group")
-            qtile.current_screen.cmd_toggle_group(group)
+            get_current_screen(qtile).cmd_toggle_group(group)
         if window_exists(qtile, re.compile(r"mail.google.com__mail_u_%s" % selected, re.I)):
             logger.debug("Matched" + str(window))
-            window = qtile.windows_map.get(window['id'])
-            qtile.current_group.layout.current = window
+            window = get_windows_map(qtile).get(window['id'])
+            get_current_group(qtile).layout.current = window
             logger.debug("layout.focus")
-            qtile.current_group.layout.focus(window)
+            get_current_group(qtile).layout.focus(window)
         else:
             cmd = (
                 'chromium --app="https://mail.google.com/mail/u/%s/#inbox"' %
