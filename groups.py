@@ -255,6 +255,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 init=True,
                 matches=[
                     Match(wm_class=["Kmail", "Kontact"]),
+                    Match(wm_class=[re.compile("mail.google.com__mail_u_.*")]),
                     Match(title=[re.compile("^Inbox .*")]),
                     Match(
                         role=[

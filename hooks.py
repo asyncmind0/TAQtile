@@ -3,7 +3,7 @@ import os
 from random import randint
 from libqtile import hook
 from libqtile.layout import Slice
-from system import get_hostconfig, get_num_monitors, execute_once, hdmi_connected
+from system import get_hostconfig, get_num_monitors, execute_once, hdmi_connected, get_windows_map
 from recent_runner import RecentRunner
 from os.path import splitext, basename
 from subprocess import check_output
@@ -102,7 +102,7 @@ def rules_shrapnel(client):
 
 @hook.subscribe.client_managed
 def set_groups(*args, **kwargs):
-    for client in list(hook.get_windows_map(qtile).values()):
+    for client in list(get_windows_map(hook.qtile).values()):
         for rule in hook.qtile.dgroups.rules:
             if rule.matches(client):
                 try:
@@ -112,8 +112,8 @@ def set_groups(*args, **kwargs):
                             client.enablemaximize()
                         else:
                             client.enablemaximize(state=4)
-                    if getattr(client, 'static', False):
-                        client.static(0)
+                    #if getattr(client, 'static', False):
+                    #    client.static(0)
                     if getattr(rule, 'opacity', False):
                         client.cmd_opacity(rule.opacity)
                     if rule.group and getattr(client, 'togroup', None):

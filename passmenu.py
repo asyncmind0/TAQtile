@@ -7,6 +7,7 @@ from recent_runner import RecentRunner
 from log import logger
 from plumbum import local
 from time import sleep
+from system import get_current_window
 
 MAX_PASS = 200
 
@@ -29,7 +30,7 @@ def passmenu(qtile, args):
             [
                 join(dirname(__file__), "bin", "passinsert"),
                 selection,
-                str(qtile.current_window.window.wid),
+                str(get_current_window(qtile).window.wid),
             ]
         )
         recent.insert(selection)

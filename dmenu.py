@@ -185,8 +185,8 @@ def list_inboxes(qtile):
             logger.debug("cmd_toggle_group")
             get_current_screen(qtile).cmd_toggle_group(group)
         if window_exists(qtile, re.compile(r"mail.google.com__mail_u_%s" % selected, re.I)):
-            logger.debug("Matched" + str(window))
             window = get_windows_map(qtile).get(window['id'])
+            logger.debug("Matched" + str(window))
             get_current_group(qtile).layout.current = window
             logger.debug("layout.focus")
             get_current_group(qtile).layout.focus(window)

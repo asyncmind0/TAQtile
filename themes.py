@@ -5,13 +5,13 @@ default_theme = dict(
     padding=0,
     margin=0,
     linewidth=1,
-    fontsize=10,
+    fontsize=11,
     #font="Inconsolata",
     #font="Terminus",
     #font="ProggySquareTTSZ",
     font="pango:monospace",
     borderwidth=1,
-    bar_height=15
+    bar_height=13
 )
 
 star_trek_blue = dict(

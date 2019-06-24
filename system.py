@@ -72,7 +72,6 @@ default_config = {
 }
 series9_config = {
     'screens': {0: 1, 1: 0},
-    'battery': True,
     'laptop': True,
     'autostart-once': laptop_autostart,
     'screen_affinity': {
@@ -84,10 +83,16 @@ series9_config = {
     'kbd_brightness_up': "sudo /home/steven/.bin/samctl.py -k up",
     'kbd_brightness_down': "sudo /home/steven/.bin/samctl.py -skdown",
     'battery': 'BAT1',
-    'dual_monitor': 'xrandr --output LVDS1 --noprimary --mode 1600x900 --output HDMI1 --mode 1920x1080 --left-of LVDS1 --rotate normal',
+    'dual_monitor': (
+        'xrandr --output LVDS1 --noprimary --mode 1600x900 '
+        ' --output HDMI1 --mode 1920x1080 --left-of LVDS1 --rotate normal'
+    ),
     'single_monitor': "xrandr --output LVDS1 --mode 1600x900 --output HDMI-1 --off",
 }
-
+monitors_series9 = {
+    'monitor1': 'eDP-1-1',
+    'monitor2': 'HDMI-1-1',
+}
 zenbook1 = {
     'screens': {0: 1, 1: 0},
     'laptop': True,
@@ -96,8 +101,16 @@ zenbook1 = {
     'brightness_down': "xbacklight -dec 10",
     'kbd_brightness_up': "asus-kbd-backlight up",
     'kbd_brightness_down': "asus-kbd-backlight down",
-    'dual_monitor': "xrandr --output eDP-1 --noprimary --mode 1600x900 --output HDMI-1 --mode 1920x1080 --left-of eDP-1 --rotate normal",
-    'single_monitor': "xrandr --output eDP-1 --mode 1600x900 --output HDMI-1 --off",
+    'dual_monitor': (
+        "xrandr --output "
+        "{monitor1} --noprimary --mode 1600x900 --output "
+        "{monitor2} --mode 1920x1080 --left-of {monitor1} "
+        "--rotate normal" % monitors_series9
+    ),
+    'single_monitor': (
+        "xrandr --output {monitor1} --mode 1600x900 "
+        "--output {monitor2} --off" % monitors_series9
+    ),
     'autostart-once': laptop_autostart,
 }
 
