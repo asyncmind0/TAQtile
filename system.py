@@ -185,8 +185,7 @@ def window_exists(qtile, regex):
         wm_class = window.window.get_wm_class()
         logger.debug(wm_class)
         if wm_class and any(map(regex.match, wm_class)):
-            return True
-    return False
+            return window
 
 
 def execute_once(

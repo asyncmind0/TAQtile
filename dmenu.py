@@ -184,12 +184,13 @@ def list_inboxes(qtile):
         if get_current_group(qtile).name != group:
             logger.debug("cmd_toggle_group")
             get_current_screen(qtile).cmd_toggle_group(group)
-        if window_exists(qtile, re.compile(r"mail.google.com__mail_u_%s" % selected, re.I)):
-            window = get_windows_map(qtile).get(window['id'])
+        window = window_exists(qtile, re.compile(r"mail.google.com__mail_u_%s" % selected, re.I))
+        if window:
+            window = get_windows_map(qtile).get(window.window.wid)
             logger.debug("Matched" + str(window))
-            get_current_group(qtile).layout.current = window
+            window.cmd_togroup(group)
             logger.debug("layout.focus")
-            get_current_group(qtile).layout.focus(window)
+            get_current_group(qtile).focus(window)
         else:
             cmd = (
                 'chromium --app="https://mail.google.com/mail/u/%s/#inbox"' %
