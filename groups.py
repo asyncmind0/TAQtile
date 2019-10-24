@@ -171,9 +171,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             ),
             Rule(
                 Match(
-                    title=[re.compile(r"slack.*", re.I)]
-                    # wm_class=[re.compile(".*slack.*", re.I)],
-                    # wm_instance_class=[re.compile(".*slack.*", re.I)]
+                    wm_class=[re.compile(".*slack.*", re.I)],
                 ),
                 group=get_group_affinity("slack"),
                 break_on_match=False,
