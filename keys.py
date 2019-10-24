@@ -405,9 +405,12 @@ def get_keys(mod, num_groups, num_monitors):
                dmenu_lines=10,
                background=current_theme['background'],
             ))),
-        ([mod], "F4", lazy.function(SwitchToWindowGroup(
-            'htop', 'htop', screen=SECONDARY_SCREEN,
-            spawn=terminal('htop', 'htop')))),
+        ([mod], "F4", lazy.function(RaiseWindowOrSpawn(
+            wmname='htop',
+            cmd_match=terminal('htop', 'htop'),
+            #floating=True,
+            static=(0, 0, 0, 1424, 500),
+            cmd=terminal('htop', 'htop')))),
         #([mod], "F5", lazy.function(RaiseWindowOrSpawn(
         #    wmname='ncmpcpp',
         #    cmd='st -t {0} -e {0}'.format('ncmpcpp'),

@@ -7,9 +7,9 @@ default_theme = dict(
     linewidth=1,
     fontsize=11,
     #font="Inconsolata",
-    #font="Terminus",
+    font="Terminus",
     #font="ProggySquareTTSZ",
-    font="pango:monospace",
+    #font="pango:monospace",
     borderwidth=1,
     bar_height=13
 )

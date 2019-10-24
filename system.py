@@ -10,25 +10,23 @@ from log import logger
 import os
 import re
 import glob
+import logging
 
 
 mod = "mod4"
 
 common_autostart = {
     'xcompmgr': None,
-    #'klipper': None,
-    'xscreensaver -nosplash': None,
     expanduser('~/.bin/xstartup'): None,
-    'xset s off -dpms': None,
     'setxkbmap -option \'ctrl:swapcaps\'': None,
+    #'dropbox': None,
 }
 
 laptop_autostart = dict(common_autostart)
 laptop_autostart.update({
     "nm-applet": None,
     'blueman-applet': None,
-    #'redshift-gtk': None,
-    'insync start': None,
+    #'insync start': None,
     #'parcellite': None,
     'slack': None,
     'feh --bg-scale ~/.wallpaper': None,
@@ -105,11 +103,11 @@ zenbook1 = {
         "xrandr --output "
         "{monitor1} --noprimary --mode 1600x900 --output "
         "{monitor2} --mode 1920x1080 --left-of {monitor1} "
-        "--rotate normal" % monitors_series9
+        "--rotate normal".format(**monitors_series9)
     ),
     'single_monitor': (
         "xrandr --output {monitor1} --mode 1600x900 "
-        "--output {monitor2} --off" % monitors_series9
+        "--output {monitor2} --off".format(**monitors_series9)
     ),
     'autostart-once': laptop_autostart,
 }
@@ -200,6 +198,7 @@ def execute_once(
     except Exception as e:
         logger.debug("Not running: %s", process_filter)
     if not pid:
+        logger.debug("process not running: %s", process_filter)
         if window_regex and window_exists(qtile, window_regex):
             assert not toggle, "cannot toggle no pid"
             return
@@ -215,7 +214,10 @@ def execute_once(
         except Exception as e:
             logger.error("Error running %s", cmd)
     elif toggle:
+        logger.debug("Kill process: %s", process_filter)
         os.kill(int(pid), signal.SIGKILL)
+    else:
+        logger.debug("Not Starting: %s", cmd)
 
 
 def get_current_screen(qtile):

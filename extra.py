@@ -34,7 +34,7 @@ def terminal_tmux(level, session):
 def terminal(title, cmd=None):
     term = _terminal.format(title)
     if cmd:
-        term += " -e %s" % cmd
+        term += "-e %s" % cmd
     return term
 
 
@@ -204,6 +204,7 @@ class RaiseWindowOrSpawn(object):
         if wmname:
             from config import float_windows
             float_windows.append(wmname)
+        assert self.static in [False, None] or isinstance(self.static, (list, tuple))
 
     def __call__(self, qtile):
 
@@ -218,21 +219,22 @@ class RaiseWindowOrSpawn(object):
 
         if self.window:
             window = self.window
-            if self.static and isinstance(self.static, list):
-                window.cmd_static(*self.static)
-            elif self.floating:
+            if self.static:
+                window.static(*self.static)
+            if self.floating:
                 window.floating = self.floating
             if self.toggle or True:
                 if window.hidden:
                     window.unhide()
                 else:
                     window.hide()
+             
             logger.error("Hidden: %s %s", window.hidden, window.window.wid)
             execute_once(
-                "transet-df %s -i %s" % (self.alpha, window.window.wid),
+                "transet-df %s -i %s" % (self.alpha, window.window.id),
                 qtile=qtile
             )
-        logger.error("Current group: %s", get_current_group(qtile).name)
+        logger.debug("No window found spawning: %s", self.cmd)
         execute_once(self.cmd, process_filter=self.cmd_match, qtile=qtile)
 
 
