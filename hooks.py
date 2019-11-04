@@ -22,6 +22,10 @@ def restart_on_randr(qtile, ev):
     cur_timestamp = ev.timestamp
     num_mons = get_num_monitors()
     if len(qtile.screens) != num_mons:
+        if num_mons == 2:
+            check_output(["dualmonitor"])
+        if num_mons == 1:
+            check_output(["singlemonitor"])
         qtile.cmd_restart()
     if hdmi_connected() == prev_state:
         return
