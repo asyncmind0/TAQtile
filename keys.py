@@ -8,7 +8,7 @@ from extra import (
     check_restart,
     terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchToScreenGroup,
     RaiseWindowOrSpawn, MoveToGroup, move_to_next_group, move_to_prev_group,
-    autossh_term, show_mail)
+    autossh_term, show_mail, hide_show_bar)
 from dmenu import (
     dmenu_run,
     list_windows,
@@ -31,6 +31,7 @@ import re
 from subprocess import check_output
 import six
 import shlex
+from extensions import Surf, DmenuRunRecent
 
 re_vol = re.compile('\[(\d?\d?\d?)%\]')
 re_touchpad = re.compile(".*TouchpadOff\s*= 1", re.DOTALL)
@@ -189,7 +190,6 @@ def get_keys(mod, num_groups, num_monitors):
 
         # APP LAUNCHERS
         #([mod], "r", lazy.spawncmd()),
-        ([mod], "F2", lazy.function(dmenu_run)),
         #([mod], "F2", lazy.spawn("dmenu-run-recent %s" % dmenu_defaults)),
         ([mod], "o", lazy.function(dmenu_org)),
         #([mod], "F2", lazy.spawn("dmenu_run %s" % dmenu_defaults)),
@@ -210,6 +210,8 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "shift"], "s", lazy.spawn("spectacle")),
         ([mod, "shift"], "m", lazy.spawn("kmag")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
+        #([mod], "b", lazy.function(hide_show_bar)),
+        ([mod], "b", lazy.hide_show_bar("bottom")),
         #(["control"], "Escape", lazy.spawn("ksysguard")),
         #([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_defaults)),
         #([mod, "control"], "v", lazy.function(dmenu_xclip, dmenu_defaults)),
@@ -221,9 +223,12 @@ def get_keys(mod, num_groups, num_monitors):
         #        cmd_match="st -t tail", floating=True,
         #        toggle=True,
         #        static=[0, 100, 100, 1024, 200]))),
-        ([mod], "e", lazy.function(SwitchToWindowGroup(
-            'krusader', 'krusader', screen=SECONDARY_SCREEN,
-            spawn="krusader"))),
+        ([mod], "e", lazy.function(
+            SwitchToWindowGroup(
+                'krusader',
+                'krusader',
+                screen=SECONDARY_SCREEN,
+                spawn="krusader"))),
         # Switch groups
         ([], "F1", lazy.function(SwitchToScreenGroup("1"))),
         ([], "F2", lazy.function(SwitchToScreenGroup("2"))),
@@ -399,17 +404,56 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "XF86AudioNext", lazy.spawn("mpc next")),
         ([], "XF86WLAN", lazy.spawn(
             expanduser("~/.bin/mobilenet"))),
-        ([mod], "F5", lazy.run_extension(
+        #([mod], "F2", lazy.function(dmenu_run)),
+        ([mod], "w", lazy.run_extension(
            extension.WindowList(
-               command='rofi -dmenu',
+               dmenu_prompt="windows:",
                dmenu_lines=10,
-               background=current_theme['background'],
+               dmenu_ignorecase=True,
+               dmenu_font=current_theme['font'],
+               **current_theme
+            ))),
+        ([mod, "shift"], "w", lazy.run_extension(
+           extension.WindowList(
+               dmenu_prompt="windows:",
+               all_groups=False,
+               dmenu_lines=10,
+               dmenu_ignorecase=True,
+               dmenu_font=current_theme['font'],
+               **current_theme
+            ))),
+        (
+            [mod], "u",
+            lazy.group["scratch"].dropdown_toggle("xterm")
+        ),
+        (
+            [mod, "shift"], "h",
+            lazy.group["scratch"].dropdown_toggle("htop")
+        ),
+        (
+            [mod], "F11",
+            lazy.group["scratch"].dropdown_toggle("pavucontrol")
+        ),
+        (
+            [mod], "g",
+            lazy.group["surf"].toscreen(),
+            lazy.run_extension(
+                Surf(
+                    dmenu_lines=10,
+                    dmenu_ignorecase=True,
+                    **current_theme
+                )),
+        ),
+        ([mod], "F2", lazy.run_extension(
+            DmenuRunRecent(
+               dmenu_lines=10,
+                **current_theme
             ))),
         ([mod], "F4", lazy.function(RaiseWindowOrSpawn(
             wmname='htop',
             cmd_match=terminal('htop', 'htop'),
-            #floating=True,
-            static=(0, 0, 0, 1424, 500),
+            floating=True,
+            #static=(0, 0, 0, 1424, 500),
             cmd=terminal('htop', 'htop')))),
         #([mod], "F5", lazy.function(RaiseWindowOrSpawn(
         #    wmname='ncmpcpp',

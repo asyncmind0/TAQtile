@@ -3,7 +3,7 @@ import re
 import shlex
 from os.path import isdir, join, pathsep, dirname
 
-from plumbum.cmd import dmenu, bluetoothctl, clipmenu, xdotool
+from plumbum.cmd import dmenu, bluetoothctl, clipmenu, xdotool, rofi
 
 from log import logger
 from recent_runner import RecentRunner
@@ -17,8 +17,11 @@ def dmenu_show(title, items):
     dmenu_args = shlex.split(dmenu_defaults())
     logger.info("DMENU: %s", dmenu_args)
     try:
-        return (dmenu[
-            "-i", "-p", "%s " % title
+        return (
+            dmenu[
+           # rofi[
+            #"-dmenu",
+                     "-i", "-p", "%s " % title
             ] << "\n".join(items))(*dmenu_args).strip()
     except Exception as e:
         logger.exception("error running dmenu")
@@ -203,6 +206,38 @@ def list_inboxes(qtile):
     except:
         logger.exception("error list_inboxes")
 
+
+def dmenu_web(qtile):
+    group = 'monit'
+    try:
+        recent = RecentRunner('qtile_web')
+        selected = dmenu_show("links:", recent.list([]))
+        if not selected:
+            return
+        recent.insert(selected)
+        if get_current_screen(qtile).index != SECONDARY_SCREEN:
+            logger.debug("cmd_to_screen")
+            qtile.cmd_to_screen(SECONDARY_SCREEN)
+        if get_current_group(qtile).name != group:
+            logger.debug("cmd_toggle_group")
+            get_current_screen(qtile).cmd_toggle_group(group)
+        window = window_exists(qtile, re.compile(r"mail.google.com__mail_u_%s" % selected, re.I))
+        if window:
+            window = get_windows_map(qtile).get(window.window.wid)
+            logger.debug("Matched" + str(window))
+            window.cmd_togroup(group)
+            logger.debug("layout.focus")
+            get_current_group(qtile).focus(window)
+        else:
+            cmd = (
+                'chromium --app="https://mail.google.com/mail/u/%s/#inbox"' %
+                selected
+            )
+
+            logger.debug(cmd)
+            qtile.cmd_spawn(cmd)
+    except:
+        logger.exception("error list_inboxes")
 
 def dmenu_clip(qtile):
     title = "Clipboard: "

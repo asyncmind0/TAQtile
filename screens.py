@@ -43,12 +43,19 @@ def get_screens(num_monitors, num_groups, groups):
         border_focus='#FFFFFF',
         is_line=False,
         center_aligned=True,
+        hide_unused=True,
+        spacing=2,
+        bar_height=15,
     )
     tasklist_params = default_params(
         selected=("[", "]"),
         rounded=False,
         border=themes.current_theme['border_focus'],
-        #foreground=themes.current_theme['foreground'],
+        icon_size=0,
+        padding=0,
+        padding_y=0,
+        margin=0,
+        foreground=themes.current_theme['foreground'],
     )
 
     #prompt_params = default_params()
@@ -203,7 +210,7 @@ def get_screens(num_monitors, num_groups, groups):
         ),
     ]
     bar_map = {0: primary_bar, 1: secondary_bar}
-    bar_height = groupbox_params.get('bar_height', 7)
+    bar_height = groupbox_params['bar_height']
 
     def make_clocks(*timezones):
         widgets = []

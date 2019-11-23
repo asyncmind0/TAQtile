@@ -50,7 +50,7 @@ def load_sounds():
                       ]
         )
 
-@hook.subscribe.startup
+#@hook.subscribe.startup
 def startup():
     try:
         # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
@@ -104,7 +104,7 @@ def rules_shrapnel(client):
         client.cmd_opacity(0.85)
 
 
-@hook.subscribe.client_managed
+#@hook.subscribe.client_managed
 def set_groups(*args, **kwargs):
     for client in list(get_windows_map(hook.qtile).values()):
         for rule in hook.qtile.dgroups.rules:

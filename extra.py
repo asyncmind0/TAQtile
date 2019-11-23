@@ -7,6 +7,8 @@ from py_compile import compile
 from subprocess import check_output
 import re
 from system import execute_once, window_exists, get_hostconfig, get_current_screen, get_current_window, get_current_group, get_windows_map
+from time import sleep
+from threading import Thread
 
 from log import logger
 try:
@@ -201,41 +203,41 @@ class RaiseWindowOrSpawn(object):
         self.toggle = toggle
         self.window = None
         self.alpha = 0.7
-        if wmname:
-            from config import float_windows
-            float_windows.append(wmname)
+        #if wmname:
+        #    from config import float_windows
+        #    float_windows.append(wmname)
         assert self.static in [False, None] or isinstance(self.static, (list, tuple))
 
     def __call__(self, qtile):
+        execute_once(self.cmd, process_filter=self.cmd_match, qtile=qtile, toggle=True)
 
         for window in get_windows_map(qtile).values():
             if window.group and window.match(
                     wname=self.wmname, wmclass=self.wmclass):
                 #window.cmd_to_screen(get_current_screen(qtile).index)
                 logger.debug("Match: %s", self.wmname)
-                #window.cmd_togroup(get_current_group(qtile).name)
+                window.cmd_togroup(get_current_group(qtile).name)
                 self.window = window
                 break
 
         if self.window:
             window = self.window
-            if self.static:
-                window.static(*self.static)
-            if self.floating:
-                window.floating = self.floating
+            #if self.static:
+            #    window.static(*self.static)
             if self.toggle or True:
                 if window.hidden:
                     window.unhide()
+                    logger.error("Window: %s", window.info()['id'])
                 else:
                     window.hide()
-             
-            logger.error("Hidden: %s %s", window.hidden, window.window.wid)
+            if self.floating:
+                window.floating = self.floating
             execute_once(
-                "transet-df %s -i %s" % (self.alpha, window.window.id),
-                qtile=qtile
+                "transet-df -n %s %s " % (window.name, self.alpha),
+                #qtile=qtile
             )
+             
         logger.debug("No window found spawning: %s", self.cmd)
-        execute_once(self.cmd, process_filter=self.cmd_match, qtile=qtile)
 
 
 def check_restart(qtile):
@@ -295,3 +297,11 @@ def show_mail(qtile):
         notification.show()
     except Exception:
         logger.exception("Error querying notmuch")
+
+
+def hide_show_bar(qtile):
+    def timer():
+        qtile.cmd_hide_show_bar()
+        sleep(1)
+        qtile.cmd_hide_show_bar()
+    Thread(None, timer).start()

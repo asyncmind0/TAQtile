@@ -2,13 +2,14 @@ import logging
 import re
 
 from libqtile import layout
-from libqtile.config import Group, Match, Rule as QRule
+from libqtile.config import Group, Match, Rule as QRule, ScratchPad, DropDown
 
 from system import get_hostconfig, get_group_affinity, get_screen_affinity
 from themes import current_theme
 from collections import OrderedDict
 from screens import SECONDARY_SCREEN, PRIMARY_SCREEN
 from itertools import chain
+from extra import terminal
 
 from log import logger
 
@@ -272,6 +273,13 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                     Match(wm_instance_class=[re.compile("calendar.google.com.*")])
                 ],
             ),
+            "surf": dict(
+                screen_affinity=SECONDARY_SCREEN,  # get_screen_affinity('mail'),
+                persist=False,
+                matches=[
+                    Match(wm_instance_class=["surf"])
+                ],
+            ),
             "term1": dict(
                 screen_affinity=PRIMARY_SCREEN,
                 exclusive=False,
@@ -336,5 +344,24 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 str(i), **group_args.get(str(i), {"layout": "max", "layouts": layouts})
             )
         )
-
+    groups.append(
+        ScratchPad(
+            'scratch',
+            dropdowns=[
+                DropDown(
+                    name='xterm',
+                    cmd='xterm',
+                ),
+                DropDown(
+                    name='htop',
+                    cmd='st -t htop -e htop',
+                ),
+                DropDown(
+                    name='pavucontrol',
+                    cmd='pavucontrol',
+                    height=1,
+                ),
+            ]
+        )
+    )
     return groups

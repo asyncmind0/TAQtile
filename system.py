@@ -11,6 +11,7 @@ import os
 import re
 import glob
 import logging
+from functools import lru_cache
 
 
 mod = "mod4"
@@ -147,6 +148,7 @@ def get_group_affinity(app):
     return str(ret)
 
 
+@lru_cache(maxsize=1)
 def get_num_monitors():
     #import Xlib.display
     #display = Xlib.display.Display(':0')

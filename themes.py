@@ -49,25 +49,20 @@ current_theme = dict(default_theme)
 current_theme.update(star_trek_blue)
 #current_theme.update(matrix_green)
 logger.debug("Current theme:%s", current_theme)
-#current_theme = matrix_green
-#dmenu_defaults = (
-#    "-w -f -l 40 "
-#    "-nb black -nf white "
-#    "-sb %(background)s -sf %(foreground)s "
-#    "-fn %(font)s"
-#) % current_theme
+dmenu_options = (
+    "-l 10 "
+    "-nb '%(background)s' "
+    "-nf '%(foreground)s' "
+    "-sb %(hl_background)s "
+    "-sf %(hl_foreground)s "
+    "-fn %(font)s"
+) % current_theme
 
-#dmenu_defaults = (
-#    "-w -f -l 40 "
-#    "-nb #000000 -nf #FFFFFF "
-#    "-bg #000000 -fg %(foreground)s "
-#    "-font '%(font)s %(fontsize)s' "
-#    "-bgalt '#001400' "
-#    "-location 1 "
-#) % current_theme
 
-rofi_defaults = (
-    "-f -l 10 -bw 1 "
+rofi_options = (
+    "-i "
+    "-f -bw 1 "
+    "-l 10 "
     "-separator-style solid "
     "-color-window '%(background)s,%(foreground)s' "
     "-color-normal '%(background)s,%(foreground)s,"
@@ -77,7 +72,11 @@ rofi_defaults = (
     "-hide-scrollbar "
     "-width 50 "
     "-monitor -2 "
+    "-no-fixed-num-lines "
+    "-padding 3 "
+    "-line-margin 0 "
 ) % current_theme
 
 def dmenu_defaults():
-    return rofi_defaults
+    return dmenu_options
+    #return rofi_options
