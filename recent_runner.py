@@ -67,3 +67,9 @@ class RecentRunner:
         else:
             sql = "insert into %s values (?, ?, ?)" % self.dbname
             return c.execute(sql, (now, command, 1))
+
+
+if __name__ == '__main__':
+    import sys
+    recent_runner = RecentRunner(sys.argv[0])
+    import ipdb; ipdb.set_trace() ######## FIXME:REMOVE ME steven.joseph ################

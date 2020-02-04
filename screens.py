@@ -61,7 +61,7 @@ def get_screens(num_monitors, num_groups, groups):
     #prompt_params = default_params()
     current_layout_params = default_params(
         name="default", border='#000000')
-    #windowname_params = default_params
+    windowname_params = default_params()
     systray_params = default_params(icon_size=15)
     clock_params = default_params(
         padding=2,
@@ -131,8 +131,8 @@ def get_screens(num_monitors, num_groups, groups):
         #widget.Sep(**sep_params),
         #widget.Prompt(**prompt_params),
         widget.Sep(**sep_params),
-        TaskList2(**tasklist_params),
-        # widget.WindowName(**windowname_params),
+        #TaskList2(**tasklist_params),
+        widget.WindowName(**windowname_params),
         # widget.TextBox(**layout_textbox_params),
         widget.Sep(**sep_params),
         widget.CurrentLayout(**current_layout_params),
@@ -200,7 +200,8 @@ def get_screens(num_monitors, num_groups, groups):
         MultiScreenGroupBox(
             namemap=mon_map[SECONDARY_SCREEN], **groupbox_params),
         widget.Sep(**sep_params),
-        TaskList2(**tasklist_params),
+        #TaskList2(**tasklist_params),
+        widget.WindowName(**windowname_params),
         widget.Sep(**sep_params),
         widget.CurrentLayout(**current_layout_params),
         widget.Sep(**sep_params),
@@ -236,10 +237,11 @@ def get_screens(num_monitors, num_groups, groups):
 
     clock_bar = make_clocks(
             "UTC",
+            "US/Central",
+            "Asia/Ho_Chi_Minh",
             "US/Eastern",
             "Australia/Sydney",
             "Asia/Kolkata",
-            "Asia/Ho_Chi_Minh",
             "Asia/Riyadh",
     )
     clock_bar.extend([

@@ -15,27 +15,27 @@ prev_timestamp = 0
 prev_state = hdmi_connected()
 
 
-@hook.subscribe.screen_change
+#@hook.subscribe.screen_change
 def restart_on_randr(qtile, ev):
-    logger.debug("Screen change: %s", ev.__dict__)
+    logger.error("Screen change: %s", ev.__dict__)
     global event_cntr, prev_timestamp
     cur_timestamp = ev.timestamp
     num_mons = get_num_monitors()
-    if len(qtile.screens) != num_mons:
-        if num_mons == 2:
-            check_output(["dualmonitor"])
-        if num_mons == 1:
-            check_output(["singlemonitor"])
-        qtile.cmd_restart()
-    if hdmi_connected() == prev_state:
-        return
-    if abs(prev_timestamp - cur_timestamp) > 1000:
-        # if num_screens != get_num_monitors():
-        # signal.signal(signal.SIGCHLD, signal.SIG_DFL)
-        print("RESTART screen change")
-        qtile.cmd_restart()
-    else:
-        prev_timestamp = cur_timestamp
+    #if len(qtile.screens) != num_mons:
+    if num_mons == 2:
+        check_output(["dualmonitor"])
+    elif num_mons == 1:
+        check_output(["singlemonitor"])
+    qtile.cmd_restart()
+    #if hdmi_connected() == prev_state:
+    #    return
+    #if abs(prev_timestamp - cur_timestamp) > 1000:
+    #    # if num_screens != get_num_monitors():
+    #    # signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+    #    print("RESTART screen change")
+    #    qtile.cmd_restart()
+    #else:
+    #    prev_timestamp = cur_timestamp
 
 
 def load_sounds():

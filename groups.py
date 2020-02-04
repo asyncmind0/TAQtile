@@ -152,11 +152,11 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 group=get_group_affinity("devtools"),
                 break_on_match=True,
             ),
-            Rule(
-                Match(role=[re.compile("^browser$")], wm_class=["webmacs"]),
-                group=get_group_affinity("browser"),
-                break_on_match=False,
-            ),
+            #Rule(
+            #    Match(role=[re.compile("^browser$")], wm_class=["webmacs"]),
+            #    group=get_group_affinity("browser"),
+            #    break_on_match=False,
+            #),
             Rule(
                 Match(title=[re.compile(r"^Hangouts$"), re.compile(r"^yakyak$", re.I)]),
                 group=get_group_affinity("hangouts"),
@@ -273,11 +273,12 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                     Match(wm_instance_class=[re.compile("calendar.google.com.*")])
                 ],
             ),
-            "surf": dict(
-                screen_affinity=SECONDARY_SCREEN,  # get_screen_affinity('mail'),
+            "browser": dict(
+                screen_affinity=PRIMARY_SCREEN,  # get_screen_affinity('mail'),
                 persist=False,
                 matches=[
-                    Match(wm_instance_class=["surf"])
+                    Match(wm_instance_class=["surf"]),
+                    Match(role=[re.compile("^browser$")], wm_class=["webmacs"]),
                 ],
             ),
             "term1": dict(
