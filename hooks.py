@@ -33,7 +33,7 @@ def restart_on_randr(qtile, ev):
         # if num_screens != get_num_monitors():
         # signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         print("RESTART screen change")
-        qtile.cmd_restart()
+        #qtile.cmd_restart()
     else:
         prev_timestamp = cur_timestamp
 
