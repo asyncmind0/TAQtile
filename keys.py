@@ -202,7 +202,6 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
         ([mod, "shift"], "p", lazy.function(passmenu, dmenu_defaults())),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
-        ([mod, "control"], "s", lazy.spawn("surf")),
         ([mod, "control"], "l", lazy.spawn(expanduser("~/.bin/lock"))),
         ([mod], "F1", lazy.spawn("sh -c 'sleep 5;xset dpms force off'")),
         #([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
@@ -230,7 +229,7 @@ def get_keys(mod, num_groups, num_monitors):
                 screen=SECONDARY_SCREEN,
                 spawn="krusader"))),
         # Switch groups
-        ([], "F1", lazy.function(SwitchToScreenGroup("1"))),
+        ([], "F1", lazy.function(SwitchToScreenGroup("browser"))),
         ([], "F2", lazy.function(SwitchToScreenGroup("2"))),
 
         #([], "Menu", lazy.function(SwitchToWindowGroup(
@@ -436,11 +435,12 @@ def get_keys(mod, num_groups, num_monitors):
         ),
         (
             [mod], "g",
-            lazy.group["surf"].toscreen(),
+            lazy.group["browser"].toscreen(),
             lazy.run_extension(
                 Surf(
                     dmenu_lines=10,
                     dmenu_ignorecase=True,
+                    item_format="* {window}",
                     **current_theme
                 )),
         ),

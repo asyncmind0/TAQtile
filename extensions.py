@@ -3,6 +3,7 @@ from log import logger
 from os import system
 from recent_runner import RecentRunner
 from dmenu import list_executables
+from plumbum.cmd import surf
 
 
 class Surf(Dmenu):
@@ -11,7 +12,7 @@ class Surf(Dmenu):
     """
 
     defaults = [
-        ("item_format", "{window}", "the format for the menu items"),
+        ("item_format", "* {window}", "the format for the menu items"),
         ("all_groups", True, "If True, list windows from all groups; otherwise only from the current group"),
         ("dmenu_lines", "80", "Give lines vertically. Set to None get inline"),
     ]
@@ -39,7 +40,11 @@ class Surf(Dmenu):
                 if win.window.get_wm_class()[0] != 'surf':
                     continue
                 item = self.item_format.format(
-                    group=win.group.label or win.group.name, id=id, window=win.name)
+                    group=win.group.label
+                    or win.group.name,
+                    id=id,
+                    window=win.name
+                )
                 self.item_to_win[item] = win
                 id += 1
 
@@ -48,7 +53,7 @@ class Surf(Dmenu):
         #logger.info(self.item_to_win)
         recent = RecentRunner(self.dbname)
         out = super().run(
-            items=set(
+            items=(
                 [x for x in self.item_to_win.keys()] +
                 [x for x in recent.list([])]
             )
@@ -64,20 +69,29 @@ class Surf(Dmenu):
             screen.set_group("surf")
             return
 
-        recent.insert(sout)
+        recent.insert(
+            sout[2:]
+            if sout.startswith('*')
+            else sout
+        )
         try:
             win = self.item_to_win[sout]
         except KeyError:
             # The selected window got closed while the menu was open?
             if sout.startswith('http'):
-                system("surf %s")
+                self.qtile.cmd_spawn("surf %s" % sout.strip())
             elif sout:
-                system("surf https://www.google.com/search?q='%s'&ie=utf-8&oe=utf-8" % sout)
+                self.qtile.cmd_spawn("surf https://www.google.com/search?q='%s'&ie=utf-8&oe=utf-8" % sout)
             return
 
         screen.set_group(win.group)
         win.group.focus(win)
-        logger.info(win.window.get_property('_SURF_URI', 'STRING').value.to_string())
+        logger.info(
+            win.window.get_property(
+                '_SURF_URI',
+                'STRING'
+            ).value.to_string()
+        )
 
 
 class DmenuRunRecent(DmenuRun):
