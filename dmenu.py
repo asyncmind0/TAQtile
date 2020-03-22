@@ -114,10 +114,10 @@ def dmenu_org(qtile):
 def list_bluetooth(qtile):
     recent = RecentRunner('qtile_bluetooth')
     devices = get_devices()['/org/bluez/hci0']['devices']
-    all_devices = dict([
-        (device['Alias'], device['Address'])
+    all_devices = {
+        device['Alias']: device['Address']
         for device in devices.values()
-    ])
+    }
     selected = dmenu_show("Bluetooth:", recent.list(all_devices.keys()))
     if not selected:
         return
@@ -142,7 +142,7 @@ def list_calendars(qtile):
             'steven@streethawk.co': "Streethawk - Calendar.*$",
         }
         selected = dmenu_show("Calendars:", recent.list(inboxes.keys()))
-        if not selected:
+        if not selected or selected not in inboxes.keys():
             return
         recent.insert(selected)
         match = re.compile(inboxes[selected], re.I)
@@ -154,7 +154,7 @@ def list_calendars(qtile):
             get_current_screen(qtile).cmd_toggle_group(group)
         for window in qtile.cmd_windows():
             if match.match(window['name']):
-                logger.debug("Matched" + str(window))
+                logger.debug("Matched %%", str(window))
                 window = get_windows_map(qtile).get(window['id'])
                 get_current_group(qtile).layout.current = window
                 logger.debug("layout.focus")
@@ -178,7 +178,7 @@ def list_inboxes(qtile):
         recent = RecentRunner('qtile_inbox')
         inboxes = get_hostconfig('google_accounts', [])
         selected = dmenu_show("Inboxes:", recent.list(inboxes))
-        if not selected:
+        if not selected or selected not in inboxes:
             return
         recent.insert(selected)
         if get_current_screen(qtile).index != SECONDARY_SCREEN:
@@ -190,7 +190,7 @@ def list_inboxes(qtile):
         window = window_exists(qtile, re.compile(r"mail.google.com__mail_u_%s" % selected, re.I))
         if window:
             window = get_windows_map(qtile).get(window.window.wid)
-            logger.debug("Matched" + str(window))
+            logger.debug("Matched %s", str(window))
             window.cmd_togroup(group)
             logger.debug("layout.focus")
             get_current_group(qtile).focus(window)
