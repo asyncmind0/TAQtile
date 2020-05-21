@@ -47,7 +47,7 @@ class Clock(widget.Clock):
             zoneinfo = timezone("UTC")
             return zoneinfo.localize(
                 datetime.utcnow() + self.DELTA
-            ).astimezone(timezone(self.timezone)).strftime(self.format)
+            ).astimezone(timezone(str(self.timezone))).strftime(self.format)
         else:
             return self._get_time()
 
