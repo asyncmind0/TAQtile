@@ -275,7 +275,8 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             ),
             "browser": dict(
                 screen_affinity=PRIMARY_SCREEN,  # get_screen_affinity('mail'),
-                persist=False,
+                init=True,
+                persist=True,
                 matches=[
                     Match(wm_instance_class=["surf"]),
                     Match(role=[re.compile("^browser$")], wm_class=["webmacs"]),

@@ -13,6 +13,7 @@ import glob
 import logging
 from functools import lru_cache
 
+# TODO https://confuse.readthedocs.io/en/latest/
 
 mod = "mod4"
 
@@ -20,14 +21,16 @@ common_autostart = {
     'xcompmgr': None,
     expanduser('~/.bin/xstartup'): None,
     'setxkbmap -option \'ctrl:swapcaps\'': None,
-    #'dropbox': None,
+    "surf 'https://grafana-bison.streethawk.com/d/000000005/bison-riak?refresh=15m'": None,
+    "surf 'https://grafana-bison.streethawk.com/d/000000003/bison-rabbitmq?orgId=1&from=now-1h&to=now&refresh=5m'": None,
+    "surf 'https://grafana.streethawk.com/d/000000004/bison-load?orgId=1&from=now-1h&to=now&refresh=15m'": None,
 }
 
 laptop_autostart = dict(common_autostart)
 laptop_autostart.update({
-    "nm-applet": None,
     'blueman-applet': None,
-    #'insync start': None,
+    'droopbox': None,
+    'insync start': None,
     #'parcellite': None,
     'slack': None,
     'feh --bg-scale ~/.wallpaper': None,

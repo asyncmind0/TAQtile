@@ -33,8 +33,8 @@ import six
 import shlex
 from extensions import Surf, DmenuRunRecent
 
-re_vol = re.compile('\[(\d?\d?\d?)%\]')
-re_touchpad = re.compile(".*TouchpadOff\s*= 1", re.DOTALL)
+re_vol = re.compile(r'\[(\d?\d?\d?)%\]')
+re_touchpad = re.compile(r".*TouchpadOff\s*= 1", re.DOTALL)
 
 
 def brightness_cmd(qtile, cmd):
@@ -42,6 +42,7 @@ def brightness_cmd(qtile, cmd):
     check_output(["dunstify", "-t", "1000", "-r", "1999990",
                   "Brightness: %s" %
                   check_output(["xbacklight", "-get"]).decode().strip()])
+
 
 def get_current_volume():
     current_volume = 0
@@ -59,6 +60,7 @@ def get_current_volume():
             current_volume = -1
     return current_volume
 
+
 def volume_cmd(qtile, cmd):
     check_output(shlex.split(cmd))
     check_output(["dunstify", "-t", "1000", "-r", "1999990", "Volume: %s" % get_current_volume()])
@@ -68,6 +70,7 @@ def volume_cmd(qtile, cmd):
 def volume_mute(qtile):
     check_output(["amixer", "-q", "sset", "Master",  "toggle"])
     check_output(["dunstify", "-t", "1000", "-r", "1999990", "Volume: %s" % get_current_volume()])
+
 
 def touchpad_toggle(qtile):
     touchpad_state = check_output(["synclient", "-l"])
@@ -101,24 +104,25 @@ def get_keys(mod, num_groups, num_monitors):
         # Switch between windows in current stack pane
         (
             [mod], "k",
-            lazy.layout.up().when('stack'),
-            lazy.layout.up().when('max'),
-            #lazy.layout.up().when('tile'),
-            #lazy.layout.up().when('slice'),
-            #lazy.layout.previous().when('monadtall'),
-            lazy.group.prev_window().when('floating'),
-            lazy.window.bring_to_front().when("floating"),
+            lazy.layout.up(),
+            #lazy.layout.up().when('stack'),
+            #lazy.layout.up().when('max'),
+            ##lazy.layout.up().when('tile'),
+            ##lazy.layout.up().when('slice'),
+            ##lazy.layout.previous().when('monadtall'),
+            #lazy.group.prev_window().when('floating'),
+            #lazy.window.bring_to_front().when("floating"),
         ),
         (
             [mod], "j",
-            #lazy.layout.next(),
-            lazy.layout.down().when('stack'),
-            lazy.layout.down().when('max'),
-            #lazy.layout.down().when('tile'),
-            #lazy.layout.down().when('slice'),
-            #lazy.layout.next().when('monadtall'),
-            lazy.group.next_window().when('floating'),
-            lazy.window.bring_to_front().when("floating"),
+            lazy.layout.down(),
+            #lazy.layout.down().when('stack'),
+            #lazy.layout.down().when('max'),
+            ##lazy.layout.down().when('tile'),
+            ##lazy.layout.down().when('slice'),
+            ##lazy.layout.next().when('monadtall'),
+            #lazy.group.next_window().when('floating'),
+            #lazy.window.bring_to_front().when("floating"),
         ),
 
         #([mod], "k", lazy.layout.up()),

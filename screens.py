@@ -60,7 +60,7 @@ def get_screens(num_monitors, num_groups, groups):
 
     #prompt_params = default_params()
     current_layout_params = default_params(
-        name="default", border='#000000')
+        name="default")
     windowname_params = default_params()
     systray_params = default_params(icon_size=15)
     clock_params = default_params(
