@@ -7,6 +7,8 @@ from system import get_hostconfig, get_num_monitors, execute_once, hdmi_connecte
 from recent_runner import RecentRunner
 from os.path import splitext, basename
 from subprocess import check_output
+from plumbum import local
+notify_send = local['notify-send']
 
 from log import logger
 
@@ -41,8 +43,10 @@ def load_sounds():
                       ]
         )
 
-#@hook.subscribe.startup
+
+@hook.subscribe.startup
 def startup():
+    errored = False
     try:
         # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
         # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
@@ -58,8 +62,12 @@ def startup():
         for command, kwargs in commands.items():
             execute_once(command, qtile=hook.qtile, **(kwargs if kwargs else {}))
         load_sounds()
-    except Exception as e:
+    except Exception:
         logger.exception("error in startup hook")
+        errored = True
+    finally:
+        if errored:
+            notify_send("Qtile startup apps errored.") 
 
 
 @hook.subscribe.startup

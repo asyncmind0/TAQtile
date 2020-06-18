@@ -36,7 +36,7 @@ def list_windows(qtile, current_group=False):
 
     if current_group:
         window_titles = [
-            w.name for w in qtile.groupMap[get_current_group(qtile).name].windows
+            w.name for w in qtile.group_map[get_current_group(qtile).name].windows
             if w.name != "<no name>"
         ]
     else:
