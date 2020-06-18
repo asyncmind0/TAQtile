@@ -118,5 +118,13 @@ class DmenuRunRecent(DmenuRun):
         if not selected:
             return
         recent.insert(selected)
-        self.qtile.cmd_spawn(selected)
+        return Popen(
+            ["nohup", selected],
+            stdout=None,
+            stdin=None,
+            preexec_fn=os.setpgrp
+        )
+        #system("%s & disown " % selected)
+        #lazy.cmd_spawn(selected)
+        #self.qtile.cmd_spawn(selected)
         return selected
