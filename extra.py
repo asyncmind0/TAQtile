@@ -21,13 +21,14 @@ except:
 #_terminal = "alacritty -t {0} "
 _terminal = "st -t {0} "
 #_terminal = "alacritty -t {0} "
+#_terminal = "kitty --name {0} --title {0} "
 
 
 def terminal_tmux(level, session):
     return "{0} -e {1} {2} {3}".format(
         _terminal.format(session),
         #expanduser("~/.local/bin/tmux.py"),
-        "tmuxpy",
+        "tmux.py",
         level,
         session
     )

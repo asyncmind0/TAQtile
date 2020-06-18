@@ -1,9 +1,9 @@
 from libqtile.extension import Dmenu, WindowList, DmenuRun
 from log import logger
-from os import system
+import os
 from recent_runner import RecentRunner
 from dmenu import list_executables
-from plumbum.cmd import surf
+from subprocess import Popen
 
 
 class Surf(Dmenu):
