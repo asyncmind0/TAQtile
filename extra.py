@@ -80,7 +80,7 @@ class SwitchToScreenGroupUrgent(SwitchToScreenGroup):
     def __call__(self, qtile):
         screen, index = super(SwitchToScreenGroupUrgent, self).__call__(qtile)
         cg = get_current_group(qtile)
-        for group in qtile.groupMap.values():
+        for group in qtile.group_map.values():
             if group == cg:
                 continue
             if len([w for w in group.windows if w.urgent]) > 0:
