@@ -448,7 +448,8 @@ def get_keys(mod, num_groups, num_monitors):
                     **current_theme
                 )),
         ),
-        ([mod], "F2", lazy.run_extension(
+        ([mod], "F3", lazy.spawn("dmenu_run")),
+        ([mod], "space", lazy.run_extension(
             DmenuRunRecent(
                dmenu_lines=10,
                 **current_theme

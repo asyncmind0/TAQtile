@@ -110,6 +110,7 @@ class DmenuRunRecent(DmenuRun):
         super(DmenuRunRecent, self)._configure(qtile)
 
     def run(self):
+        logger.error("running")
         recent = RecentRunner(self.dbname)
         selected = super(DmenuRunRecent, self).run(
             items=[x for x in recent.list(

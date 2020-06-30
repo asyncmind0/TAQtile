@@ -47,7 +47,7 @@ class Clock(widget.Clock):
             zoneinfo = timezone("UTC")
             return zoneinfo.localize(
                 datetime.utcnow() + self.DELTA
-            ).astimezone(timezone(str(self.timezone))).strftime(self.format)
+            ).astimezone(self.timezone).strftime(self.format)
         else:
             return self._get_time()
 
@@ -67,14 +67,14 @@ class CalClock(Clock):
         #rws(self.qtile)
 
 
-class GraphHistory(widget.NetGraph):
+class GraphHistory(widget.graph.NetGraph):
     """Graph that persists history and reloads it when restarted.
     provides a continuous graph, desipite qtile restarting.
     """
     default_store = None
 
     def __init__(self, *args, **kwargs):
-        super(widget.NetGraph, self).__init__(*args, **kwargs)
+        super(widget.graph.NetGraph, self).__init__(*args, **kwargs)
 
     def push(self, value):
-        return super(widget.NetGraph, self).push(value)
+        return super(widget.graph.NetGraph, self).push(value)

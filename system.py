@@ -120,6 +120,7 @@ platform_specific = {
     'series9': series9_config,
     'zenbook1': zenbook1,
     'steven-series9': series9_config,
+    'razorjack': zenbook1,
 }
 
 
