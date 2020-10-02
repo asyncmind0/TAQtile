@@ -60,7 +60,7 @@ def startup():
             commands[get_hostconfig('single_monitor')] = None
 
         for command, kwargs in commands.items():
-            execute_once(command, qtile=hook.qtile, **(kwargs if kwargs else {}))
+            execute_once(command, **(kwargs if kwargs else {}))
         load_sounds()
     except Exception:
         logger.exception("error in startup hook")
@@ -104,11 +104,12 @@ def rules_shrapnel(client):
 
 
 #@hook.subscribe.client_managed
-def set_groups(*args, **kwargs):
-    for client in list(get_windows_map(hook.qtile).values()):
-        for rule in hook.qtile.dgroups.rules:
-            if rule.matches(client):
-                try:
+def set_groups(qtile, *args, **kwargs):
+    for client in list(get_windows_map(qtile).values()):
+        for rule in qtile.dgroups.rules:
+            logger.info("Matching %s", rule)
+            try:
+                if rule.matches(client):
                     client.floating = rule.float
                     if getattr(rule, 'fullscreen', None):
                         if rule.fullscreen:
@@ -128,10 +129,10 @@ def set_groups(*args, **kwargs):
                         client.cmd_bring_to_front()
                     center = getattr(rule, 'center', False)
                     if center:
-                        logger.debug(dir(get_current_screen(hook.qtile)))
+                        logger.debug(dir(get_current_screen(qtile)))
                         client.tweak_float(
-                            x=(get_current_screen(hook.qtile).width/2) - (client.width/2),
-                            y=(get_current_screen(hook.qtile).height/2) - (client.height/2)
+                            x=(get_current_screen(qtile).width/2) - (client.width/2),
+                            y=(get_current_screen(qtile).height/2) - (client.height/2)
                         )
                     #current_screen = getattr(rule, 'current_screen', False)
                     #if current_screen:
@@ -144,11 +145,11 @@ def set_groups(*args, **kwargs):
                             geometry['width'],
                             geometry['height'],
                             1, None, above=True, force=True)#, '00C000')
-                        
+
                     if rule.break_on_match:
                         break
-                except Exception as e:
-                    logger.exception("error setting rules")
+            except Exception as e:
+                logger.exception("error setting rules")
 
 
 #@hook.subscribe.client_urgent_hint_changed

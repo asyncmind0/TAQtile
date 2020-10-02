@@ -2,14 +2,30 @@ import logging
 
 import system
 import themes
-from libqtile import bar, widget
 from libqtile.config import Screen
-from widgets import CalClock, Clock
-from widgets.bankbalance import BankBalance
-from widgets.mail import NotmuchCount
+from widgets import (
+    CalClock,
+    Clock,
+)
+from libqtile.widget import (
+    Sep,
+    Pomodoro,
+    WindowName,
+    CurrentLayout,
+    Battery,
+    NetGraph,
+    MemoryGraph,
+    CPUGraph,
+    Systray,
+    DF,
+    TextBox,
+)
+#from widgets.bankbalance import BankBalance
+#from widgets.mail import NotmuchCount
 from widgets.multiscreengroupbox import MultiScreenGroupBox
-from widgets.priority_notify import PriorityNotify
-from widgets.tasklist2 import TaskList2
+#from widgets.priority_notify import PriorityNotify
+#from widgets.tasklist2 import TaskList2
+from widgets.bar import Bar
 from log import logger
 from subprocess import check_output
 
@@ -18,6 +34,7 @@ log = logging.getLogger('qtile')
 
 PRIMARY_SCREEN = system.get_screen(0)
 SECONDARY_SCREEN = system.get_screen(1)
+TERTIARY_SCREEN = system.get_screen(2)
 PRIMARY_MONITOR = 0
 SECONDARY_MONITOR = 1
 
@@ -111,7 +128,7 @@ def get_screens(num_monitors, num_groups, groups):
 
     group_splits = ((num_groups / num_monitors) if multi_monitor else num_groups,)
     # change labels of groups for multi monitor support
-    mon_map = {0: {}, 1: {}}
+    mon_map = {0: {}, 1: {}, 2: {}}
     mon = 0
     for i, group in enumerate(groups):
         if group.name.isdigit():
@@ -125,69 +142,69 @@ def get_screens(num_monitors, num_groups, groups):
             mon_map[group.screen_affinity][groupname] = grouplabel
 
     primary_bar = [
-        #widget.GroupBox(**groupbox_params),
+        #GroupBox(**groupbox_params),
         MultiScreenGroupBox(
             namemap=mon_map[PRIMARY_SCREEN], **groupbox_params),
-        #widget.Sep(**sep_params),
-        #widget.Prompt(**prompt_params),
-        widget.Sep(**sep_params),
+        #Sep(**sep_params),
+        #Prompt(**prompt_params),
+        Sep(**sep_params),
         #TaskList2(**tasklist_params),
-        widget.WindowName(**windowname_params),
+        WindowName(**windowname_params),
         # widget.TextBox(**layout_textbox_params),
-        widget.Sep(**sep_params),
-        widget.CurrentLayout(**current_layout_params),
-        #widget.Sep(**sep_params),
-        # widget.BitcoinTicker(**bitcointicker_params),
-        # widget.Sep(**sep_params),
+        Sep(**sep_params),
+        CurrentLayout(**current_layout_params),
+        #Sep(**sep_params),
+        # BitcoinTicker(**bitcointicker_params),
+        # Sep(**sep_params),
         #ThreadedPacman(**pacman_params),
-        #widget.Sep(**sep_params),
-        widget.DF(**default_params()),
-        #widget.Sep(**sep_params),
+        #Sep(**sep_params),
+        DF(**default_params()),
+        #Sep(**sep_params),
         #BankBalance(account='credit', **default_params()),
-        #widget.Sep(**sep_params),
+        #Sep(**sep_params),
         #BankBalance(account='debit', **default_params()),
-        #widget.Sep(**sep_params),
+        #Sep(**sep_params),
         #PriorityNotify(**default_params()),
-        # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
-        #widget.Sep(**sep_params),
+        # Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
+        #Sep(**sep_params),
         # NotmuchCount(**default_params()),
-        #widget.Sep(**sep_params),
-        #widget.Volume(update_interval=1, **default_params()),
-        widget.Sep(**sep_params),
-        widget.TextBox(
+        #Sep(**sep_params),
+        #Volume(update_interval=1, **default_params()),
+        Sep(**sep_params),
+        TextBox(
             "c",
             **default_params(
                 foreground=cpugraph_params['graph_color'],
                 **graph_label_defaults
             )
         ),
-        widget.CPUGraph(**cpugraph_params),
-        #widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/media-flash-memory-stick.png"),
-        widget.TextBox(
+        CPUGraph(**cpugraph_params),
+        #Image(filename="/usr/share/icons/oxygen/16x16/devices/media-flash-memory-stick.png"),
+        TextBox(
             "m",
             **default_params(
                 foreground=memgraph_params['graph_color'],
                 **graph_label_defaults
             )
         ),
-        widget.MemoryGraph(**memgraph_params),
-        # widget.Image(filename="/usr/share/icons/oxygen/16x16/devices/network-wired.png"),
-        widget.TextBox(
+        MemoryGraph(**memgraph_params),
+        # Image(filename="/usr/share/icons/oxygen/16x16/devices/network-wired.png"),
+        TextBox(
             "n",
             **default_params(
                 foreground=netgraph_params['graph_color'],
                 **graph_label_defaults
             )
         ),
-        widget.NetGraph(**netgraph_params),
-        widget.Sep(**sep_params),
-        # widget.Notify(width=30, **notify_params),
-        widget.Sep(**sep_params),
+        NetGraph(**netgraph_params),
+        Sep(**sep_params),
+        # Notify(width=30, **notify_params),
+        Sep(**sep_params),
     ]
     if system.get_hostconfig('battery'):
-        primary_bar.append(widget.Battery(**batteryicon_params))
-        primary_bar.append(widget.Sep(**sep_params))
-    primary_bar.append(widget.Systray(**systray_params))
+        primary_bar.append(Battery(**batteryicon_params))
+        primary_bar.append(Sep(**sep_params))
+    primary_bar.append(Systray(**systray_params))
     primary_bar.append(
         CalClock(
             timezone=localtimezone,
@@ -196,21 +213,31 @@ def get_screens(num_monitors, num_groups, groups):
     )
 
     secondary_bar = [
-        #widget.GroupBox(**groupbox_params),
+        #GroupBox(**groupbox_params),
         MultiScreenGroupBox(
             namemap=mon_map[SECONDARY_SCREEN], **groupbox_params),
-        widget.Sep(**sep_params),
+        Sep(**sep_params),
         #TaskList2(**tasklist_params),
-        widget.WindowName(**windowname_params),
-        widget.Sep(**sep_params),
-        widget.CurrentLayout(**current_layout_params),
-        widget.Sep(**sep_params),
+        WindowName(**windowname_params),
+        Sep(**sep_params),
+        CurrentLayout(**current_layout_params),
+        Sep(**sep_params),
         CalClock(
             timezone=localtimezone,
             **clock_params
         ),
     ]
-    bar_map = {0: primary_bar, 1: secondary_bar}
+    tertiary_bar = [
+        #MultiScreenGroupBox(
+        #    namemap=mon_map[TERTIARY_SCREEN], **groupbox_params),
+        #Sep(**sep_params),
+        ##TaskList2(**tasklist_params),
+        #WindowName(**windowname_params),
+        #Sep(**sep_params),
+        #CurrentLayout(**current_layout_params),
+        #Sep(**sep_params),
+    ]
+    bar_map = {0: primary_bar, 1: secondary_bar, 2: tertiary_bar}
     bar_height = groupbox_params['bar_height']
 
     def make_clocks(*timezones):
@@ -219,7 +246,7 @@ def get_screens(num_monitors, num_groups, groups):
             if timezone == localtimezone:
                 continue
             widgets.append(
-                widget.TextBox(
+                TextBox(
                     "%s:" % timezone,
                     **default_params()
                 )
@@ -231,7 +258,7 @@ def get_screens(num_monitors, num_groups, groups):
                 )
             )
             widgets.append(
-                widget.Sep(**default_params(padding=8, fontsize=9)),
+                Sep(**default_params(padding=8, fontsize=9)),
             )
         return widgets
 
@@ -245,20 +272,22 @@ def get_screens(num_monitors, num_groups, groups):
             "Asia/Riyadh",
     )
     clock_bar.extend([
-        widget.Sep(**sep_params),
-        widget.Pomodoro(**groupbox_params),
+        Sep(**sep_params),
+        Pomodoro(**groupbox_params),
     ])
-    clock_bar = bar.Bar(
+    clock_bar = Bar(
         clock_bar,
         size=bar_height
     )
     #clock_bar.size = 0
     screens.append(
         Screen(
-            top=bar.Bar(bar_map[PRIMARY_SCREEN], bar_height),
+            top=Bar(bar_map[PRIMARY_SCREEN], bar_height),
             bottom=clock_bar,
         )
     )
     if num_monitors > 1:
-        screens.append(Screen(bar.Bar(bar_map[SECONDARY_SCREEN], bar_height)))
+        screens.append(Screen(Bar(bar_map[SECONDARY_SCREEN], bar_height)))
+    if num_monitors > 2:
+        screens.append(Screen(Bar(bar_map[TERTIARY_SCREEN], bar_height)))
     return screens

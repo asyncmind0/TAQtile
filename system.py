@@ -12,6 +12,7 @@ import re
 import glob
 import logging
 from functools import lru_cache
+from libqtile import qtile
 
 # TODO https://confuse.readthedocs.io/en/latest/
 
@@ -21,19 +22,20 @@ common_autostart = {
     'xcompmgr': None,
     expanduser('~/.bin/xstartup'): None,
     'setxkbmap -option \'ctrl:swapcaps\'': None,
-    "surf 'https://grafana-bison.streethawk.com/d/000000005/bison-riak?refresh=15m'": None,
-    "surf 'https://grafana-bison.streethawk.com/d/000000003/bison-rabbitmq?orgId=1&from=now-1h&to=now&refresh=5m'": None,
-    "surf 'https://grafana.streethawk.com/d/000000004/bison-load?orgId=1&from=now-1h&to=now&refresh=15m'": None,
+    #"surf 'https://grafana-bison.streethawk.com/d/000000005/bison-riak?refresh=15m'": None,
+    #"surf 'https://grafana-bison.streethawk.com/d/000000003/bison-rabbitmq?orgId=1&from=now-1h&to=now&refresh=5m'": None,
+    #"surf 'https://grafana.streethawk.com/d/000000004/bison-load?orgId=1&from=now-1h&to=now&refresh=15m'": None,
+    'dropbox': None,
 }
 
 laptop_autostart = dict(common_autostart)
 laptop_autostart.update({
     'blueman-applet': None,
-    'droopbox': None,
     'insync start': None,
     #'parcellite': None,
     'slack': None,
     'feh --bg-scale ~/.wallpaper': None,
+    'discord': None,
     'whatsapp-web-desktop': dict(
         process_filter="whatsapp",
         window_regex=re.compile(r".*whatsapp.*", re.I),
@@ -49,25 +51,41 @@ default_config = {
     'term2_key': 'F12',
     'term3_key': 'F9',
     'term4_key': 'F10',
-    'google_accounts': [
-        'melit.stevenjoseph@gmail.com',
-        'steven@stevenjoseph.in',
-        'steven@streethawk.co',
-        'stevenjose@gmail.com',
-    ],
+    'google_accounts': {
+            'melit.stevenjoseph@gmail.com': {
+                "calendar_regex": "^Google Calendar.*$",
+                "profile": "default-release",
+                #"profile": "Profile 1",
+            },
+            'steven@stevenjoseph.in': {
+                "calendar_regex": "^stevenjoseph - Calendar.*$",
+                "profile": "default-release",
+                #"profile": "Profile 1",
+            },
+            'steven@streethawk.co': {
+                "calendar_regex": "Streethawk - Calendar.*$",
+                "profile": "Streethawk"
+            },
+            'stevenjose@gmail.com': {
+                "calendar_regex": "stevenjose - Calendar.*$",
+                "profile": "default-release",
+                #"profile": "Profile 1",
+            },
+    },
     'volume_up': 'pactl set-sink-volume @DEFAULT_SINK@ +5000',
     'volume_down': 'pactl set-sink-volume @DEFAULT_SINK@ -5000',
     'group_affinity': {
         'emulator': 3,
-        'mail': 1,
+        'mail': 11,
         'browser': 11,
         'transgui': 1,
         'devtools': 2,
         'rdesktop': 15,
         'virtualbox': 4,
         'slack': 16,
-        'hangouts': 7,
-        'discord': 8,
+        'hangouts': 17,
+        'discord': 18,
+        'zoom': 18,
         'whatsapp': 8,
         'android-studio': 12
     },
@@ -115,12 +133,21 @@ zenbook1 = {
     ),
     'autostart-once': laptop_autostart,
 }
+razorjack = dict(zenbook1)
+razorjack['battery'] = False
+razorjack.update(
+    {
+        'screens': {0: 1, 1: 0},
+        'term1_key': 'F12',
+        'term2_key': 'F11',
+    }
+)
 
 platform_specific = {
     'series9': series9_config,
     'zenbook1': zenbook1,
     'steven-series9': series9_config,
-    'razorjack': zenbook1,
+    'razorjack': razorjack,
 }
 
 
@@ -185,7 +212,7 @@ def hdmi_connected():
 def window_exists(qtile, regex):
     for window in get_windows_map(qtile).values():
         if regex.match(window.name):
-            return True
+            return window
         wm_class = window.window.get_wm_class()
         logger.debug(wm_class)
         if wm_class and any(map(regex.match, wm_class)):
@@ -193,7 +220,7 @@ def window_exists(qtile, regex):
 
 
 def execute_once(
-        process, process_filter=None, qtile=None,
+        process, process_filter=None,
         toggle=False, window_regex=None):
     cmd = process.split()
     process_filter = process_filter or cmd[0]
@@ -211,14 +238,14 @@ def execute_once(
         # spawn the process using a shell command with subprocess.Popen
         logger.debug("Starting: %s", cmd)
         try:
-            if qtile:
-                qtile.cmd_spawn(process)
-            else:
-                cmd = local[process]
-                cmd()
+            #if qtile:
+            qtile.cmd_spawn(process)
+            #else:
+            #    cmd = local[process]
+            #    cmd()
             logger.info("Started: %s: %s", cmd, pid)
         except Exception as e:
-            logger.error("Error running %s", cmd)
+            logger.exception("Error running %s", cmd)
     elif toggle:
         logger.debug("Kill process: %s", process_filter)
         os.kill(int(pid), signal.SIGKILL)
@@ -226,25 +253,25 @@ def execute_once(
         logger.debug("Not Starting: %s", cmd)
 
 
-def get_current_screen(qtile):
+def get_current_screen(qtile_):
     try:
         return qtile.current_screen
     except AttributeError:
         return qtile.currentScreen
 
-def get_current_window(qtile):
+def get_current_window(qtile_):
     try:
         return qtile.current_window
     except AttributeError:
         return qtile.currentWindow
 
-def get_current_group(qtile):
+def get_current_group(qtile_):
     try:
         return qtile.current_group
     except AttributeError:
         return qtile.currentGroup
 
-def get_windows_map(qtile):
+def get_windows_map(qtile_):
     try:
         return qtile.windows_map
     except AttributeError:

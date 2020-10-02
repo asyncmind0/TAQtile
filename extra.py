@@ -259,7 +259,7 @@ def check_restart(qtile):
 def autossh_term(
         title="autossh", port=22, host='localhost',
         session="default"):
-    autossh_py = "autosshpy"
+    autossh_py = "autossh.py"
     cmd = " ".join(
         [
             "st",

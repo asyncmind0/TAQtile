@@ -10,20 +10,14 @@ from extra import (
     RaiseWindowOrSpawn, MoveToGroup, move_to_next_group, move_to_prev_group,
     autossh_term, show_mail, hide_show_bar)
 from dmenu import (
-    dmenu_run,
-    list_windows,
-    list_windows_group,
     dmenu_org,
     list_bluetooth,
-    list_inboxes,
     list_calendars,
-    dmenu_clip,
 )
 from system import get_hostconfig, get_group_affinity, get_screen_affinity
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from system import get_hostconfig
-from themes import current_theme, dmenu_defaults
-from passmenu import passmenu
+from themes import current_theme, dmenu_cmd_args
 from os.path import expanduser
 from hooks import set_groups
 from log import logger
@@ -31,7 +25,8 @@ import re
 from subprocess import check_output
 import six
 import shlex
-from extensions import Surf, DmenuRunRecent
+from extensions import Surf, DmenuRunRecent, BroTab, PassMenu, Inboxes
+from clip import dmenu_xclip
 
 re_vol = re.compile(r'\[(\d?\d?\d?)%\]')
 re_touchpad = re.compile(r".*TouchpadOff\s*= 1", re.DOTALL)
@@ -93,7 +88,7 @@ def notify_spawn(qtile, cmd):
     )
 
 def get_keys(mod, num_groups, num_monitors):
-    logger.debug(dmenu_defaults)
+    logger.debug(dmenu_cmd_args)
     is_laptop = get_hostconfig('laptop')
     term1_key = get_hostconfig('term1_key')
     term2_key = get_hostconfig('term2_key')
@@ -194,17 +189,18 @@ def get_keys(mod, num_groups, num_monitors):
 
         # APP LAUNCHERS
         #([mod], "r", lazy.spawncmd()),
-        #([mod], "F2", lazy.spawn("dmenu-run-recent %s" % dmenu_defaults)),
+        #([mod], "F2", lazy.spawn("dmenu-run-recent %s" % dmenu_cmd_args)),
         ([mod], "o", lazy.function(dmenu_org)),
-        #([mod], "F2", lazy.spawn("dmenu_run %s" % dmenu_defaults)),
-        ([mod], "F3", lazy.function(list_windows_group)),
         #([mod], "f5", lazy.spawn('st -t {0} -e {0}'.format('ncmpcpp'))),
         ([mod], "r", lazy.spawncmd()),
         ([mod], "Return", lazy.spawn("st -t shrapnel")),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         #([mod, "shift"], "b", lazy.spawn("google-chrome-stable")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
-        ([mod, "shift"], "p", lazy.function(passmenu, dmenu_defaults())),
+        ([mod, "shift"], "p", lazy.run_extension(
+            PassMenu(
+                **current_theme
+            ))),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
         ([mod, "control"], "l", lazy.spawn(expanduser("~/.bin/lock"))),
         ([mod], "F1", lazy.spawn("sh -c 'sleep 5;xset dpms force off'")),
@@ -216,9 +212,9 @@ def get_keys(mod, num_groups, num_monitors):
         #([mod], "b", lazy.function(hide_show_bar)),
         ([mod], "b", lazy.hide_show_bar("bottom")),
         #(["control"], "Escape", lazy.spawn("ksysguard")),
-        #([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_defaults)),
-        #([mod, "control"], "v", lazy.function(dmenu_xclip, dmenu_defaults)),
-        (["mod1", "control"], "v", lazy.spawn("clipmenu")),
+        #([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_cmd_args)),
+        (["mod1", "control"], "v", lazy.function(dmenu_xclip, dmenu_cmd_args)),
+        #(["mod1", "control"], "v", lazy.spawn("clipmenu")),
         #(["shift", mod], "v", lazy.function(dmenu_clip)),
         #([], "XF86Launch1", lazy.function(
         #    RaiseWindowOrSpawn(
@@ -242,14 +238,12 @@ def get_keys(mod, num_groups, num_monitors):
         #([], "XF86Eject", lazy.function(SwitchToWindowGroup(
         #    'monitor', 'monitor', screen=PRIMARY_SCREEN,
         #    spawn=terminal_tmux('outer', 'monitor')))),
-        ([], "F6", lazy.function(SwitchToScreenGroup(
-            "6",
-            preferred_screen=PRIMARY_SCREEN))),
+        ([], "F6", lazy.function(SwitchToScreenGroup("slack"))),
         ([mod], "F6", lazy.function(list_bluetooth)),
         ([], "F7", lazy.function(SwitchToScreenGroup(
             "7", preferred_screen=SECONDARY_SCREEN))),
         ([], "F8", lazy.function(SwitchToScreenGroup(
-            "8", preferred_screen=SECONDARY_SCREEN))),
+            "webcon"))),
         (
             [], "F9", lazy.function(
                 SwitchToWindowGroup(
@@ -263,7 +257,11 @@ def get_keys(mod, num_groups, num_monitors):
         (
             [],
             "F10",
-            lazy.function(list_inboxes),
+            lazy.run_extension(
+                Inboxes(
+                    dmenu_ignorecase=True,
+                    **current_theme
+                )),
         ),
         (
             [mod],
@@ -323,7 +321,15 @@ def get_keys(mod, num_groups, num_monitors):
                                 session="left"
                             ),
                             match="zebra_left"
-                        )
+                        ),
+                        dict(
+                            cmd=autossh_term(
+                                title="series9_left",
+                                host="series9.local",
+                                session="series9"
+                            ),
+                            match="series9_left"
+                        ),
                     ]
                 )
             )
@@ -353,6 +359,14 @@ def get_keys(mod, num_groups, num_monitors):
                             ),
                             match="zebra_right"
                         ),
+                        dict(
+                            cmd=autossh_term(
+                                title="series9_right",
+                                host="series9.local",
+                                session="series9"
+                            ),
+                            match="series9_right"
+                        ),
                     ]
                 )
             )
@@ -362,6 +376,7 @@ def get_keys(mod, num_groups, num_monitors):
             title='System Monitor',
             screen=PRIMARY_SCREEN,
             spawn="ksysguard"))),
+        #([mod], "tab", lazy.group.next_layout()),
         #(
         #    ['control'],
         #    'Escape',
@@ -401,17 +416,15 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "XF86Launch1", lazy.function(RaiseWindowOrSpawn(
             wmclass='Pavucontrol', cmd='pavucontrol'))),
         ([], "XF86AudioMute", lazy.function(volume_mute)),
-        ([], "XF86AudioPlay", lazy.spawn("mpc toggle")),
-        ([], "XF86AudioPause", lazy.spawn("mpc toggle")),
-        ([], "XF86AudioPrev", lazy.spawn("mpc prev")),
-        ([], "XF86AudioNext", lazy.spawn("mpc next")),
+        ([], "XF86AudioPlay", lazy.spawn("sp play")),
+        ([], "XF86AudioPause", lazy.spawn("sp pause")),
+        ([], "XF86AudioPrev", lazy.spawn("sp prev")),
+        ([], "XF86AudioNext", lazy.spawn("sp next")),
         ([], "XF86WLAN", lazy.spawn(
             expanduser("~/.bin/mobilenet"))),
-        #([mod], "F2", lazy.function(dmenu_run)),
         ([mod], "w", lazy.run_extension(
            extension.WindowList(
                dmenu_prompt="windows:",
-               dmenu_lines=10,
                dmenu_ignorecase=True,
                dmenu_font=current_theme['font'],
                **current_theme
@@ -420,14 +433,13 @@ def get_keys(mod, num_groups, num_monitors):
            extension.WindowList(
                dmenu_prompt="windows:",
                all_groups=False,
-               dmenu_lines=10,
                dmenu_ignorecase=True,
                dmenu_font=current_theme['font'],
                **current_theme
             ))),
         (
             [mod], "u",
-            lazy.group["scratch"].dropdown_toggle("xterm")
+            lazy.group["scratch"].dropdown_toggle("st")
         ),
         (
             [mod, "shift"], "h",
@@ -435,23 +447,19 @@ def get_keys(mod, num_groups, num_monitors):
         ),
         (
             [mod], "F11",
-            lazy.group["scratch"].dropdown_toggle("pavucontrol")
+            lazy.group["scratch"].dropdown_toggle("pamixer")
         ),
         (
             [mod], "g",
-            lazy.group["browser"].toscreen(),
             lazy.run_extension(
-                Surf(
-                    dmenu_lines=10,
+                BroTab(
                     dmenu_ignorecase=True,
                     item_format="* {window}",
                     **current_theme
                 )),
         ),
-        ([mod], "F3", lazy.spawn("dmenu_run")),
         ([mod], "space", lazy.run_extension(
             DmenuRunRecent(
-               dmenu_lines=10,
                 **current_theme
             ))),
         ([mod], "F4", lazy.function(RaiseWindowOrSpawn(

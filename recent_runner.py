@@ -43,7 +43,7 @@ class RecentRunner:
             itemslist[item] = i
         ret = [x[0] for x in sorted(itemslist.items(), key=lambda x: x[1])]
         #logger.error(ret)
-        return reversed(ret)
+        return list(reversed(ret))
 
     def recent(self, command=''):
         sql = "SELECT command FROM %s " % self.dbname

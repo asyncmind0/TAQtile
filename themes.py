@@ -8,10 +8,11 @@ default_theme = dict(
     fontsize=11,
     #font="Inconsolata",
     font="Terminus",
-    #font="ProggySquareTTSZ",
+    ##font="ProggySquareTTSZ",
     #font="pango:monospace",
     borderwidth=1,
-    bar_height=13
+    bar_height=13,
+    dmenu_lines=30,
 )
 
 star_trek_blue = dict(
@@ -50,13 +51,13 @@ current_theme.update(star_trek_blue)
 #current_theme.update(matrix_green)
 logger.debug("Current theme:%s", current_theme)
 dmenu_options = (
-    "-l 10 "
+    "-l %(dmenu_lines)s "
     "-nb '%(background)s' "
     "-nf '%(foreground)s' "
     "-sb %(hl_background)s "
     "-sf %(hl_foreground)s "
-    "-fn %(font)s"
-) % current_theme
+    "-fn %(font)s "
+)
 
 
 rofi_options = (
@@ -77,6 +78,8 @@ rofi_options = (
     "-line-margin 0 "
 ) % current_theme
 
-def dmenu_defaults():
-    return dmenu_options
+def dmenu_cmd_args(**overrides):
+    opts = dict(current_theme)
+    opts.update(overrides)
+    return dmenu_options % opts
     #return rofi_options

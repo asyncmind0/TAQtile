@@ -2,7 +2,8 @@ import logging
 import subprocess
 import threading
 
-from libqtile import widget
+from libqtile.widget import NetGraph, Clock
+
 from extra import RaiseWindowOrSpawn
 from pytz import timezone
 from datetime import datetime
@@ -12,34 +13,34 @@ from system import execute_once
 from log import logger
 
 
-class ThreadedPacman(widget.Pacman):
+#class ThreadedPacman(widget.Pacman):
+#
+#    def __init__(self, *args, **kwargs):
+#        super(ThreadedPacman, self).__init__(*args, **kwargs)
+#        self.timeout_add(self.update_interval, self.wx_updater)
+#        self.wx_updater()
+#
+#    def update(self, data=None):
+#        if self.configured and data:
+#            self.updates_data = str(data)
+#            if self.text != self.updates_data:
+#                self.text = self.updates_data
+#                self.bar.draw()
+#        return "N/A"
+#
+#    def wx_updater(self):
+#        logger.warn('adding WX Pacman widget timer')
+#        import gobject
+#
+#        def worker():
+#            pacman = subprocess.Popen(['checkupdates'], stdout=subprocess.PIPE)
+#            data = len(pacman.stdout.readlines())
+#            gobject.idle_add(self.update, data)
+#        threading.Thread(target=worker).start()
+#        return True
 
-    def __init__(self, *args, **kwargs):
-        super(ThreadedPacman, self).__init__(*args, **kwargs)
-        self.timeout_add(self.update_interval, self.wx_updater)
-        self.wx_updater()
 
-    def update(self, data=None):
-        if self.configured and data:
-            self.updates_data = str(data)
-            if self.text != self.updates_data:
-                self.text = self.updates_data
-                self.bar.draw()
-        return "N/A"
-
-    def wx_updater(self):
-        logger.warn('adding WX Pacman widget timer')
-        import gobject
-
-        def worker():
-            pacman = subprocess.Popen(['checkupdates'], stdout=subprocess.PIPE)
-            data = len(pacman.stdout.readlines())
-            gobject.idle_add(self.update, data)
-        threading.Thread(target=worker).start()
-        return True
-
-
-class Clock(widget.Clock):
+class Clock(Clock):
     def poll(self):
         # We use None as a sentinel here because C's strftime defaults to UTC
         # if TZ=''.
@@ -67,14 +68,11 @@ class CalClock(Clock):
         #rws(self.qtile)
 
 
-class GraphHistory(widget.graph.NetGraph):
-    """Graph that persists history and reloads it when restarted.
-    provides a continuous graph, desipite qtile restarting.
-    """
-    default_store = None
-
-    def __init__(self, *args, **kwargs):
-        super(widget.graph.NetGraph, self).__init__(*args, **kwargs)
-
-    def push(self, value):
-        return super(widget.graph.NetGraph, self).push(value)
+#class GraphHistory(NetGraph):
+#    """Graph that persists history and reloads it when restarted.
+#    provides a continuous graph, desipite qtile restarting.
+#    """
+#    default_store = None
+#
+#    def push(self, value):
+#        return super().push(value)

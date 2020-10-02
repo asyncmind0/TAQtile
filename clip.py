@@ -1,10 +1,12 @@
 from __future__ import print_function
 import logging
 import os
-from libqtile import hook, xcbq
+from os.path import join
 import json
 from plumbum import local
 from log import logger
+from dmenu import dmenu_show
+import subprocess
 
 use_selection = 'CLIPBOARD'
 blacklist = []
@@ -12,10 +14,16 @@ blacklist_text = "*********"
 history_len = 50
 previous_clip = None
 count_call = 0
-history_file = os.path.expanduser("~/.qtile-cliphistory")
+history_file = os.path.expanduser(
+    join(
+        os.environ.get("XDG_RUNTIME_DIR", "~/"),
+        "clipmenu.6.steven/line_cache"
+    )
+)
 
 
 def is_blacklisted(owner_id):
+    from libqtile import hook, xcbq
     if not blacklist:
         return False
 
@@ -66,6 +74,16 @@ def hook_change(name, selection):
     except Exception as e:
         logger.exception("Error getting selection")
 
+def copy_xclip(text, primary=False):
+    PRIMARY_SELECTION='-p'
+    DEFAULT_SELECTION='c'
+    ENCODING = 'utf-8'
+    selection=DEFAULT_SELECTION
+    if primary:
+        selection=PRIMARY_SELECTION
+    p = subprocess.Popen(['xclip', '-selection', selection],
+                            stdin=subprocess.PIPE, close_fds=True)
+    p.communicate(input=text.encode(ENCODING))
 
 def dmenu_xclip(qtile, args):
     dmenu = local['dmenu']
@@ -73,19 +91,30 @@ def dmenu_xclip(qtile, args):
     xclip = local['xclip']
 
     history = []
-    args = args.split(' ')
-    args.extend(['-p', 'Clip:'])
+    logger.info(history_file)
 
     if os.path.isfile(history_file):
         with open(history_file, 'r') as qfile:
-            history = json.load(qfile)
+            history = qfile.readlines()
 
-    command = (echo['\n'.join(reversed(history))] | dmenu[args])(retcode=None)
-    outf = os.popen('xclip -selection secondary', 'w')
-    outf.write(command)
+    history = reversed([x.split(' ', 1) for x in history if x and x.strip()])
+    logger.info("Clips %s", history)
+    selected = dmenu_show("Clips:", [y.strip() for y in [x[1] for x in history] if y])
+    if not selected or not selected.strip():
+        return
+    logger.info(selected)
+
+
+    copy_xclip(selected, True)
+    copy_xclip(selected, False)
+
+
+    #command = (echo['\n'.join(reversed(history))] | dmenu[args])(retcode=None)
+    outf = os.popen('xclip -selection secondary\n\n', 'w')
+    outf.write(selected)
     outf.close()
-    outf = os.popen('xclip -selection primary', 'w')
-    outf.write(command)
+    outf = os.popen('xclip -selection primary\n\n', 'w')
+    outf.write(selected)
     outf.close()
-    #(echo[command] | xclip['-i', '-selection', 'primary'])()
+    #(echo[selected] | xclip['-i', '-selection', 'primary'])()
     #(echo[command] | xclip['-i', '-selection', 'secondary'])()

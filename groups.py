@@ -61,7 +61,11 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             # Everything i want to be float, but don't want to change group
             Rule(
                 Match(
-                    title=["nested", "gscreenshot"],
+                    title=[
+                        "nested",
+                        "gscreenshot"
+                        "discord.com is sharing your screen.",
+                    ],
                     wm_class=[
                         "Guake.py",
                         "Exe",
@@ -76,7 +80,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                         re.compile("Gnome-keyring-prompt.*?"),
                         "SshAskpass",
                         "ssh-askpass",
-                        "zoom",
+                        #"zoom",
                     ],
                 ),
                 float=True,
@@ -170,13 +174,13 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 group=get_group_affinity("hangouts"),
                 break_on_match=False,
             ),
-            Rule(
-                Match(
-                    wm_class=[re.compile(".*slack.*", re.I)],
-                ),
-                group=get_group_affinity("slack"),
-                break_on_match=False,
-            ),
+            #Rule(
+            #    Match(
+            #        wm_class=[re.compile(".*slack.*", re.I)],
+            #    ),
+            #    group=get_group_affinity("slack"),
+            #    break_on_match=False,
+            #),
             Rule(
                 Match(
                     title=[re.compile(r"whatsapp.*", re.I)],
@@ -193,12 +197,17 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             Rule(
                 Match(
                     title=[re.compile(r".*discord.*", re.I)]
-                    # wm_class=[re.compile(".*slack.*", re.I)],
-                    # wm_instance_class=[re.compile(".*slack.*", re.I)]
                 ),
-                group=get_group_affinity("discord"),
+                group="webcon",
                 break_on_match=False,
             ),
+            #Rule(
+            #    Match(
+            #        wm_class=[re.compile("zoom", re.I)],
+            #    ),
+            #    group=get_group_affinity("zoom"),
+            #    break_on_match=False,
+            #),
             Rule(
                 Match(
                     wm_class=[re.compile("insync.*", re.I)],
@@ -250,23 +259,25 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             ),
             "mail": dict(
                 screen_affinity=PRIMARY_SCREEN,
-                exclusive=False,
+                exclusive=True,
                 init=True,
                 matches=[
-                    Match(wm_class=["Kmail", "Kontact"]),
-                    Match(wm_class=[re.compile("mail.google.com__mail_u_.*")]),
-                    Match(title=[re.compile("^Inbox .*")]),
-                    Match(
-                        role=[
-                            re.compile("^kmail-mainwindow.*"),
-                            re.compile("^kontact-mainwindow.*"),
-                        ]
-                    ),
+                    #Match(wm_class=["Kmail", "Kontact"]),
+                    #Match(wm_class=[re.compile("mail.google.com__mail_u_.*")]),
+                    #Match(title=[re.compile("^Inbox .*")]),
+                    Match(title=[re.compile(".*mail.*", re.I)]),
+                    #Match(title=[re.compile(".*StreetHawk Mail.*", re.I)]),
+                    #Match(
+                    #    role=[
+                    #        re.compile("^kmail-mainwindow.*"),
+                    #        re.compile("^kontact-mainwindow.*"),
+                    #    ]
+                    #),
                 ]
                 + terminal_matches([r"^mail$"]),
             ),
             "cal": dict(
-                screen_affinity=PRIMARY_SCREEN,  # get_screen_affinity('mail'),
+                screen_affinity=PRIMARY_SCREEN,
                 exclusive=False,
                 init=True,
                 matches=[
@@ -274,12 +285,33 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 ],
             ),
             "browser": dict(
-                screen_affinity=PRIMARY_SCREEN,  # get_screen_affinity('mail'),
+                screen_affinity=PRIMARY_SCREEN,
                 init=True,
                 persist=True,
                 matches=[
                     Match(wm_instance_class=["surf"]),
                     Match(role=[re.compile("^browser$")], wm_class=["webmacs"]),
+                ],
+            ),
+            "slack": dict(
+                screen_affinity=PRIMARY_SCREEN,
+                init=True,
+                persist=True,
+                matches=[
+                    Match(wm_instance_class=["slack"]),
+                    #Match(role=[re.compile("^slack$")], wm_class=["slack"]),
+                ],
+            ),
+            "webcon": dict(
+                screen_affinity=PRIMARY_SCREEN,
+                init=True,
+                persist=True,
+                matches=[
+                    Match(wm_instance_class=["zoom"]),
+                    Match(wm_instance_class=["discord"]),
+                    Match(title=[re.compile(r".*discord.*", re.I)]),
+                    Match(title=[re.compile(r".*whatsapp.*", re.I)]),
+                    #Match(role=[re.compile("^slack$")], wm_class=["slack"]),
                 ],
             ),
             "term1": dict(
@@ -359,8 +391,8 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                     cmd='st -t htop -e htop',
                 ),
                 DropDown(
-                    name='pavucontrol',
-                    cmd='pavucontrol',
+                    name='ncpamixer',
+                    cmd='st -t pamixer -e ncpamixer',
                     height=1,
                 ),
             ]
