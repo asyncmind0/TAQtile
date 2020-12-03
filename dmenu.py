@@ -101,8 +101,8 @@ def list_calendars(qtile):
                 break
         else:
             cmd = (
-                #'chromium --app="https://calendar.google.com/calendar/b/%s/" --profile-directory=%s' %
-                'firefox --new-window  --kiosk "https://calendar.google.com/calendar/b/%s/"  -P %s' % 
+                'chromium --app="https://calendar.google.com/calendar/b/%s/" --profile-directory=%s' %
+                #'firefox --new-window  --kiosk "https://calendar.google.com/calendar/b/%s/"  -P %s' %
                 (
                     selected,
                     inboxes[selected]['profile'],

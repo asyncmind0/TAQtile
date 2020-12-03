@@ -259,7 +259,8 @@ class Inboxes(DmenuRun):
         if get_current_group(qtile).name != group:
             logger.debug("cmd_toggle_group")
             get_current_screen(qtile).cmd_toggle_group(group)
-        window = window_exists(qtile, re.compile(r".*%s.*" % selected, re.I))
+        mail_regex = inboxes[selected].get('mail_regex', r".*%s.*" % selected)
+        window = window_exists(qtile, re.compile(mail_regex, re.I))
         if window:
             window = get_windows_map(qtile).get(window.window.wid)
             logger.debug("Matched %s", str(window))
@@ -268,13 +269,9 @@ class Inboxes(DmenuRun):
             get_current_group(qtile).focus(window)
         else:
             cmd = (
-                #'chromium --app="https://mail.google.com/mail/u/%s/#inbox"  --profile-directory="%s"' % (
-                #'firefox --new-window  --kiosk "https://mail.google.com/mail/u/%s/#inbox"  -P %s' % (
-                'surf',
-                "https://mail.google.com/mail/u/%s/#inbox" % (
-                    selected,
-                    #inboxes[selected]['profile']
-                )
+                'chromium',
+                '--app=https://mail.google.com/mail/u/%s/#inbox' % selected,
+                '--profile-directory=%s' % inboxes[selected]['profile'],
             )
 
             logger.info(cmd)
