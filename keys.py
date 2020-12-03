@@ -452,7 +452,7 @@ def get_keys(mod, num_groups, num_monitors):
         (
             [mod], "g",
             lazy.run_extension(
-                BroTab(
+                Surf(
                     dmenu_ignorecase=True,
                     item_format="* {window}",
                     **current_theme

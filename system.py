@@ -53,23 +53,24 @@ default_config = {
     'term4_key': 'F10',
     'google_accounts': {
             'melit.stevenjoseph@gmail.com': {
-                "calendar_regex": "^Google Calendar.*$",
-                "profile": "default-release",
-                #"profile": "Profile 1",
+                "calendar_regex": r"^Google Calendar.*$",
+                #"profile": "default-release",
+                "profile": "Profile 1",
             },
             'steven@stevenjoseph.in': {
-                "calendar_regex": "^stevenjoseph - Calendar.*$",
-                "profile": "default-release",
-                #"profile": "Profile 1",
+                "calendar_regex": r"^stevenjoseph - Calendar.*$",
+                #"profile": "default-release",
+                "profile": "Profile 1",
             },
             'steven@streethawk.co': {
-                "calendar_regex": "Streethawk - Calendar.*$",
-                "profile": "Streethawk"
+                "calendar_regex": r"Streethawk - Calendar.*$",
+                "mail_regex": r".*Streethawk - Mail.*$",
+                "profile": "Default"
             },
             'stevenjose@gmail.com': {
-                "calendar_regex": "stevenjose - Calendar.*$",
-                "profile": "default-release",
-                #"profile": "Profile 1",
+                "calendar_regex": r"stevenjose - Calendar.*$",
+                #"profile": "default-release",
+                "profile": "Profile 1",
             },
     },
     'volume_up': 'pactl set-sink-volume @DEFAULT_SINK@ +5000',
