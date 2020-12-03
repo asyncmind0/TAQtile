@@ -13,6 +13,7 @@ from dmenu import (
     dmenu_org,
     list_bluetooth,
     list_calendars,
+    dmenu_pushbullet,
 )
 from system import get_hostconfig, get_group_affinity, get_screen_affinity
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
@@ -201,6 +202,7 @@ def get_keys(mod, num_groups, num_monitors):
             PassMenu(
                 **current_theme
             ))),
+        ([mod, "control"], "p", lazy.function(dmenu_pushbullet)),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
         ([mod, "control"], "l", lazy.spawn(expanduser("~/.bin/lock"))),
         ([mod], "F1", lazy.spawn("sh -c 'sleep 5;xset dpms force off'")),
