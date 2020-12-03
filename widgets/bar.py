@@ -16,9 +16,9 @@ class Bar(QBar):
         self.default_background = self.background
         return super()._configure(qtile, screen)
     def _actual_draw(self):
-        logger.error("Current screen %s", self.qtile.current_screen.index)
-        logger.error("Bar screen %s", self.screen.index)
-        logger.error("Background %s %s", self.background, self.focused_background)
+        logger.debug("Current screen %s", self.qtile.current_screen.index)
+        logger.debug("Bar screen %s", self.screen.index)
+        logger.debug("Background %s %s", self.background, self.focused_background)
         if self.qtile.current_screen.index == self.screen.index:
             self.background = self.focused_background
         else:
