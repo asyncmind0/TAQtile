@@ -95,6 +95,7 @@ default_config = {
         'whatsapp': 8,
         'android-studio': 12
     },
+    'pushbullet_api_key': 'o.erHnfFynMisnu5Cy4X2Klw6y12lJcX26',
 }
 series9_config = {
     'laptop': True,

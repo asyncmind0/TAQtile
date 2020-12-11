@@ -146,3 +146,21 @@ def dmenu_web(qtile):
             qtile.cmd_spawn(cmd)
     except:
         logger.exception("error list_inboxes")
+
+
+def dmenu_pushbullet(qtile):
+    pushbullet_api_key = get_hostconfig('pushbullet_api_key', [])
+    from pushbullet import PushBullet
+    pb = PushBullet(pushbullet_api_key)
+    device = dmenu_show("Devices:", [x.nickname for x in pb.devices])
+    device = pb.get_device(device)
+    title = "Select clip item to push: "
+    dmenu_args = shlex.split(dmenu_cmd_args(dmenu_lines=min(30, len(items))))
+    body = clipmenu[
+            "-i", "-p", "%s" % title
+        ](*dmenu_args).strip()
+    device.push_note(
+        "Shared from %s" % socket.gethostname(),
+        open(body).read()
+        
+    )
