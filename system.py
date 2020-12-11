@@ -47,10 +47,15 @@ desktop_autostart.update({
     'jabberel-tray.py': None
 })
 default_config = {
-    'term1_key': 'F11',
-    'term2_key': 'F12',
+    'screens': {
+        0: 1,
+        1: 0,
+        2: 2
+    },
+    'term0_key': 'F11',
+    'term1_key': 'F12',
+    'term2_key': 'XF86Eject',
     'term3_key': 'F9',
-    'term4_key': 'F10',
     'google_accounts': {
             'melit.stevenjoseph@gmail.com': {
                 "calendar_regex": r"^Google Calendar.*$",
@@ -84,7 +89,7 @@ default_config = {
         'rdesktop': 15,
         'virtualbox': 4,
         'slack': 16,
-        'hangouts': 17,
+        'hangouts': 7,
         'discord': 18,
         'zoom': 18,
         'whatsapp': 8,
@@ -92,7 +97,6 @@ default_config = {
     },
 }
 series9_config = {
-    'screens': {0: 1, 1: 0},
     'laptop': True,
     'autostart-once': laptop_autostart,
     'screen_affinity': {
@@ -104,45 +108,18 @@ series9_config = {
     'kbd_brightness_up': "sudo /home/steven/.bin/samctl.py -k up",
     'kbd_brightness_down': "sudo /home/steven/.bin/samctl.py -skdown",
     'battery': 'BAT1',
-    'dual_monitor': (
-        'xrandr --output LVDS1 --noprimary --mode 1600x900 '
-        ' --output HDMI1 --mode 1920x1080 --left-of LVDS1 --rotate normal'
-    ),
-    'single_monitor': "xrandr --output LVDS1 --mode 1600x900 --output HDMI-1 --off",
-}
-monitors_series9 = {
-    'monitor1': 'eDP-1-1',
-    'monitor2': 'HDMI-1-1',
 }
 zenbook1 = {
-    'screens': {0: 1, 1: 0},
     'laptop': True,
     'battery': 'BAT0',
     'brightness_up': "xbacklight -inc 10",
     'brightness_down': "xbacklight -dec 10",
     'kbd_brightness_up': "asus-kbd-backlight up",
     'kbd_brightness_down': "asus-kbd-backlight down",
-    'dual_monitor': (
-        "xrandr --output "
-        "{monitor1} --noprimary --mode 1600x900 --output "
-        "{monitor2} --mode 1920x1080 --left-of {monitor1} "
-        "--rotate normal".format(**monitors_series9)
-    ),
-    'single_monitor': (
-        "xrandr --output {monitor1} --mode 1600x900 "
-        "--output {monitor2} --off".format(**monitors_series9)
-    ),
     'autostart-once': laptop_autostart,
 }
 razorjack = dict(zenbook1)
 razorjack['battery'] = False
-razorjack.update(
-    {
-        'screens': {0: 1, 1: 0},
-        'term1_key': 'F12',
-        'term2_key': 'F11',
-    }
-)
 
 platform_specific = {
     'series9': series9_config,
@@ -191,7 +168,7 @@ def get_num_monitors():
             shell=True, stdout=subprocess.PIPE).communicate()[0]
 
         displays = output.strip().decode('utf8').split('\n')
-        logger.debug(displays)
+        logger.debug("Number of displays detected : %s", displays)
         return len(displays)
     except Exception:
         logging.exception("failed to get number of monitors")
@@ -212,7 +189,8 @@ def hdmi_connected():
 
 def window_exists(qtile, regex):
     for window in get_windows_map(qtile).values():
-        if regex.match(window.name):
+        logging.info(f"windowname {window.name}")
+        if regex.match(str(window.name)):
             return window
         wm_class = window.window.get_wm_class()
         logger.debug(wm_class)

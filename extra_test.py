@@ -16,7 +16,7 @@ class QtileRunTest(TestCase):
         self.assertIn("python", list_executables())
     
     def test_autossh_term(self):
-        print(autossh_term(title="shawk_left", port=9001))
+        print(autossh_term(title="shawk_term0", port=9001))
 
 
 class TestDmenuListBluetooth(TestCase):

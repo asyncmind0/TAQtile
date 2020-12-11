@@ -7,7 +7,7 @@ from libqtile.config import Group, Match, Rule as QRule, ScratchPad, DropDown
 from system import get_hostconfig, get_group_affinity, get_screen_affinity
 from themes import current_theme
 from collections import OrderedDict
-from screens import SECONDARY_SCREEN, PRIMARY_SCREEN
+from screens import SECONDARY_SCREEN, PRIMARY_SCREEN, TERTIARY_SCREEN
 from itertools import chain
 from extra import terminal
 
@@ -162,7 +162,10 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             #    break_on_match=False,
             #),
             Rule(
-                Match(title=[re.compile(r"^Hangouts$"), re.compile(r"^yakyak$", re.I)]),
+                Match(title=[
+                    re.compile(r"^Hangouts$"),
+                    re.compile(r"^yakyak$", re.I)
+                ]),
                 group=get_group_affinity("hangouts"),
                 break_on_match=False,
             ),
@@ -184,7 +187,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             Rule(
                 Match(
                     title=[re.compile(r"whatsapp.*", re.I)],
-                    wm_class=[re.compile("^whats-app.*", re.I)],
+                    wm_class=[re.compile(".*whatsapp.*", re.I)],
                 ),
                 group=get_group_affinity("whatsapp"),
                 break_on_match=False,
@@ -218,7 +221,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 break_on_match=True,
             ),
             Rule(
-                Match(title="shrapnel"),
+                Match(title=["shrapnel"]),
                 group="1",
                 break_on_match=False,
                 float=True,
@@ -285,12 +288,16 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 ],
             ),
             "browser": dict(
-                screen_affinity=PRIMARY_SCREEN,
+                screen_affinity=SECONDARY_SCREEN,
                 init=True,
                 persist=True,
                 matches=[
+                    Match(wm_class=["qutebrowser"]),
                     Match(wm_instance_class=["surf"]),
-                    Match(role=[re.compile("^browser$")], wm_class=["webmacs"]),
+                    Match(
+                        role=[re.compile("^browser$")],
+                        wm_class=["webmacs"]
+                    ),
                 ],
             ),
             "slack": dict(
@@ -298,7 +305,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 init=True,
                 persist=True,
                 matches=[
-                    Match(wm_instance_class=["slack"]),
+                    Match(wm_class=["slack"]),
                     #Match(role=[re.compile("^slack$")], wm_class=["slack"]),
                 ],
             ),
@@ -307,55 +314,58 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 init=True,
                 persist=True,
                 matches=[
-                    Match(wm_instance_class=["zoom"]),
-                    Match(wm_instance_class=["discord"]),
+                    Match(wm_class=["zoom"]),
+                    Match(wm_class=["discord"]),
                     Match(title=[re.compile(r".*discord.*", re.I)]),
                     Match(title=[re.compile(r".*whatsapp.*", re.I)]),
                     #Match(role=[re.compile("^slack$")], wm_class=["slack"]),
                 ],
             ),
-            "term1": dict(
+            "term0": dict(
                 screen_affinity=PRIMARY_SCREEN,
                 exclusive=False,
                 init=True,
-                matches=terminal_matches([r"left", r"^shawk_left$"]),
+                matches=terminal_matches([r"term0"]),
+            ),
+            "term1": dict(
+                screen_affinity=SECONDARY_SCREEN,
+                exclusive=False,
+                init=True,
+                matches=terminal_matches([r"term1"]),
             ),
             "term2": dict(
+                screen_affinity=TERTIARY_SCREEN,
+                exclusive=False,
+                init=True,
+                matches=terminal_matches([r"term2"]),
+            ),
+            "cloud-term0": dict(
                 screen_affinity=SECONDARY_SCREEN,
                 exclusive=False,
                 init=True,
-                matches=terminal_matches([r"right", r"^shawk_right$"]),
+                matches=terminal_matches([
+                    r"^bison-term0$",
+                    r"^jupyter-bison$",
+                    r"^salt-bison$",
+                ]),
             ),
-            "azure_left": dict(
-                screen_affinity=PRIMARY_SCREEN,
+            "cloud-term1": dict(
+                screen_affinity=TERTIARY_SCREEN,
                 exclusive=False,
                 init=True,
-                matches=terminal_matches([r"^bison_left$", r"zebra_left"]),
-            ),
-            "azure_right": dict(
-                screen_affinity=SECONDARY_SCREEN,
-                exclusive=False,
-                init=True,
-                matches=terminal_matches([r"^bison_right$", r"zebra_right"]),
+                matches=terminal_matches([
+                    r"zebra-term0"
+                    r"jupyter-zebra"
+                ]),
             ),
             "krusader": dict(
-                screen_affinity=SECONDARY_SCREEN,
+                screen_affinity=PRIMARY_SCREEN,
                 persist=False,
                 matches=[Match(title=[".*krusader.*"], wm_class=["Krusader"])],
             ),
         }
     )
     if not is_laptop:
-        group_args["remote_term1"] = dict(
-            screen_affinity=PRIMARY_SCREEN,
-            exclusive=False,
-            matches=terminal_matches([r"^remote_term1$"]),
-        )
-        group_args["remote_term2"] = dict(
-            screen_affinity=SECONDARY_SCREEN,
-            exclusive=False,
-            matches=terminal_matches(["^remote_term2$"]),
-        )
         group_args["htop"] = dict(
             screen_affinity=SECONDARY_SCREEN,
             persist=False,

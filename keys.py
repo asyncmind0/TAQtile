@@ -8,14 +8,14 @@ from extra import (
     check_restart,
     terminal_tmux, terminal, MoveToOtherScreenGroup, SwitchToScreenGroup,
     RaiseWindowOrSpawn, MoveToGroup, move_to_next_group, move_to_prev_group,
-    autossh_term, show_mail, hide_show_bar)
+    autossh_term, show_mail, hide_show_bar, kubctl_term)
 from dmenu import (
     dmenu_org,
     list_bluetooth,
     list_calendars,
 )
 from system import get_hostconfig, get_group_affinity, get_screen_affinity
-from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
+from screens import PRIMARY_SCREEN, SECONDARY_SCREEN, TERTIARY_SCREEN
 from system import get_hostconfig
 from themes import current_theme, dmenu_cmd_args
 from os.path import expanduser
@@ -90,10 +90,10 @@ def notify_spawn(qtile, cmd):
 def get_keys(mod, num_groups, num_monitors):
     logger.debug(dmenu_cmd_args)
     is_laptop = get_hostconfig('laptop')
+    term0_key = get_hostconfig('term0_key')
     term1_key = get_hostconfig('term1_key')
     term2_key = get_hostconfig('term2_key')
     term3_key = get_hostconfig('term3_key')
-    term4_key = get_hostconfig('term4_key')
 
     keys = [
         # Switch between windows in current stack pane
@@ -193,7 +193,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "o", lazy.function(dmenu_org)),
         #([mod], "f5", lazy.spawn('st -t {0} -e {0}'.format('ncmpcpp'))),
         ([mod], "r", lazy.spawncmd()),
-        ([mod], "Return", lazy.spawn("st -t shrapnel")),
+        ([mod], "Return", lazy.spawn("st")),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         #([mod, "shift"], "b", lazy.spawn("google-chrome-stable")),
         ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
@@ -270,16 +270,30 @@ def get_keys(mod, num_groups, num_monitors):
         ),
         (
             [],
+            term0_key,
+            lazy.function(
+                SwitchToWindowGroup(
+                    'term0',
+                    title='term0',
+                    screen=PRIMARY_SCREEN,
+                    spawn=terminal_tmux(
+                        'outer', 'term0'
+                        )
+
+                    )
+                )
+        ),
+        (
+            [],
             term1_key,
             lazy.function(
                 SwitchToWindowGroup(
                     'term1',
-                    title='left',
-                    screen=PRIMARY_SCREEN,
+                    title='term1',
+                    screen=SECONDARY_SCREEN,
                     spawn=terminal_tmux(
-                        'outer', 'left'
+                        'outer', 'term1'
                         )
-
                     )
                 )
         ),
@@ -289,46 +303,38 @@ def get_keys(mod, num_groups, num_monitors):
             lazy.function(
                 SwitchToWindowGroup(
                     'term2',
-                    title='right',
-                    screen=SECONDARY_SCREEN,
+                    title='term2',
+                    screen=TERTIARY_SCREEN,
                     spawn=terminal_tmux(
-                        'outer', 'right'
+                        'outer', 'term2'
                         )
                     )
                 )
         ),
         (
             [mod],
-            term3_key,
+            term1_key,
             lazy.function(
                 SwitchToWindowGroup(
-                    'azure_left',
-                    title='bison_left',
-                    screen=PRIMARY_SCREEN,
+                    'cloud-term0',
+                    title='bison-term0',
+                    screen=SECONDARY_SCREEN,
                     spawn=[
                         dict(
-                            cmd=autossh_term(
-                                title="bison_left",
-                                host="salt.streethawk.com",
-                                session="left"
-                            ),
-                            match="bison_left",
+                            cmd="jupyter-bison",
+                            match="jupyter-bison",
+                        ),
+                        dict(
+                            cmd="salt-bison",
+                            match="salt-bison",
                         ),
                         dict(
                             cmd=autossh_term(
-                                title="zebra_left",
-                                host="salt.streethawk.com",
-                                session="left"
-                            ),
-                            match="zebra_left"
-                        ),
-                        dict(
-                            cmd=autossh_term(
-                                title="series9_left",
+                                title="series9-term0",
                                 host="series9.local",
                                 session="series9"
                             ),
-                            match="series9_left"
+                            match="series9-term0"
                         ),
                     ]
                 )
@@ -336,36 +342,16 @@ def get_keys(mod, num_groups, num_monitors):
         ),
         (
             [mod],
-            term4_key,
+            term2_key,
             lazy.function(
                 SwitchToWindowGroup(
-                    'azure_right',
-                    title='bison_right',
-                    screen=SECONDARY_SCREEN,
+                    'cloud-term1',
+                    title='bison-term1',
+                    screen=TERTIARY_SCREEN,
                     spawn=[
                         dict(
-                            cmd=autossh_term(
-                                title="bison_right",
-                                host="salt.streethawk.com",
-                                session="right"
-                            ),
-                            match="bison_right"
-                        ),
-                        dict(
-                            cmd=autossh_term(
-                                title="zebra_right",
-                                host="salt.streethawk.com",
-                                session="right"
-                            ),
-                            match="zebra_right"
-                        ),
-                        dict(
-                            cmd=autossh_term(
-                                title="series9_right",
-                                host="series9.local",
-                                session="series9"
-                            ),
-                            match="series9_right"
+                            cmd="jupyter-zebra",
+                            match="jupyter-zebra",
                         ),
                     ]
                 )
@@ -412,7 +398,7 @@ def get_keys(mod, num_groups, num_monitors):
             volume_cmd,
             get_hostconfig("volume_up"))),
         ([], "XF86LaunchB", lazy.function(RaiseWindowOrSpawn(
-            wmclass='Pavucontrol', cmd='pavucontrol'))),
+            wmclass='Pavucontrol', cmd='kmix'))),
         ([], "XF86Launch1", lazy.function(RaiseWindowOrSpawn(
             wmclass='Pavucontrol', cmd='pavucontrol'))),
         ([], "XF86AudioMute", lazy.function(volume_mute)),
@@ -442,7 +428,7 @@ def get_keys(mod, num_groups, num_monitors):
             lazy.group["scratch"].dropdown_toggle("st")
         ),
         (
-            [mod, "shift"], "h",
+            [mod], "F3",
             lazy.group["scratch"].dropdown_toggle("htop")
         ),
         (

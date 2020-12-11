@@ -35,8 +35,6 @@ log = logging.getLogger('qtile')
 PRIMARY_SCREEN = system.get_screen(0)
 SECONDARY_SCREEN = system.get_screen(1)
 TERTIARY_SCREEN = system.get_screen(2)
-PRIMARY_MONITOR = 0
-SECONDARY_MONITOR = 1
 
 try:
     localtimezone = check_output(['tzupdate', '-p', '-s', '5']).decode().strip()
@@ -46,7 +44,6 @@ except:
 
 
 def get_screens(num_monitors, num_groups, groups):
-    screens = []
     multi_monitor = num_monitors > 1
 
     def default_params(**kwargs):
@@ -142,6 +139,8 @@ def get_screens(num_monitors, num_groups, groups):
             mon_map[group.screen_affinity][groupname] = grouplabel
 
     primary_bar = [
+        TextBox("first"),
+        Sep(**sep_params),
         #GroupBox(**groupbox_params),
         MultiScreenGroupBox(
             namemap=mon_map[PRIMARY_SCREEN], **groupbox_params),
@@ -204,15 +203,10 @@ def get_screens(num_monitors, num_groups, groups):
     if system.get_hostconfig('battery'):
         primary_bar.append(Battery(**batteryicon_params))
         primary_bar.append(Sep(**sep_params))
-    primary_bar.append(Systray(**systray_params))
-    primary_bar.append(
-        CalClock(
-            timezone=localtimezone,
-            **clock_params
-        )
-    )
 
     secondary_bar = [
+        TextBox("second"),
+        Sep(**sep_params),
         #GroupBox(**groupbox_params),
         MultiScreenGroupBox(
             namemap=mon_map[SECONDARY_SCREEN], **groupbox_params),
@@ -222,22 +216,28 @@ def get_screens(num_monitors, num_groups, groups):
         Sep(**sep_params),
         CurrentLayout(**current_layout_params),
         Sep(**sep_params),
+        Systray(**systray_params),
+        Sep(**sep_params),
         CalClock(
             timezone=localtimezone,
             **clock_params
         ),
     ]
     tertiary_bar = [
-        #MultiScreenGroupBox(
-        #    namemap=mon_map[TERTIARY_SCREEN], **groupbox_params),
+        TextBox("third"),
+        Sep(**sep_params),
+        MultiScreenGroupBox(
+            namemap=mon_map[TERTIARY_SCREEN], **groupbox_params),
         #Sep(**sep_params),
         ##TaskList2(**tasklist_params),
-        #WindowName(**windowname_params),
-        #Sep(**sep_params),
-        #CurrentLayout(**current_layout_params),
-        #Sep(**sep_params),
+        WindowName(**windowname_params),
+        Sep(**sep_params),
+        CurrentLayout(**current_layout_params),
+        CalClock(
+            timezone=localtimezone,
+            **clock_params
+        ),
     ]
-    bar_map = {0: primary_bar, 1: secondary_bar, 2: tertiary_bar}
     bar_height = groupbox_params['bar_height']
 
     def make_clocks(*timezones):
@@ -280,14 +280,16 @@ def get_screens(num_monitors, num_groups, groups):
         size=bar_height
     )
     #clock_bar.size = 0
-    screens.append(
-        Screen(
-            top=Bar(bar_map[PRIMARY_SCREEN], bar_height),
-            bottom=clock_bar,
-        )
+    screens = dict()
+    screens[PRIMARY_SCREEN] = Screen(Bar(primary_bar, bar_height))
+    screens[SECONDARY_SCREEN] = Screen(
+        Bar(
+            secondary_bar,
+            bar_height,
+        ),
+        bottom=clock_bar,
     )
-    if num_monitors > 1:
-        screens.append(Screen(Bar(bar_map[SECONDARY_SCREEN], bar_height)))
-    if num_monitors > 2:
-        screens.append(Screen(Bar(bar_map[TERTIARY_SCREEN], bar_height)))
+    screens[TERTIARY_SCREEN] = Screen(Bar(tertiary_bar, bar_height))
+    screens = [screens[y] for y in sorted(screens.keys())]
+    log.error("Screens: %s ", screens)
     return screens

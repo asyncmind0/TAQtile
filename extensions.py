@@ -23,7 +23,6 @@ def list_executables():
                 executables.append(file_)
     return set(executables)
 
-print(Dmenu)
 
 class Surf(Dmenu):
     """

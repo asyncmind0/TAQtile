@@ -53,12 +53,6 @@ def startup():
         commands = get_hostconfig('autostart-once') or {}
         num_mons = get_num_monitors()
         logger.debug("Num MONS:%s", num_mons)
-        # logger.debug("Num DeSKTOPS:%s", len(qtile.screens))
-        if num_mons > 1:
-            commands[get_hostconfig('dual_monitor')] = None
-        elif num_mons == 1:
-            commands[get_hostconfig('single_monitor')] = None
-
         for command, kwargs in commands.items():
             execute_once(command, **(kwargs if kwargs else {}))
         load_sounds()
