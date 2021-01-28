@@ -1,10 +1,12 @@
 import os
+from datetime import datetime
 import re
 from os.path import dirname, join, splitext, expanduser, isdir, pathsep
 from subprocess import Popen
 
 from libqtile.extension.dmenu import Dmenu, DmenuRun
 from libqtile.extension.window_list import WindowList
+from libqtile import hook
 
 from plumbum import local
 from plumbum.cmd import brotab
@@ -12,6 +14,7 @@ from plumbum.cmd import brotab
 from log import logger
 from recent_runner import RecentRunner
 from system import get_current_window, get_hostconfig, window_exists, get_windows_map, get_current_screen, get_current_group
+from system import get_redis
 
 
 def list_executables():
@@ -234,15 +237,18 @@ class PassMenu(DmenuRun):
             preexec_fn=os.setpgrp
         )
 
+
 class Inboxes(DmenuRun):
     defaults = [
         ("dbname", 'list_inboxes', "the sqlite db to store history."),
         ("dmenu_command", 'dmenu', "the dmenu command to be launched"),
         ("group", 'mail', "the group to use."),
     ]
+
     def __init__(self, **config):
         super().__init__(**config)
         self.add_defaults(Inboxes.defaults)
+        self.launched = {}
 
     def run(self):
         recent = RecentRunner(self.dbname)
@@ -258,8 +264,11 @@ class Inboxes(DmenuRun):
         if get_current_group(qtile).name != group:
             logger.debug("cmd_toggle_group")
             get_current_screen(qtile).cmd_toggle_group(group)
-        mail_regex = inboxes[selected].get('mail_regex', r".*%s.*" % selected)
+        #mail_regex = inboxes[selected].get('mail_regex', ".*%s.*" % selected)
+        mail_regex = ".*%s.*" % selected
         window = window_exists(qtile, re.compile(mail_regex, re.I))
+        rc = get_redis()
+        is_launched = rc.get(mail_regex)
         if window:
             window = get_windows_map(qtile).get(window.window.wid)
             logger.debug("Matched %s", str(window))
@@ -275,9 +284,32 @@ class Inboxes(DmenuRun):
 
             logger.info(cmd)
             #qtile.cmd_spawn(cmd)
+            rc.set(mail_regex, datetime.now())
             return Popen(
                 cmd,
                 stdout=None,
                 stdin=None,
                 preexec_fn=os.setpgrp
             )
+
+
+@hook.subscribe.client_name_updated
+def on_inbox_open(client):
+    inboxes = get_hostconfig('google_accounts', [])
+    for inbox, config in inboxes.items():
+        mail_regex = config.get('mail_regex', None)
+        if mail_regex and re.match(mail_regex, client.name):
+            rc = get_redis()
+            rc.set(mail_regex, datetime.now())
+            client.to_group("mail")
+
+
+@hook.subscribe.client_killed
+def on_inbox_close(client):
+    inboxes = get_hostconfig('google_accounts', [])
+    for inbox, config in inboxes.items():
+        mail_regex = config.get('mail_regex', None)
+        logger.error("window close %s", client.name, mail_regex)
+        if mail_regex and re.match(mail_regex, client.name):
+            rc = get_redis()
+            rc.delete(mail_regex)

@@ -30,12 +30,12 @@ common_autostart = {
 
 laptop_autostart = dict(common_autostart)
 laptop_autostart.update({
-    'blueman-applet': None,
+    #'blueman-applet': None,
     'insync start': None,
     #'parcellite': None,
     'slack': None,
     'feh --bg-scale ~/.wallpaper': None,
-    'discord': None,
+    #'discord': None,
     'whatsapp-web-desktop': dict(
         process_filter="whatsapp",
         window_regex=re.compile(r".*whatsapp.*", re.I),
@@ -54,7 +54,7 @@ default_config = {
     },
     'term0_key': 'F11',
     'term1_key': 'F12',
-    'term2_key': 'XF86Eject',
+    'term2_key': 'XF86Launch5',
     'term3_key': 'F9',
     'google_accounts': {
             'melit.stevenjoseph@gmail.com': {
@@ -190,7 +190,7 @@ def hdmi_connected():
 
 def window_exists(qtile, regex):
     for window in get_windows_map(qtile).values():
-        logging.info(f"windowname {window.name}")
+        logger.debug("windowname %s", window.name)
         if regex.match(str(window.name)):
             return window
         wm_class = window.window.get_wm_class()
@@ -256,3 +256,10 @@ def get_windows_map(qtile_):
         return qtile.windows_map
     except AttributeError:
         return qtile.windowMap
+
+
+def get_redis():
+    from redis.client import Redis
+    from redis import BlockingConnectionPool
+    client = Redis(connection_pool=BlockingConnectionPool())
+    return client

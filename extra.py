@@ -27,8 +27,7 @@ _terminal = "st -t {0} "
 def terminal_tmux(level, session):
     return "{0} -e {1} {2} {3}".format(
         _terminal.format(session),
-        #expanduser("~/.local/bin/tmux.py"),
-        "tmux.py",
+        expanduser("~/.local/bin/tmux.py"),
         level,
         session
     )
@@ -274,6 +273,18 @@ def autossh_term(
         ]
     )
     return cmd
+
+def kubctl_term(
+    kube_context=None,
+    title=None,
+):
+    return " ".join([
+        "st",
+        "-t",
+        title,
+        "-e",
+        "jupyter_bison"
+        ])
 
 
 def show_mail(qtile):

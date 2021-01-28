@@ -28,7 +28,7 @@ layouts = [
     layout.Zoomy(**current_theme),
     # layout.TreeTab(),
     # a layout just for gimp
-    # layout.Slice('left', 192, name='gimp', role='gimp-toolbox',
+    # layout.Slice('term1', 192, name='gimp', role='gimp-toolbox',
     #             fallback=layout.Slice('right', 256, role='gimp-dock',
     #                                   fallback=layout.Stack(
     #                                       num_stacks=1, **border_args))),
@@ -83,7 +83,7 @@ class NoTimerFilter(logging.Filter):
 
 def main(self):
     self.logger = init_log(
-        log_level=logging.INFO,
+        log_level=logging.DEBUG,
     )
 
 

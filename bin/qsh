@@ -1,9 +1,13 @@
-from libqtile import sh, command
+from libqtile import sh
+from libqtile.command_client import InteractiveCommandClient
+from traitlets.config import get_config
 from IPython import embed
 
 def main():
-    client = command.Client()
-    embed()
+    client = InteractiveCommandClient()
+    c = get_config()
+    c.InteractiveShellEmbed.colors = "Linux"
+    embed(config=c)
 
 if __name__ == "__main__":
     main()
