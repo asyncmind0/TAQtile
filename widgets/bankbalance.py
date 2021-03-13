@@ -1,5 +1,6 @@
 from os.path import expanduser
 import subprocess
+
 try:
     from builtins import str
 except Exception as e:
@@ -13,13 +14,13 @@ from .bank import CommBank
 
 class BankBalance(base.ThreadedPollText):
     defaults = [
-        ('warning', 300, 'Warning limit.'),
-        ('warning_foreground', '#FF0000', 'Warning Color - no updates.'),
-        ('warning_background', '', 'Warning Color - no updates.'),
-        ('critical', 100, 'Critical limit.'),
-        ('critical_foreground', '#FF0000', 'Warning Color - no updates.'),
-        ('critical_background', '#FFffff', 'Critical Color - no updates.'),
-        ('unavailable', '#ffffff', 'Unavailable Color - no updates.'),
+        ("warning", 300, "Warning limit."),
+        ("warning_foreground", "#FF0000", "Warning Color - no updates."),
+        ("warning_background", "", "Warning Color - no updates."),
+        ("critical", 100, "Critical limit."),
+        ("critical_foreground", "#FF0000", "Warning Color - no updates."),
+        ("critical_background", "#FFffff", "Critical Color - no updates."),
+        ("unavailable", "#ffffff", "Unavailable Color - no updates."),
         ("account", "debit", "Which account to show (all/0/1/2/...)"),
     ]
     fixed_upper_bound = False
@@ -31,14 +32,22 @@ class BankBalance(base.ThreadedPollText):
         base.ThreadedPollText.__init__(self, **config)
         self.add_defaults(BankBalance.defaults)
         try:
-            user = subprocess.check_output(
-                ['pass', "financial/commbank/debit/user"]
-            ).strip().decode('utf8')
+            user = (
+                subprocess.check_output(
+                    ["pass", "financial/commbank/debit/user"]
+                )
+                .strip()
+                .decode("utf8")
+            )
             if not user:
                 return
-            password = subprocess.check_output(
-                ['pass', "financial/commbank/debit/pass"],
-            ).strip().decode('utf8')
+            password = (
+                subprocess.check_output(
+                    ["pass", "financial/commbank/debit/pass"],
+                )
+                .strip()
+                .decode("utf8")
+            )
             self.commbank = CommBank(user, password)
         except:
             logger.exception("Failed to get pasword")
@@ -72,17 +81,21 @@ class BankBalance(base.ThreadedPollText):
             logger.warning("BankBalance:%s", user)
             self.commbank.update()
             self.data = data = self.commbank.data
-            if self.account == 'credit':
+            if self.account == "credit":
                 self.amount = self.commbank.get_currency(
-                    self.commbank.data['AccountGroups'][1]['ListAccount'][-2]['AvailableFunds']
+                    self.commbank.data["AccountGroups"][1]["ListAccount"][-2][
+                        "AvailableFunds"
+                    ]
                 )
             else:
                 self.amount = self.commbank.get_currency(
-                    self.commbank.data['AccountGroups'][1]['ListAccount'][0]['AvailableFunds']
+                    self.commbank.data["AccountGroups"][1]["ListAccount"][0][
+                        "AvailableFunds"
+                    ]
                 )
             text = "%s%s" % (
                 self.amount,
-                'C' if self.account == 'credit' else 'D',
+                "C" if self.account == "credit" else "D",
             )
             logger.warning("BankBalance:%s", text)
         except Exception as e:
@@ -92,12 +105,15 @@ class BankBalance(base.ThreadedPollText):
 
     def button_press(self, x, y, button):
         subprocess.check_output(
-            'notify-send %s' %
-            str(
+            "notify-send %s"
+            % str(
                 subprocess.check_output(
                     [
-                        'python',
+                        "python",
                         expanduser("~/.bin/bank.py"),
-                    ]).strip().decode('utf8')
+                    ]
+                )
+                .strip()
+                .decode("utf8")
             )
         )

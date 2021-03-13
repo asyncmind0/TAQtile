@@ -14,7 +14,7 @@ class PriorityNotify(widget.base.ThreadedPollText):
         ("type", "linefill", "'box', 'line', 'linefill'"),
         ("line_width", 3, "Line width"),
         ("start_pos", "bottom", "Drawer starting position ('bottom'/'top')"),
-        ("background", '18BAEB', "Widget background color")
+        ("background", "18BAEB", "Widget background color"),
     ]
 
     def __init__(self, width=100, **config):

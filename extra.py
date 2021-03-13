@@ -3,14 +3,27 @@ import six
 import logging
 import os
 from os.path import expanduser, isdir, join, pathsep
+from libqtile.config import Key, Match, Rule
 from py_compile import compile
+from libqtile.config import Match
 from subprocess import check_output
 import re
-from system import execute_once, window_exists, get_hostconfig, get_current_screen, get_current_window, get_current_group, get_windows_map
+from system import (
+    execute_once,
+    window_exists,
+    get_hostconfig,
+    get_current_screen,
+    get_current_window,
+    get_current_group,
+    get_windows_map,
+)
+from libqtile.config import Group, Match, Rule as QRule, ScratchPad, DropDown
 from time import sleep
 from threading import Thread
+from libqtile.command import lazy
 
 from log import logger
+
 try:
     import notify2
 except:
@@ -18,10 +31,10 @@ except:
 
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
-#_terminal = "alacritty -t {0} "
-_terminal = "st -t {0} "
-#_terminal = "alacritty -t {0} "
-#_terminal = "kitty --name {0} --title {0} "
+# _terminal = "alacritty -t {0} "
+_terminal = "st -t {0} -c st "
+# _terminal = "alacritty -t {0} "
+# _terminal = "kitty --name {0} --title {0} "
 
 
 def terminal_tmux(level, session):
@@ -29,7 +42,7 @@ def terminal_tmux(level, session):
         _terminal.format(session),
         expanduser("~/.local/bin/tmux.py"),
         level,
-        session
+        session,
     )
 
 
@@ -47,8 +60,10 @@ class SwitchToScreen(object):
 
     def __call__(self, qtile):
         max_screen = len(qtile.screens) - 1
-        if(self.preferred_screen is not None and
-           self.preferred_screen <= max_screen):
+        if (
+            self.preferred_screen is not None
+            and self.preferred_screen <= max_screen
+        ):
             screen = qtile.screens[self.preferred_screen]
             if self.preferred_screen != get_current_screen(qtile).index:
                 qtile.cmd_to_screen(self.preferred_screen)
@@ -93,7 +108,8 @@ class MoveToGroup(object):
 
     def __call__(self, qtile):
         logging.debug(
-            "MoveToGroup:%s:%s", get_current_screen(qtile).index, self.name)
+            "MoveToGroup:%s:%s", get_current_screen(qtile).index, self.name
+        )
         index = int(self.name)
         screenindex = get_current_screen(qtile).index
         if screenindex > 0:
@@ -121,19 +137,23 @@ class MoveToOtherScreenGroup(object):
         self.direction = -1 if prev else 1
 
     def __call__(self, qtile):
-        logger.error("MoveToOtherScreenGroup:%s", get_current_screen(qtile).index)
-        otherscreen = (qtile.screens.index(get_current_screen(qtile))
-                       + self.direction) % len(qtile.screens)
+        logger.error(
+            "MoveToOtherScreenGroup:%s", get_current_screen(qtile).index
+        )
+        otherscreen = (
+            qtile.screens.index(get_current_screen(qtile)) + self.direction
+        ) % len(qtile.screens)
         othergroup = qtile.screens[otherscreen].group.name
         if get_current_window(qtile):
             get_current_window(qtile).cmd_togroup(othergroup)
 
 
 class SwitchToWindowGroup(object):
-    def __init__(
-            self, name, title=None, spawn=None, screen=0, matches=None):
+    def __init__(self, name, title=None, spawn=None, screen=0, matches=None):
         self.name = name
-        self.title = re.compile(title) if isinstance(title, six.string_types) else title
+        self.title = (
+            re.compile(title) if isinstance(title, six.string_types) else title
+        )
         self.screen = screen
         if spawn:
             self.cmd = spawn if isinstance(spawn, (tuple, list)) else [spawn]
@@ -142,7 +162,7 @@ class SwitchToWindowGroup(object):
 
     def raise_window(self, qtile):
         for window in get_windows_map(qtile).values():
-            if window.group and window.match(wname=self.title):
+            if window.group and window.match(Match(title=self.title)):
                 logger.debug("Raise window %s", window)
                 get_current_group(qtile).focus(window, False)
 
@@ -152,8 +172,8 @@ class SwitchToWindowGroup(object):
             for cmd in self.cmd:
                 logger.debug("Check %s", cmd)
                 if isinstance(cmd, dict):
-                    if not window_exists(qtile, re.compile(cmd['match'])):
-                        cmds.append(cmd['cmd'])
+                    if not window_exists(qtile, re.compile(cmd["match"])):
+                        cmds.append(cmd["cmd"])
                 else:
                     if not window_exists(qtile, self.title):
                         cmds.append(cmd)
@@ -168,7 +188,9 @@ class SwitchToWindowGroup(object):
         self.spawn_ifnot(qtile)
         if self.screen > len(qtile.screens) - 1:
             self.screen = len(qtile.screens) - 1
-        if get_current_screen(qtile).index != self.screen: # and qtile.currentWindow.title != self.title:
+        if (
+            get_current_screen(qtile).index != self.screen
+        ):  # and qtile.currentWindow.title != self.title:
             try:
                 logger.info("cmd_to_screen: %s" % self.screen)
                 qtile.cmd_to_screen(self.screen)
@@ -189,11 +211,18 @@ class ToggleApplication(SwitchToWindowGroup):
         self.spawn_ifnot(qtile)
 
 
-
 class RaiseWindowOrSpawn(object):
     def __init__(
-            self, wmclass=None, wmname=None, cmd=None, cmd_match=None,
-            floating=False, static=False, toggle=False, alpha=0.7):
+        self,
+        wmclass=None,
+        wmname=None,
+        cmd=None,
+        cmd_match=None,
+        floating=False,
+        static=False,
+        toggle=False,
+        alpha=0.7,
+    ):
         self.wmname = wmname
         self.cmd = cmd
         self.cmd_match = cmd_match
@@ -203,18 +232,23 @@ class RaiseWindowOrSpawn(object):
         self.toggle = toggle
         self.window = None
         self.alpha = 0.7
-        #if wmname:
+        # if wmname:
         #    from config import float_windows
         #    float_windows.append(wmname)
-        assert self.static in [False, None] or isinstance(self.static, (list, tuple))
+        assert self.static in [False, None] or isinstance(
+            self.static, (list, tuple)
+        )
 
     def __call__(self, qtile):
-        execute_once(self.cmd, process_filter=self.cmd_match, qtile=qtile, toggle=True)
+        execute_once(
+            self.cmd, process_filter=self.cmd_match, qtile=qtile, toggle=True
+        )
 
         for window in get_windows_map(qtile).values():
             if window.group and window.match(
-                    wname=self.wmname, wmclass=self.wmclass):
-                #window.cmd_to_screen(get_current_screen(qtile).index)
+                wname=self.wmname, wmclass=self.wmclass
+            ):
+                # window.cmd_to_screen(get_current_screen(qtile).index)
                 logger.debug("Match: %s", self.wmname)
                 window.cmd_togroup(get_current_group(qtile).name)
                 self.window = window
@@ -222,76 +256,72 @@ class RaiseWindowOrSpawn(object):
 
         if self.window:
             window = self.window
-            #if self.static:
+            # if self.static:
             #    window.static(*self.static)
             if self.toggle or True:
                 if window.hidden:
                     window.unhide()
-                    logger.error("Window: %s", window.info()['id'])
+                    logger.error("Window: %s", window.info()["id"])
                 else:
                     window.hide()
             if self.floating:
                 window.floating = self.floating
             execute_once(
                 "transet-df -n %s %s " % (window.name, self.alpha),
-                #qtile=qtile
+                # qtile=qtile
             )
-             
+
         logger.debug("No window found spawning: %s", self.cmd)
 
 
 def check_restart(qtile):
     logger.info("check_restart qtile ...")
     try:
-        for pyfile in glob.glob(os.path.expanduser('~/.config/qtile/*.py')):
+        for pyfile in glob.glob(os.path.expanduser("~/.config/qtile/*.py")):
             # log.debug(pyfile)
             compile(pyfile, doraise=True)
     except Exception as e:
         logger.exception("Syntax error")
     else:
-        #import signal
-        #signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+        # import signal
+        # signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         logger.info("restarting qtile ...")
         qtile.cmd_restart()
 
 
-def autossh_term(
-        title="autossh", port=22, host='localhost',
-        session="default"):
+def autossh_term(title="autossh", port=22, host="localhost", session="default"):
     autossh_py = "autossh.py"
     cmd = " ".join(
         [
             "st",
-            #"alacritty",
+            # "alacritty",
             "-t",
             title,
             "-e",
             autossh_py,
             "%s:%s" % (host, port),
             "outer",
-            title
+            title,
         ]
     )
     return cmd
+
 
 def kubctl_term(
     kube_context=None,
     title=None,
 ):
-    return " ".join([
-        "st",
-        "-t",
-        title,
-        "-e",
-        "jupyter_bison"
-        ])
+    return " ".join(["st", "-t", title, "-e", "jupyter_bison"])
 
 
 def show_mail(qtile):
     from collections import OrderedDict
     import notmuch
+
     queries = OrderedDict()
-    queries["inbox"] = "(tag:INBOX or tag:inbox) and not (tag:misc) and date:30d..0s and tag:unread and tag:me"
+    queries[
+        "inbox"
+    ] = "(tag:INBOX or tag:inbox) and not (tag:misc) and date:30d..0s and tag:unread and tag:me"
     queries["pullrequests"] = "tag:pullrequests and tag:unread"
     queries["drafts"] = "tag:draft"
     queries["Other"] = "tag:INBOX and tag:unread"
@@ -304,7 +334,7 @@ def show_mail(qtile):
         notification = notify2.Notification(
             "Mail",
             "<br>".join(message),
-            #icon=user_icon
+            # icon=user_icon
         )
         notification.show()
     except Exception:
@@ -316,4 +346,60 @@ def hide_show_bar(qtile):
         qtile.cmd_hide_show_bar()
         sleep(1)
         qtile.cmd_hide_show_bar()
+
     Thread(None, timer).start()
+
+
+class Terminal:
+    def __init__(
+        self,
+        name,
+        key,
+        group=None,
+        screen=None,
+        groups=None,
+        keys=None,
+        dgroups=None,
+    ):
+        self.name = name
+        self.key = key
+        self.group = group or name
+        self.screen = screen or 0
+        dgroups.append(self.get_dgroup_match())
+        keys.append(self.get_keybinding())
+        groups.append(self.get_group())
+
+    def get_keybinding(self):
+        mod = []
+        key = None
+        if isinstance(self.key, (list, tuple)) and len(self.key) == 2:
+            mod, key = self.key
+        else:
+            key = self.key
+        return Key(
+            mod,
+            key,
+            lazy.function(
+                SwitchToWindowGroup(
+                    self.name,
+                    title=self.name,
+                    screen=self.screen,
+                    spawn=terminal_tmux("outer", self.name),
+                )
+            ),
+        )
+
+    def get_match(self):
+        return Match(title=[self.name])
+
+    def get_group(self):
+        return Group(
+            self.name,
+            screen_affinity=self.screen,
+            exclusive=False,
+            init=True,
+            matches=[self.get_match()],
+        )
+
+    def get_dgroup_match(self):
+        self.get_match()

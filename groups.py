@@ -43,7 +43,11 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
     # dgroup rules that not belongs to any group
     dgroups_app_rules.extend(
         [
-            Rule(Match(title=["TDE World Clock"]), break_on_match=True, float=True),
+            Rule(
+                Match(title=["TDE World Clock"]),
+                break_on_match=True,
+                float=True,
+            ),
             Rule(
                 Match(wm_class=[re.compile(".*dunst.*", re.I)]),
                 group="1",
@@ -63,8 +67,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 Match(
                     title=[
                         "nested",
-                        "gscreenshot"
-                        "discord.com is sharing your screen.",
+                        "gscreenshot" "discord.com is sharing your screen.",
                     ],
                     wm_class=[
                         "Guake.py",
@@ -80,14 +83,15 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                         re.compile("Gnome-keyring-prompt.*?"),
                         "SshAskpass",
                         "ssh-askpass",
-                        #"zoom",
+                        # "zoom",
                     ],
                 ),
                 float=True,
                 intrusive=True,
             ),
             Rule(
-                Match(wm_class=["Pavucontrol", "Wine", "Xephyr", "Gmrun"]), float=True
+                Match(wm_class=["Pavucontrol", "Wine", "Xephyr", "Gmrun"]),
+                float=True,
             ),
             Rule(Match(wm_class=["Pidgin"]), group="3", float=False),
             Rule(
@@ -96,20 +100,21 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             ),
             Rule(
                 Match(
-                    wm_class=["jetbrains-studio", ]
+                    wm_class=[
+                        "jetbrains-studio",
+                    ]
                 ),
-                group=get_group_affinity('android-studio'),
+                group=get_group_affinity("android-studio"),
                 fullscreen=False,
-                #break_on_match=True,
+                # break_on_match=True,
             ),
+            Rule(Match(wm_class=["Screenkey"])),
             Rule(
                 Match(
-                    wm_class=["Screenkey"]
-                )
-            ),
-            Rule(
-                Match(
-                    title=[re.compile("^Android Emulator.*"), re.compile("^Emulator.*")]
+                    title=[
+                        re.compile("^Android Emulator.*"),
+                        re.compile("^Emulator.*"),
+                    ]
                 ),
                 float=True,
                 intrusive=True,
@@ -117,17 +122,24 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
             ),
             Rule(
                 Match(
-                    wm_class=["jetbrains-studio", ]
+                    wm_class=[
+                        "jetbrains-studio",
+                    ]
                 ),
-                group=get_group_affinity('android-studio'),
+                group=get_group_affinity("android-studio"),
                 fullscreen=False,
-                #break_on_match=True,
+                # break_on_match=True,
             ),
             Rule(Match(wm_class=["Screenkey"]), float=True, intrusive=True),
             Rule(
-                Match(title=[re.compile(".*Org Select.*")]), float=True, intrusive=True
+                Match(title=[re.compile(".*Org Select.*")]),
+                float=True,
+                intrusive=True,
             ),
-            Rule(Match(wm_class=["rdesktop"]), group=get_group_affinity("rdesktop")),
+            Rule(
+                Match(wm_class=["rdesktop"]),
+                group=get_group_affinity("rdesktop"),
+            ),
             Rule(
                 Match(wm_class=[re.compile(r".*VirtualBox.*")]),
                 group=get_group_affinity("virtualbox"),
@@ -143,7 +155,10 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 fullscreen=False,
                 float=False,
             ),
-            Rule(Match(wm_class=["Transgui"]), group=get_group_affinity("transgui")),
+            Rule(
+                Match(wm_class=["Transgui"]),
+                group=get_group_affinity("transgui"),
+            ),
             Rule(
                 Match(
                     title=[
@@ -156,16 +171,19 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 group=get_group_affinity("devtools"),
                 break_on_match=True,
             ),
-            #Rule(
+            # Rule(
             #    Match(role=[re.compile("^browser$")], wm_class=["webmacs"]),
             #    group=get_group_affinity("browser"),
             #    break_on_match=False,
-            #),
+            # ),
             Rule(
-                Match(title=[
-                    re.compile(r"^Hangouts$"),
-                    re.compile(r"^yakyak$", re.I)
-                ]),
+                Match(
+                    title=[
+                        re.compile(r"^Hangouts$"),
+                        re.compile(r"^yakyak$", re.I),
+                        re.compile(r"^Signal$", re.I),
+                    ]
+                ),
                 group=get_group_affinity("hangouts"),
                 break_on_match=False,
             ),
@@ -177,13 +195,13 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 group=get_group_affinity("hangouts"),
                 break_on_match=False,
             ),
-            #Rule(
+            # Rule(
             #    Match(
             #        wm_class=[re.compile(".*slack.*", re.I)],
             #    ),
             #    group=get_group_affinity("slack"),
             #    break_on_match=False,
-            #),
+            # ),
             Rule(
                 Match(
                     title=[re.compile(r"whatsapp.*", re.I)],
@@ -198,19 +216,17 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 break_on_match=False,
             ),
             Rule(
-                Match(
-                    title=[re.compile(r".*discord.*", re.I)]
-                ),
+                Match(title=[re.compile(r".*discord.*", re.I)]),
                 group="webcon",
                 break_on_match=False,
             ),
-            #Rule(
+            # Rule(
             #    Match(
             #        wm_class=[re.compile("zoom", re.I)],
             #    ),
             #    group=get_group_affinity("zoom"),
             #    break_on_match=False,
-            #),
+            # ),
             Rule(
                 Match(
                     wm_class=[re.compile("insync.*", re.I)],
@@ -258,24 +274,25 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 # ]
             ),
             "monitor": dict(
-                screen_affinity=PRIMARY_SCREEN, matches=terminal_matches([r"^monitor$"])
+                screen_affinity=PRIMARY_SCREEN,
+                matches=terminal_matches([r"^monitor$"]),
             ),
             "mail": dict(
                 screen_affinity=PRIMARY_SCREEN,
                 exclusive=True,
                 init=True,
                 matches=[
-                    #Match(wm_class=["Kmail", "Kontact"]),
-                    #Match(wm_class=[re.compile("mail.google.com__mail_u_.*")]),
-                    #Match(title=[re.compile("^Inbox .*")]),
+                    # Match(wm_class=["Kmail", "Kontact"]),
+                    # Match(wm_class=[re.compile("mail.google.com__mail_u_.*")]),
+                    # Match(title=[re.compile("^Inbox .*")]),
                     Match(title=[re.compile(".*mail.*", re.I)]),
-                    #Match(title=[re.compile(".*StreetHawk Mail.*", re.I)]),
-                    #Match(
+                    # Match(title=[re.compile(".*StreetHawk Mail.*", re.I)]),
+                    # Match(
                     #    role=[
                     #        re.compile("^kmail-mainwindow.*"),
                     #        re.compile("^kontact-mainwindow.*"),
                     #    ]
-                    #),
+                    # ),
                 ]
                 + terminal_matches([r"^mail$"]),
             ),
@@ -284,7 +301,9 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 exclusive=False,
                 init=True,
                 matches=[
-                    Match(wm_instance_class=[re.compile("calendar.google.com.*")])
+                    Match(
+                        wm_instance_class=[re.compile("calendar.google.com.*")]
+                    )
                 ],
             ),
             "browser": dict(
@@ -294,10 +313,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 matches=[
                     Match(wm_class=["qutebrowser"]),
                     Match(wm_instance_class=["surf"]),
-                    Match(
-                        role=[re.compile("^browser$")],
-                        wm_class=["webmacs"]
-                    ),
+                    Match(role=[re.compile("^browser$")], wm_class=["webmacs"]),
                 ],
             ),
             "slack": dict(
@@ -306,7 +322,7 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                 persist=True,
                 matches=[
                     Match(wm_class=["slack"]),
-                    #Match(role=[re.compile("^slack$")], wm_class=["slack"]),
+                    # Match(role=[re.compile("^slack$")], wm_class=["slack"]),
                 ],
             ),
             "webcon": dict(
@@ -318,45 +334,8 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
                     Match(wm_class=["discord"]),
                     Match(title=[re.compile(r".*discord.*", re.I)]),
                     Match(title=[re.compile(r".*whatsapp.*", re.I)]),
-                    #Match(role=[re.compile("^slack$")], wm_class=["slack"]),
+                    # Match(role=[re.compile("^slack$")], wm_class=["slack"]),
                 ],
-            ),
-            "term0": dict(
-                screen_affinity=PRIMARY_SCREEN,
-                exclusive=False,
-                init=True,
-                matches=terminal_matches([r"term0"]),
-            ),
-            "term1": dict(
-                screen_affinity=SECONDARY_SCREEN,
-                exclusive=False,
-                init=True,
-                matches=terminal_matches([r"term1"]),
-            ),
-            "term2": dict(
-                screen_affinity=TERTIARY_SCREEN,
-                exclusive=False,
-                init=True,
-                matches=terminal_matches([r"term2"]),
-            ),
-            "cloud-term0": dict(
-                screen_affinity=SECONDARY_SCREEN,
-                exclusive=False,
-                init=True,
-                matches=terminal_matches([
-                    r"^bison-term0$",
-                    r"^jupyter-bison$",
-                    r"^salt-bison$",
-                ]),
-            ),
-            "cloud-term1": dict(
-                screen_affinity=TERTIARY_SCREEN,
-                exclusive=False,
-                init=True,
-                matches=terminal_matches([
-                    r"zebra-term0"
-                    r"jupyter-zebra"
-                ]),
             ),
             "krusader": dict(
                 screen_affinity=PRIMARY_SCREEN,
@@ -385,27 +364,28 @@ def generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts):
     for i in chain(range(1, num_groups + 1), group_args.keys()):
         groups.append(
             Group(
-                str(i), **group_args.get(str(i), {"layout": "max", "layouts": layouts})
+                str(i),
+                **group_args.get(str(i), {"layout": "max", "layouts": layouts})
             )
         )
     groups.append(
         ScratchPad(
-            'scratch',
+            "scratch",
             dropdowns=[
                 DropDown(
-                    name='xterm',
-                    cmd='xterm',
+                    name="xterm",
+                    cmd="xterm",
                 ),
                 DropDown(
-                    name='htop',
-                    cmd='st -t htop -e htop',
+                    name="htop",
+                    cmd="st -t htop -e htop",
                 ),
                 DropDown(
-                    name='ncpamixer',
-                    cmd='st -t pamixer -e ncpamixer',
+                    name="ncpamixer",
+                    cmd="st -t pamixer -e ncpamixer",
                     height=1,
                 ),
-            ]
+            ],
         )
     )
     return groups

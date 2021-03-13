@@ -10,7 +10,13 @@ from recent_runner import RecentRunner
 from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from dbus_bluetooth import get_devices
 from themes import dmenu_cmd_args
-from system import get_hostconfig, window_exists, get_windows_map, get_current_screen, get_current_group
+from system import (
+    get_hostconfig,
+    window_exists,
+    get_windows_map,
+    get_current_screen,
+    get_current_group,
+)
 
 
 def dmenu_show(title, items):
@@ -18,10 +24,9 @@ def dmenu_show(title, items):
     dmenu_args = shlex.split(dmenu_cmd_args(dmenu_lines=min(30, len(items))))
     logger.info("DMENU: %s", dmenu_args)
     try:
-        return (
-            dmenu[
-                     "-c", "-i", "-p", "%s " % title
-            ] << "\n".join(items))(*dmenu_args).strip()
+        return (dmenu["-c", "-i", "-p", "%s " % title] << "\n".join(items))(
+            *dmenu_args
+        ).strip()
     except Exception as e:
         logger.exception("error running dmenu")
 
@@ -35,19 +40,16 @@ def dmenu_org(qtile):
     title = dmenu_show("Run", org_categories)
     cmd_str = (
         "emacsclient -f xdev -c org-protocol://capture://"
-        "url/%s/etext" % (
-            title,
-        )
+        "url/%s/etext" % (title,)
     )
     qtile.cmd_spawn(cmd_str)
 
 
 def list_bluetooth(qtile):
-    recent = RecentRunner('qtile_bluetooth')
-    devices = get_devices()['/org/bluez/hci0']['devices']
+    recent = RecentRunner("qtile_bluetooth")
+    devices = get_devices()["/org/bluez/hci0"]["devices"]
     all_devices = {
-        device['Alias']: device['Address']
-        for device in devices.values()
+        device["Alias"]: device["Address"] for device in devices.values()
     }
     selected = dmenu_show("Bluetooth:", recent.list(all_devices.keys()))
     if not selected:
@@ -55,13 +57,16 @@ def list_bluetooth(qtile):
     action = dmenu_show("Action", ["connect", "disconnect", "music", "voice"])
     if action in ["music", "voice"]:
         logger.info(
-                "bluez_card.%s", all_devices[selected].replace(':', '_'),
-            )
+            "bluez_card.%s",
+            all_devices[selected].replace(":", "_"),
+        )
         logger.info(
             pacmd(
                 "set-card-profile",
-                "bluez_card.%s" % all_devices[selected].replace(':', '_'),
-                {"music": "a2dp_sink_aptx", "voice": "headset_head_unit"}[action]
+                "bluez_card.%s" % all_devices[selected].replace(":", "_"),
+                {"music": "a2dp_sink_aptx", "voice": "headset_head_unit"}[
+                    action
+                ],
             )
         )
     else:
@@ -70,21 +75,19 @@ def list_bluetooth(qtile):
 
 
 def get_window_titles(qtile):
-    return [
-        w['name'] for w in qtile.cmd_windows()
-        if w['name'] != "<no name>"
-    ]
+    return [w["name"] for w in qtile.cmd_windows() if w["name"] != "<no name>"]
+
 
 def list_calendars(qtile):
-    group = 'cal'
+    group = "cal"
     try:
-        recent = RecentRunner('qtile_calendar')
-        inboxes = get_hostconfig('google_accounts', [])
+        recent = RecentRunner("qtile_calendar")
+        inboxes = get_hostconfig("google_accounts", [])
         selected = dmenu_show("Calendars:", recent.list(inboxes.keys()))
         if not selected or selected not in inboxes.keys():
             return
         recent.insert(selected)
-        match = re.compile(inboxes[selected]['calendar_regex'], re.I)
+        match = re.compile(inboxes[selected]["calendar_regex"], re.I)
         if get_current_screen(qtile).index != SECONDARY_SCREEN:
             logger.debug("cmd_to_screen")
             qtile.cmd_to_screen(SECONDARY_SCREEN)
@@ -92,20 +95,21 @@ def list_calendars(qtile):
             logger.debug("cmd_toggle_group")
             get_current_screen(qtile).cmd_toggle_group(group)
         for window in qtile.cmd_windows():
-            if match.match(window['name']):
+            if match.match(window["name"]):
                 logger.debug("Matched %s", str(window))
-                window = get_windows_map(qtile).get(window['id'])
+                window = get_windows_map(qtile).get(window["id"])
                 get_current_group(qtile).layout.current = window
                 logger.debug("layout.focus")
                 get_current_group(qtile).layout.focus(window)
                 break
         else:
             cmd = (
-                'chromium --app="https://calendar.google.com/calendar/b/%s/" --profile-directory=%s' %
+                'chromium --app="https://calendar.google.com/calendar/b/%s/" --profile-directory=%s'
+                %
                 #'firefox --new-window  --kiosk "https://calendar.google.com/calendar/b/%s/"  -P %s' %
                 (
                     selected,
-                    inboxes[selected]['profile'],
+                    inboxes[selected]["profile"],
                 )
             )
 
@@ -115,10 +119,11 @@ def list_calendars(qtile):
     except:
         logger.exception("error list_calendars")
 
+
 def dmenu_web(qtile):
-    group = 'monit'
+    group = "monit"
     try:
-        recent = RecentRunner('qtile_web')
+        recent = RecentRunner("qtile_web")
         selected = dmenu_show("links:", recent.list([]))
         if not selected:
             return
@@ -129,7 +134,9 @@ def dmenu_web(qtile):
         if get_current_group(qtile).name != group:
             logger.debug("cmd_toggle_group")
             get_current_screen(qtile).cmd_toggle_group(group)
-        window = window_exists(qtile, re.compile(r"mail.google.com__mail_u_%s" % selected, re.I))
+        window = window_exists(
+            qtile, re.compile(r"mail.google.com__mail_u_%s" % selected, re.I)
+        )
         if window:
             window = get_windows_map(qtile).get(window.window.wid)
             logger.debug("Matched" + str(window))
@@ -138,8 +145,8 @@ def dmenu_web(qtile):
             get_current_group(qtile).focus(window)
         else:
             cmd = (
-                'chromium --app="https://mail.google.com/mail/u/%s/#inbox"' %
-                selected
+                'chromium --app="https://mail.google.com/mail/u/%s/#inbox"'
+                % selected
             )
 
             logger.debug(cmd)
@@ -149,18 +156,13 @@ def dmenu_web(qtile):
 
 
 def dmenu_pushbullet(qtile):
-    pushbullet_api_key = get_hostconfig('pushbullet_api_key', [])
+    pushbullet_api_key = get_hostconfig("pushbullet_api_key", [])
     from pushbullet import PushBullet
+
     pb = PushBullet(pushbullet_api_key)
     device = dmenu_show("Devices:", [x.nickname for x in pb.devices])
     device = pb.get_device(device)
     title = "Select clip item to push: "
     dmenu_args = shlex.split(dmenu_cmd_args(dmenu_lines=min(30, len(items))))
-    body = clipmenu[
-            "-i", "-p", "%s" % title
-        ](*dmenu_args).strip()
-    device.push_note(
-        "Shared from %s" % socket.gethostname(),
-        open(body).read()
-        
-    )
+    body = clipmenu["-i", "-p", "%s" % title](*dmenu_args).strip()
+    device.push_note("Shared from %s" % socket.gethostname(), open(body).read())

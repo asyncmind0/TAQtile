@@ -3,6 +3,7 @@ import logging
 import os
 from os.path import expanduser
 from log import init_log
+
 logger = init_log(
     log_level=logging.DEBUG,
 )
@@ -13,9 +14,15 @@ from libqtile.config import Click, Drag
 
 from groups import generate_groups
 from keys import get_keys
-from screens import get_screens
+from screens import (
+    get_screens,
+    PRIMARY_SCREEN,
+    SECONDARY_SCREEN,
+    TERTIARY_SCREEN,
+)
 from system import get_num_monitors
 from themes import current_theme
+from extra import Terminal
 
 mod = "mod4"
 num_monitors = get_num_monitors()
@@ -39,30 +46,42 @@ layouts = [
 # gimp slice layout specified later on.
 floating_layout = layout.Floating(
     float_rules=[
-        {'wname': 'shrapnel'},
-        {'wname': 'Copying'},
-        {'wmclass': 'Kgpg'},
-        #{'wmclass': 'Insync.py'},
+        {"wname": "shrapnel"},
+        {"wname": "Copying"},
+        {"wmclass": "Kgpg"},
+        # {'wmclass': 'Insync.py'},
     ],
     auto_float_types=[
         "notification",
         "toolbar",
         "splash",
-        'dialog',  # this has to be here else dialogs go to new group
+        "dialog",  # this has to be here else dialogs go to new group
         "Screenkey",
-    ], **current_theme)
+    ],
+    **current_theme
+)
 
 
 # This allows you to drag windows around with the mouse if you want.
 mouse = [
-    Drag([mod], "Button1", lazy.window.set_position_floating(),
-         start=lazy.window.get_position()),
-    Drag([mod], "Button3", lazy.window.set_size_floating(),
-         start=lazy.window.get_size()),
-    #Click([mod], "Button2", lazy.window.bring_to_front())
+    Drag(
+        [mod],
+        "Button1",
+        lazy.window.set_position_floating(),
+        start=lazy.window.get_position(),
+    ),
+    Drag(
+        [mod],
+        "Button3",
+        lazy.window.set_size_floating(),
+        start=lazy.window.get_size(),
+    ),
+    # Click([mod], "Button2", lazy.window.bring_to_front())
 ]
 
-float_windows = ['buddy_list', ]
+float_windows = [
+    "buddy_list",
+]
 follow_mouse_focus = True
 bring_front_click = True
 cursor_warp = False
@@ -71,15 +90,60 @@ widget_defaults = current_theme
 dgroups_app_rules = []
 num_groups = num_monitors * 10
 
-groups = generate_groups(
-    num_groups, num_monitors, dgroups_app_rules, layouts)
+groups = generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts)
 keys = get_keys(mod, num_groups, num_monitors)
+
+
+Terminal(
+    "term0",
+    "F11",
+    groups=groups,
+    keys=keys,
+    dgroups=dgroups_app_rules,
+    screen=PRIMARY_SCREEN,
+)
+
+Terminal(
+    "term1",
+    "F12",
+    groups=groups,
+    keys=keys,
+    dgroups=dgroups_app_rules,
+    screen=SECONDARY_SCREEN,
+)
+
+Terminal(
+    "term2",
+    "XF86Launch5",
+    groups=groups,
+    keys=keys,
+    dgroups=dgroups_app_rules,
+    screen=TERTIARY_SCREEN,
+)
+
+Terminal(
+    "term3",
+    [[mod], "F12"],
+    groups=groups,
+    keys=keys,
+    dgroups=dgroups_app_rules,
+)
+Terminal(
+    "comm",
+    "F9",
+    groups=groups,
+    keys=keys,
+    dgroups=dgroups_app_rules,
+    screen=PRIMARY_SCREEN,
+)
+
 screens = get_screens(num_monitors, num_groups, groups)
 
 
 class NoTimerFilter(logging.Filter):
     def filter(self, record):
-        return 'timer' not in record.getMessage()
+        return "timer" not in record.getMessage()
+
 
 def main(self):
     self.logger = init_log(

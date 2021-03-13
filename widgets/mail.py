@@ -1,5 +1,6 @@
 from libqtile.widget import base
 from log import logger
+
 try:
     import notmuch
 except ImportError:
@@ -16,7 +17,7 @@ class NotmuchCount(base.ThreadedPollText):
 
     def poll(self):
         if not notmuch:
-            return ''
+            return ""
         db = notmuch.Database()
         query = db.create_query(self.query)
         try:
@@ -24,6 +25,6 @@ class NotmuchCount(base.ThreadedPollText):
             if count:
                 return u"\u2709 %s" % count
             else:
-                return ''
+                return ""
         except Exception as e:
             logger.exception("Error querying notmuch")

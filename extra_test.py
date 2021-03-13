@@ -14,7 +14,7 @@ class QtileRunTest(TestCase):
     def test_list_executables(self):
         self.assertIn("bash", list_executables())
         self.assertIn("python", list_executables())
-    
+
     def test_autossh_term(self):
         print(autossh_term(title="shawk_term0", port=9001))
 
@@ -29,15 +29,31 @@ class TestSwitchToWindowGroup(TestCase):
     def test_switch_group(self):
         client = command.Client()
         sw = SwitchToWindowGroup(
-            'mail',
-            title=re.compile('Inbox .*$'),
+            "mail",
+            title=re.compile("Inbox .*$"),
             screen=PRIMARY_SCREEN,
             spawn=[
-                {"cmd": 'google-chrome-stable --app="https://inbox.google.com/u/0/"', "match": re.compile("^Inbox .* melit.stevenjoseph@gmail.com$")},
-                {"cmd": 'google-chrome-stable --app="https://inbox.google.com/u/1/"', "match": re.compile("^Inbox .* steven@streethawk.co$")},
-                {"cmd": 'google-chrome-stable --app="https://inbox.google.com/u/2/"', "match": re.compile("^Inbox .* stevenjose@gmail.com$")},
-                {"cmd": 'google-chrome-stable --app="https://inbox.google.com/u/3/"', "match": re.compile("^Inbox .* steven@stevenjoseph.in$")},
-            ]
+                {
+                    "cmd": 'google-chrome-stable --app="https://inbox.google.com/u/0/"',
+                    "match": re.compile(
+                        "^Inbox .* melit.stevenjoseph@gmail.com$"
+                    ),
+                },
+                {
+                    "cmd": 'google-chrome-stable --app="https://inbox.google.com/u/1/"',
+                    "match": re.compile("^Inbox .* steven@streethawk.co$"),
+                },
+                {
+                    "cmd": 'google-chrome-stable --app="https://inbox.google.com/u/2/"',
+                    "match": re.compile("^Inbox .* stevenjose@gmail.com$"),
+                },
+                {
+                    "cmd": 'google-chrome-stable --app="https://inbox.google.com/u/3/"',
+                    "match": re.compile("^Inbox .* steven@stevenjoseph.in$"),
+                },
+            ],
         )
-        
-        sw.window_exists(client, re.compile("^Inbox .* steven@stevenjoseph.in$"))
+
+        sw.window_exists(
+            client, re.compile("^Inbox .* steven@stevenjoseph.in$")
+        )

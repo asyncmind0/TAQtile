@@ -5,11 +5,11 @@ from dmenu import list_executables
 
 class RecentRunnerTest(TestCase):
     def test_list(self):
-        rr = RecentRunner('qtile_run', dbpath="~/.qtile_run_test.db")
+        rr = RecentRunner("qtile_run", dbpath="~/.qtile_run_test.db")
         self.assertGreater(len(rr.list(list_executables())), 1)
 
     def test_recent_run(self):
-        rr = RecentRunner('qtile_run', dbpath="~/.qtile_run_test.db")
+        rr = RecentRunner("qtile_run", dbpath="~/.qtile_run_test.db")
         rr.insert("testcmd")
         rr.insert("testcmd2")
         rr.insert("testcmd1")

@@ -13,7 +13,7 @@ from system import execute_once
 from log import logger
 
 
-#class ThreadedPacman(widget.Pacman):
+# class ThreadedPacman(widget.Pacman):
 #
 #    def __init__(self, *args, **kwargs):
 #        super(ThreadedPacman, self).__init__(*args, **kwargs)
@@ -46,9 +46,11 @@ class Clock(Clock):
         # if TZ=''.
         if self.timezone is not None:
             zoneinfo = timezone("UTC")
-            return zoneinfo.localize(
-                datetime.utcnow() + self.DELTA
-            ).astimezone(self.timezone).strftime(self.format)
+            return (
+                zoneinfo.localize(datetime.utcnow() + self.DELTA)
+                .astimezone(self.timezone)
+                .strftime(self.format)
+            )
         else:
             return self._get_time()
 
@@ -57,18 +59,19 @@ class CalClock(Clock):
     # def button_release(self, x, y, button):
 
     def button_press(self, x, y, button):
-        #self.qtile.cmd_spawn("calendar_applet.py")
+        # self.qtile.cmd_spawn("calendar_applet.py")
         try:
             self.qtile.current_screen.bottom.show(
-                not self.qtile.current_screen.bottom.is_show())
+                not self.qtile.current_screen.bottom.is_show()
+            )
         except:
             logger.exception("error")
         execute_once("kworldclock", qtile=self.qtile, toggle=True)
-        #rws = RaiseWindowOrSpawn(wmname="TDE World Clock", cmd="/opt/trinity/bin/kworldclock")
-        #rws(self.qtile)
+        # rws = RaiseWindowOrSpawn(wmname="TDE World Clock", cmd="/opt/trinity/bin/kworldclock")
+        # rws(self.qtile)
 
 
-#class GraphHistory(NetGraph):
+# class GraphHistory(NetGraph):
 #    """Graph that persists history and reloads it when restarted.
 #    provides a continuous graph, desipite qtile restarting.
 #    """
