@@ -17,7 +17,9 @@ history_len = 50
 previous_clip = None
 count_call = 0
 history_file = os.path.expanduser(
-    join(os.environ.get("XDG_RUNTIME_DIR", "~/"), "clipmenu.6.steven/line_cache")
+    join(
+        os.environ.get("XDG_RUNTIME_DIR", "~/"), "clipmenu.6.steven/line_cache"
+    )
 )
 
 

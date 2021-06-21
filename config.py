@@ -12,7 +12,7 @@ from libqtile import layout
 from libqtile.command import lazy
 from libqtile.config import Click, Drag
 
-from groups import generate_groups
+from groups import generate_groups, get_dgroups
 from keys import get_keys
 from screens import (
     get_screens,
@@ -87,10 +87,10 @@ bring_front_click = True
 cursor_warp = False
 auto_fullscreen = True
 widget_defaults = current_theme
-dgroups_app_rules = []
+dgroups_app_rules = get_dgroups()
 num_groups = num_monitors * 10
 
-groups = generate_groups(num_groups, num_monitors, dgroups_app_rules, layouts)
+groups = generate_groups(num_groups, num_monitors, layouts)
 keys = get_keys(mod, num_groups, num_monitors)
 
 
@@ -122,12 +122,14 @@ Terminal(
 )
 
 Terminal(
-    "term3",
+    "salt-bison",
     [[mod], "F12"],
     groups=groups,
     keys=keys,
     dgroups=dgroups_app_rules,
+    spawn="salt-bison",
 )
+
 Terminal(
     "comm",
     "F9",
@@ -135,6 +137,26 @@ Terminal(
     keys=keys,
     dgroups=dgroups_app_rules,
     screen=PRIMARY_SCREEN,
+)
+
+Terminal(
+    "jupyter-bison",
+    [[mod], "XF86Launch5"],
+    groups=groups,
+    keys=keys,
+    dgroups=dgroups_app_rules,
+    screen=TERTIARY_SCREEN,
+    spawn="jupyter-bison",
+)
+
+Terminal(
+    "jupyter-zebra",
+    [[mod], "F11"],
+    groups=groups,
+    keys=keys,
+    dgroups=dgroups_app_rules,
+    screen=TERTIARY_SCREEN,
+    spawn="jupyter-zebra",
 )
 
 screens = get_screens(num_monitors, num_groups, groups)

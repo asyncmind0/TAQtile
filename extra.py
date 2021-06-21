@@ -2,10 +2,15 @@ import glob
 import six
 import logging
 import os
+from libqtile.config import (
+    Key,
+    Group,
+    Match,
+    ScratchPad,
+    DropDown,
+)
 from os.path import expanduser, isdir, join, pathsep
-from libqtile.config import Key, Match, Rule
 from py_compile import compile
-from libqtile.config import Match
 from subprocess import check_output
 import re
 from system import (
@@ -17,7 +22,6 @@ from system import (
     get_current_group,
     get_windows_map,
 )
-from libqtile.config import Group, Match, Rule as QRule, ScratchPad, DropDown
 from time import sleep
 from threading import Thread
 from libqtile.command import lazy
@@ -85,14 +89,14 @@ class SwitchToScreen(object):
 
 class SwitchToScreenGroup(SwitchToScreen):
     def __call__(self, qtile):
-        screen, index = super(SwitchToScreenGroup, self).__call__(qtile)
+        screen, index = super().__call__(qtile)
         if index and screen:
             screen.cmd_toggle_group(index)
 
 
 class SwitchToScreenGroupUrgent(SwitchToScreenGroup):
     def __call__(self, qtile):
-        screen, index = super(SwitchToScreenGroupUrgent, self).__call__(qtile)
+        super().__call__(qtile)
         cg = get_current_group(qtile)
         for group in qtile.group_map.values():
             if group == cg:
@@ -307,13 +311,6 @@ def autossh_term(title="autossh", port=22, host="localhost", session="default"):
     return cmd
 
 
-def kubctl_term(
-    kube_context=None,
-    title=None,
-):
-    return " ".join(["st", "-t", title, "-e", "jupyter_bison"])
-
-
 def show_mail(qtile):
     from collections import OrderedDict
     import notmuch
@@ -360,14 +357,16 @@ class Terminal:
         groups=None,
         keys=None,
         dgroups=None,
+        spawn=None,
     ):
         self.name = name
         self.key = key
         self.group = group or name
         self.screen = screen or 0
-        dgroups.append(self.get_dgroup_match())
+        self.spawn = spawn or terminal_tmux("outer", self.name)
         keys.append(self.get_keybinding())
         groups.append(self.get_group())
+        dgroups.append(self.get_dgroup_match())
 
     def get_keybinding(self):
         mod = []
@@ -384,7 +383,7 @@ class Terminal:
                     self.name,
                     title=self.name,
                     screen=self.screen,
-                    spawn=terminal_tmux("outer", self.name),
+                    spawn=self.spawn,
                 )
             ),
         )
@@ -402,4 +401,11 @@ class Terminal:
         )
 
     def get_dgroup_match(self):
-        self.get_match()
+        from groups import Rule
+
+        return Rule(
+            self.get_match(),
+            group=self.group,
+            fullscreen=True,
+            float=False,
+        )

@@ -256,7 +256,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "control"], "l", lazy.spawn(expanduser("~/.bin/lock"))),
         ([mod], "F1", lazy.spawn("sh -c 'sleep 5;xset dpms force off'")),
         # ([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
-        ([mod, "shift"], "c", lazy.spawn("spectacle")),
+        ([mod, "shift"], "c", lazy.spawn("flameshot gui")),
         ([mod, "shift"], "s", lazy.spawn("spectacle")),
         ([mod, "shift"], "m", lazy.spawn("kmag")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),

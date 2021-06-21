@@ -112,25 +112,32 @@ def rules_shrapnel(client):
 def set_groups(qtile, *args, **kwargs):
     for client in list(get_windows_map(qtile).values()):
         for rule in qtile.dgroups.rules:
-            logger.info("Matching %s", rule)
             try:
-                if rule.matches(client):
-                    client.floating = rule.float
-                    if getattr(rule, "fullscreen", None):
-                        if rule.fullscreen:
-                            client.enablemaximize()
-                        else:
-                            client.enablemaximize(state=4)
-                    # if getattr(client, 'static', False):
-                    #    client.static(0)
-                    if getattr(rule, "opacity", False):
-                        client.cmd_opacity(rule.opacity)
-                    if rule.group and getattr(client, "togroup", None):
+                if client.__class__.__name__ in [
+                    'Icon',
+                    'Internal',
+                    'Systray',
+                ]:
+                    continue
+                if rule and rule.matches(client):
+                    logger.info("Matched %s %s", rule, client)
+                    if rule.group:
+                        logger.error("to group %s", rule.group)
                         client.togroup(rule.group)
                     front = getattr(rule, "front", False)
                     if front and hasattr(client, "cmd_bring_to_front"):
                         logger.error("to front %s", client.window.get_name())
                         client.cmd_bring_to_front()
+                    #client.floating = rule.float
+                    if getattr(rule, "fullscreen", None):
+                        if rule.fullscreen:
+                            client.fullscreen = True
+                        else:
+                            client.fullscreen = False
+                    # if getattr(client, 'static', False):
+                    #    client.static(0)
+                    if getattr(rule, "opacity", False):
+                        client.cmd_opacity(rule.opacity)
                     center = getattr(rule, "center", False)
                     if center:
                         logger.debug(dir(get_current_screen(qtile)))
@@ -159,7 +166,7 @@ def set_groups(qtile, *args, **kwargs):
                     if rule.break_on_match:
                         break
             except Exception as e:
-                logger.exception("error setting rules")
+                logger.exception("error setting rules %s", client)
 
 
 # @hook.subscribe.client_urgent_hint_changed

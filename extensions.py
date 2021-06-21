@@ -274,28 +274,30 @@ class Inboxes(DmenuRun):
         if get_current_group(qtile).name != group:
             logger.debug("cmd_toggle_group")
             get_current_screen(qtile).cmd_toggle_group(group)
-        # mail_regex = inboxes[selected].get('mail_regex', ".*%s.*" % selected)
-        mail_regex = ".*%s.*" % selected
+        mail_regex = inboxes[selected].get("mail_regex", ".*%s.*" % selected)
+        # mail_regex = ".*%s.*" % selected
         window = window_exists(qtile, re.compile(mail_regex, re.I))
-        rc = get_redis()
-        is_launched = rc.get(mail_regex)
+        logger.debug("mail window exists %s regex %s ", window, mail_regex)
+        # rc = get_redis()
+        # is_launched = rc.get(mail_regex)
         if window:
-            window = get_windows_map(qtile).get(window.window.wid)
+            #window = get_windows_map(qtile).get(window.window.wid)
             logger.debug("Matched %s", str(window))
             window.cmd_togroup(group)
             logger.debug("layout.focus")
             get_current_group(qtile).focus(window)
         else:
             cmd = (
-                "google-chrome-stable",
+                # "google-chrome-stable",
+                "brave",
                 "--app=https://mail.google.com/mail/u/%s/#inbox" % selected,
                 "--profile-directory=%s" % inboxes[selected]["profile"],
             )
 
             logger.info(cmd)
-            # qtile.cmd_spawn(cmd)
-            rc.set(mail_regex, datetime.now().timestamp())
-            return Popen(cmd, stdout=None, stdin=None, preexec_fn=os.setpgrp)
+            qtile.cmd_spawn(cmd)
+            # rc.set(mail_regex, datetime.now().timestamp())
+            # return Popen(cmd, stdout=None, stdin=None, preexec_fn=os.setpgrp)
 
 
 @hook.subscribe.client_name_updated

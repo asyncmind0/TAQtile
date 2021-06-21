@@ -55,23 +55,25 @@ default_config = {
     "google_accounts": {
         "melit.stevenjoseph@gmail.com": {
             "calendar_regex": r"^Google Calendar.*$",
+            "mail_regex": r".*melit\.stevenjoseph@gmail\.com.*$",
             # "profile": "default-release",
-            "profile": "Profile 1",
+            "profile": "Home",
         },
         "steven@stevenjoseph.in": {
             "calendar_regex": r"^stevenjoseph - Calendar.*$",
+            "mail_regex": r".*steven@stevenjoseph.*$",
             # "profile": "default-release",
-            "profile": "Profile 1",
+            "profile": "Home",
         },
         "steven@streethawk.co": {
             "calendar_regex": r"Streethawk - Calendar.*$",
-            "mail_regex": r".*Streethawk - Mail.*$",
-            "profile": "Default",
+            "mail_regex": r".*Streethawk Mail.*$",
+            "profile": "Work",
         },
         "stevenjose@gmail.com": {
             "calendar_regex": r"stevenjose - Calendar.*$",
             # "profile": "default-release",
-            "profile": "Profile 1",
+            "profile": "Home",
         },
     },
     "volume_up": "pactl set-sink-volume @DEFAULT_SINK@ +5000",
@@ -192,14 +194,19 @@ def hdmi_connected():
 
 
 def window_exists(qtile, regex):
-    for window in get_windows_map(qtile).values():
-        logger.debug("windowname %s", window.name)
-        if regex.match(str(window.name)):
+    for window in qtile.cmd_windows():
+        if regex.match(window["name"]):
+            logger.debug("Matched %s", str(window))
+            window = get_windows_map(qtile).get(window["id"])
             return window
-        wm_class = window.window.get_wm_class()
-        logger.debug(wm_class)
-        if wm_class and any(map(regex.match, wm_class)):
-            return window
+    # for window in get_windows_map(qtile).values():
+    #    logger.debug("windowname %s", window.name)
+    #    if regex.match(str(window.name)):
+    #        return window
+    #    wm_class = window.window.get_wm_class()
+    #    logger.debug(wm_class)
+    #    if wm_class and any(map(regex.match, wm_class)):
+    #        return window
 
 
 def execute_once(process, process_filter=None, toggle=False, window_regex=None):
