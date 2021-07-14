@@ -5,13 +5,15 @@ default_theme = dict(
     padding=0,
     margin=0,
     linewidth=1,
-    fontsize=11,
+    fontsize=16,
+    terminal_fontsize=26,
+    font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
     # font="Inconsolata",
-    font="Terminus",
-    ##font="ProggySquareTTSZ",
+    # font="Terminus",
+    # font="ProggySquareTTSZ",
     # font="pango:monospace",
     borderwidth=1,
-    bar_height=13,
+    bar_height=20,
     dmenu_lines=30,
 )
 
@@ -30,6 +32,7 @@ star_trek_blue = dict(
     this_current_screen_border="#5981B9",
     highlight_method="block",
     disable_drag=True,
+    focused_background="#5981B9",
 )
 
 matrix_green = dict(

@@ -47,7 +47,7 @@ laptop_autostart.update(
 desktop_autostart = dict(common_autostart)
 desktop_autostart.update({"jabberel-tray.py": None})
 default_config = {
-    "screens": {0: 1, 1: 0, 2: 2},
+    "screens": {0: 1, 1: 0, 2: 2, 3: 3},
     "term0_key": "F11",
     "term1_key": "F12",
     "term2_key": "XF86Launch5",
@@ -133,13 +133,15 @@ platform_specific = {
 }
 
 
-host = platform.node().split(".", 1)[0].lower()
+def get_hostconfig_dict():
+    host = platform.node().split(".", 1)[0].lower()
+    config = dict(default_config)
+    config.update(platform_specific.get(host, default_config))
+    return config
 
 
 def get_hostconfig(key, default=None):
-    config = dict(default_config)
-    config.update(platform_specific.get(host, default_config))
-    return config.get(key, default)
+    return get_hostconfig_dict().get(key, default)
 
 
 def get_screen(index):

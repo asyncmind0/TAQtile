@@ -37,6 +37,7 @@ log = logging.getLogger("qtile")
 PRIMARY_SCREEN = system.get_screen(0)
 SECONDARY_SCREEN = system.get_screen(1)
 TERTIARY_SCREEN = system.get_screen(2)
+QUATERNARY_SCREEN = system.get_screen(3)
 
 try:
     localtimezone = check_output(["tzupdate", "-p", "-s", "5"]).decode().strip()
@@ -61,7 +62,6 @@ def get_screens(num_monitors, num_groups, groups):
         center_aligned=True,
         hide_unused=True,
         spacing=2,
-        bar_height=15,
     )
     tasklist_params = default_params(
         selected=("[", "]"),
@@ -243,7 +243,23 @@ def get_screens(num_monitors, num_groups, groups):
         CurrentLayout(**current_layout_params),
         CalClock(timezone=localtimezone, **clock_params),
     ]
-    bar_height = groupbox_params["bar_height"]
+    quaternary_bar = [
+        TextBox("fourth"),
+        Sep(**sep_params),
+        MultiScreenGroupBox(
+            namemap=mon_map[TERTIARY_SCREEN], **groupbox_params
+        ),
+        # Sep(**sep_params),
+        ##TaskList2(**tasklist_params),
+        WindowName(**windowname_params),
+        Sep(**sep_params),
+        CurrentLayout(**current_layout_params),
+        CalClock(timezone=localtimezone, **clock_params),
+    ]
+    bar_defaults = dict(
+        focused_background=themes.current_theme.get("focused_background"),
+        size=groupbox_params["bar_height"],
+    )
 
     def make_clocks(*timezones):
         widgets = []
@@ -272,26 +288,23 @@ def get_screens(num_monitors, num_groups, groups):
             Pomodoro(**groupbox_params),
         ]
     )
-    clock_bar = Bar(clock_bar, size=bar_height)
+    clock_bar = Bar(clock_bar, **bar_defaults)
     # clock_bar.size = 0
     screens = dict()
     if num_monitors == 1:
         primary_bar.append(CalClock(timezone=localtimezone, **clock_params))
         screens[PRIMARY_SCREEN] = Screen(
-            Bar(primary_bar, bar_height),
+            Bar(primary_bar, **bar_defaults),
             bottom=clock_bar,
         )
     else:
-        screens[PRIMARY_SCREEN] = Screen(Bar(primary_bar, bar_height))
+        screens[PRIMARY_SCREEN] = Screen(Bar(primary_bar, **bar_defaults))
         screens[SECONDARY_SCREEN] = Screen(
-            Bar(
-                secondary_bar,
-                bar_height,
-            ),
+            Bar(secondary_bar, **bar_defaults),
             bottom=clock_bar,
         )
-        screens[TERTIARY_SCREEN] = Screen(Bar(tertiary_bar, bar_height))
-        screens[3] = Screen(Bar(tertiary_bar, bar_height))
+        screens[TERTIARY_SCREEN] = Screen(Bar(tertiary_bar, **bar_defaults))
+        screens[QUATERNARY_SCREEN] = Screen(Bar(quaternary_bar, **bar_defaults))
     screens = [screens[y] for y in sorted(screens.keys())]
     log.error("Screens: %s ", screens)
     return screens

@@ -1,16 +1,12 @@
-import logging
 import re
-
-from libqtile import layout
-from libqtile.config import Group, Match, Rule as QRule, ScratchPad, DropDown
-
-from system import get_hostconfig, get_group_affinity, get_screen_affinity
-from themes import current_theme
 from collections import OrderedDict
-from screens import SECONDARY_SCREEN, PRIMARY_SCREEN, TERTIARY_SCREEN
 from itertools import chain
 
+from libqtile.config import Group, Match, Rule as QRule, ScratchPad, DropDown
+
 from log import logger
+from screens import SECONDARY_SCREEN, PRIMARY_SCREEN
+from system import get_hostconfig, get_group_affinity
 
 
 class Rule(QRule):
@@ -113,7 +109,7 @@ def get_dgroups():
                 title=[
                     re.compile(r".*mail.*", re.I),
                 ],
-                #role="pop-up",
+                # role="pop-up",
             ),
             group="mail",
             break_on_match=True,
@@ -183,13 +179,13 @@ def get_dgroups():
             static=True,
             break_on_match=True,
         ),
-        #Rule(
+        # Rule(
         #    Match(title=["shrapnel"]),
         #    group="1",
         #    break_on_match=False,
         #    float=True,
         #    opacity=0.85,
-        #),
+        # ),
     ]
 
 
@@ -277,6 +273,7 @@ def generate_groups(num_groups, num_monitors, layouts):
                 init=True,
                 persist=True,
                 matches=[
+                    Match(wm_class=["zoom"]),
                     Match(wm_class=["slack"]),
                     # Match(role=[re.compile("^slack$")], wm_class=["slack"]),
                 ],
@@ -286,7 +283,6 @@ def generate_groups(num_groups, num_monitors, layouts):
                 init=True,
                 persist=True,
                 matches=[
-                    Match(wm_class=["zoom"]),
                     Match(wm_class=["discord"]),
                     Match(title=[re.compile(r".*discord.*", re.I)]),
                     Match(title=[re.compile(r".*whatsapp.*", re.I)]),
@@ -297,6 +293,11 @@ def generate_groups(num_groups, num_monitors, layouts):
                 screen_affinity=PRIMARY_SCREEN,
                 persist=False,
                 matches=[Match(title=[".*krusader.*"], wm_class=["Krusader"])],
+            ),
+            "emacs": dict(
+                screen_affinity=PRIMARY_SCREEN,
+                persist=False,
+                matches=[Match(wm_class=["emacs"])],
             ),
         }
     )

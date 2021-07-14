@@ -13,6 +13,7 @@ from os.path import expanduser, isdir, join, pathsep
 from py_compile import compile
 from subprocess import check_output
 import re
+from themes import current_theme
 from system import (
     execute_once,
     window_exists,
@@ -36,7 +37,11 @@ except:
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
 # _terminal = "alacritty -t {0} "
-_terminal = "st -t {0} -c st "
+_terminal = (
+    'st -f "%(font)s:pixelsize=%(terminal_fontsize)s" -t {0} -c st '
+    % current_theme
+)
+
 # _terminal = "alacritty -t {0} "
 # _terminal = "kitty --name {0} --title {0} "
 

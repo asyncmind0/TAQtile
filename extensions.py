@@ -281,7 +281,7 @@ class Inboxes(DmenuRun):
         # rc = get_redis()
         # is_launched = rc.get(mail_regex)
         if window:
-            #window = get_windows_map(qtile).get(window.window.wid)
+            # window = get_windows_map(qtile).get(window.window.wid)
             logger.debug("Matched %s", str(window))
             window.cmd_togroup(group)
             logger.debug("layout.focus")
@@ -289,6 +289,9 @@ class Inboxes(DmenuRun):
         else:
             cmd = (
                 # "google-chrome-stable",
+                "/usr/sbin//systemd-run",
+                "--user",
+                "--slice=browser.slice",
                 "brave",
                 "--app=https://mail.google.com/mail/u/%s/#inbox" % selected,
                 "--profile-directory=%s" % inboxes[selected]["profile"],

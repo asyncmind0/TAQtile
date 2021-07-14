@@ -114,9 +114,9 @@ def set_groups(qtile, *args, **kwargs):
         for rule in qtile.dgroups.rules:
             try:
                 if client.__class__.__name__ in [
-                    'Icon',
-                    'Internal',
-                    'Systray',
+                    "Icon",
+                    "Internal",
+                    "Systray",
                 ]:
                     continue
                 if rule and rule.matches(client):
@@ -128,7 +128,7 @@ def set_groups(qtile, *args, **kwargs):
                     if front and hasattr(client, "cmd_bring_to_front"):
                         logger.error("to front %s", client.window.get_name())
                         client.cmd_bring_to_front()
-                    #client.floating = rule.float
+                    # client.floating = rule.float
                     if getattr(rule, "fullscreen", None):
                         if rule.fullscreen:
                             client.fullscreen = True
