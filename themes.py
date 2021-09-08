@@ -6,7 +6,7 @@ default_theme = dict(
     margin=0,
     linewidth=1,
     fontsize=16,
-    terminal_fontsize=26,
+    terminal_fontsize=16,
     font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
     # font="Inconsolata",
     # font="Terminus",

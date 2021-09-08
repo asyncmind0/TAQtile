@@ -99,6 +99,8 @@ default_config = {
         "android-studio": 12,
     },
     "pushbullet_api_key": "o.erHnfFynMisnu5Cy4X2Klw6y12lJcX26",
+    "brightness_up": "xbacklight -inc 10",
+    "brightness_down": "xbacklight -dec 10",
 }
 series9_config = {
     "laptop": True,
@@ -116,8 +118,6 @@ series9_config = {
 zenbook1 = {
     "laptop": True,
     "battery": "BAT0",
-    "brightness_up": "xbacklight -inc 10",
-    "brightness_down": "xbacklight -dec 10",
     "kbd_brightness_up": "asus-kbd-backlight up",
     "kbd_brightness_down": "asus-kbd-backlight down",
     "autostart-once": laptop_autostart,
