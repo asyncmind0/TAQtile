@@ -47,7 +47,12 @@ laptop_autostart.update(
 desktop_autostart = dict(common_autostart)
 desktop_autostart.update({"jabberel-tray.py": None})
 default_config = {
-    "screens": {0: 1, 1: 0, 2: 2, 3: 3},
+    "screens": {
+        0: 2,
+        1: 1,
+        2: 0,
+        3: 3,
+    },
     "term0_key": "F11",
     "term1_key": "F12",
     "term2_key": "XF86Launch5",

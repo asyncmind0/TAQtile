@@ -128,6 +128,7 @@ Terminal(
     keys=keys,
     dgroups=dgroups_app_rules,
     spawn="salt-bison",
+    screen=SECONDARY_SCREEN,
 )
 
 Terminal(
