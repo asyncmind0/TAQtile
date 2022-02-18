@@ -41,25 +41,6 @@ layouts = [
     #                                       num_stacks=1, **border_args))),
 ]
 
-# Automatically float these types. This overrides the default behavior (which
-# is to also float utility types), but the default behavior breaks our fancy
-# gimp slice layout specified later on.
-floating_layout = layout.Floating(
-    float_rules=[
-        {"wname": "shrapnel"},
-        {"wname": "Copying"},
-        {"wmclass": "Kgpg"},
-        # {'wmclass': 'Insync.py'},
-    ],
-    auto_float_types=[
-        "notification",
-        "toolbar",
-        "splash",
-        "dialog",  # this has to be here else dialogs go to new group
-        "Screenkey",
-    ],
-    **current_theme
-)
 
 
 # This allows you to drag windows around with the mouse if you want.
@@ -146,7 +127,7 @@ Terminal(
     groups=groups,
     keys=keys,
     dgroups=dgroups_app_rules,
-    screen=TERTIARY_SCREEN,
+    screen=SECONDARY_SCREEN,
     spawn="jupyter-bison",
 )
 
