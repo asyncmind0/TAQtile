@@ -259,52 +259,67 @@ def get_screens(num_monitors, num_groups, groups):
     bar_defaults = dict(
         focused_background=themes.current_theme.get("focused_background"),
         size=groupbox_params["bar_height"],
+        font="Terminus",
+        fontsize=12,
     )
 
-    def make_clocks(*timezones):
+    clock_params = default_params(
+        padding=2, format="%Y-%m-%d %a %H:%M", fontsize=12
+    )
+    clock_text = default_params(fontsize=12)
+
+    def make_clock_bar():
+        timezones = [
+            "UTC",
+            "US/Central",
+            "Asia/Ho_Chi_Minh",
+            "US/Eastern",
+            "Australia/Sydney",
+            "Asia/Kolkata",
+            "Asia/Riyadh",
+        ]
         widgets = []
         for timezone in timezones:
             if timezone == localtimezone:
                 continue
-            widgets.append(TextBox("%s:" % timezone, **default_params()))
+            widgets.append(TextBox("%s:" % timezone, **clock_text))
             widgets.append(Clock(timezone=timezone, **clock_params))
             widgets.append(
                 Sep(**default_params(padding=8, fontsize=9)),
             )
-        return widgets
+        widgets.extend(
+            [
+                Sep(**sep_params),
+                Pomodoro(**groupbox_params),
+            ]
+        )
+        return Bar(widgets, **bar_defaults)
 
-    clock_bar = make_clocks(
-        "UTC",
-        "US/Central",
-        "Asia/Ho_Chi_Minh",
-        "US/Eastern",
-        "Australia/Sydney",
-        "Asia/Kolkata",
-        "Asia/Riyadh",
-    )
-    clock_bar.extend(
-        [
-            Sep(**sep_params),
-            Pomodoro(**groupbox_params),
-        ]
-    )
-    clock_bar = Bar(clock_bar, **bar_defaults)
     # clock_bar.size = 0
     screens = dict()
     if num_monitors == 1:
         primary_bar.append(CalClock(timezone=localtimezone, **clock_params))
         screens[PRIMARY_SCREEN] = Screen(
             Bar(primary_bar, **bar_defaults),
-            bottom=clock_bar,
+            bottom=make_clock_bar(),
         )
     else:
-        screens[PRIMARY_SCREEN] = Screen(Bar(primary_bar, **bar_defaults))
+        screens[PRIMARY_SCREEN] = Screen(
+            Bar(primary_bar, **bar_defaults),
+            bottom=make_clock_bar(),
+        )
         screens[SECONDARY_SCREEN] = Screen(
             Bar(secondary_bar, **bar_defaults),
-            bottom=clock_bar,
+            bottom=make_clock_bar(),
         )
-        screens[TERTIARY_SCREEN] = Screen(Bar(tertiary_bar, **bar_defaults))
-        screens[QUATERNARY_SCREEN] = Screen(Bar(quaternary_bar, **bar_defaults))
+        screens[TERTIARY_SCREEN] = Screen(
+            Bar(tertiary_bar, **bar_defaults),
+            bottom=make_clock_bar(),
+        )
+        screens[QUATERNARY_SCREEN] = Screen(
+            Bar(quaternary_bar, **bar_defaults),
+            bottom=make_clock_bar(),
+        )
     screens = [screens[y] for y in sorted(screens.keys())]
     log.error("Screens: %s ", screens)
     return screens
