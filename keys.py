@@ -224,6 +224,8 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "shift"], "Return", lazy.layout.toggle_split()),
         (["shift", mod], "q", lazy.shutdown()),
         ([mod, "control"], "q", lazy.spawn("dmenu-session")),
+        (["control"], "space", lazy.spawn("dunstctl close")),
+        (["control"], "grave", lazy.spawn("dunstctl history-pop")),
         # Toggle between different layouts as defined below
         # ([mod], "space",    lazy.nextlayout()),
         ([mod], "q", lazy.window.kill()),
