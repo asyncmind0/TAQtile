@@ -2,18 +2,19 @@ from log import logger
 
 
 default_theme = dict(
-    padding=0,
+    padding=1,
     margin=0,
-    linewidth=1,
-    fontsize=16,
+    linewidth=2,
+    fontsize=12,
+    terminal_font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
     terminal_fontsize=16,
-    font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
+    # font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
     # font="Inconsolata",
-    # font="Terminus",
+    font="Terminus",
     # font="ProggySquareTTSZ",
     # font="pango:monospace",
     borderwidth=1,
-    bar_height=20,
+    bar_height=18,
     dmenu_lines=30,
 )
 
