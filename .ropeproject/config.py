@@ -41,6 +41,7 @@ def set_prefs(prefs):
 
     # You can extend python path for looking up modules
     prefs.add("python_path", "~/.local/lib/python3.10/site-packages/")
+    prefs.add("python_path", "/usr/lib/python3.10/site-packages/")
 
     # Should rope save object information or not.
     prefs["save_objectdb"] = True
