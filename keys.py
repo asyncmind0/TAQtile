@@ -1,12 +1,29 @@
-import logging
+import re
+import shlex
+from os.path import expanduser
+from subprocess import check_output
+
 from libqtile import extension
 from libqtile.command import lazy
-from libqtile.config import Key, Match, Rule
+from libqtile.config import Key
+
+from clip import dmenu_xclip
+from dmenu import (
+    dmenu_org,
+    list_bluetooth,
+    list_calendars,
+    dmenu_pushbullet,
+)
+from extensions import (
+    Surf,
+    DmenuRunRecent,
+    PassMenu,
+    Inboxes,
+    BringWindowToGroup,
+)
 from extra import (
     SwitchToWindowGroup,
-    ToggleApplication,
     check_restart,
-    terminal_tmux,
     terminal,
     MoveToOtherScreenGroup,
     SwitchToScreenGroup,
@@ -14,29 +31,14 @@ from extra import (
     MoveToGroup,
     move_to_next_group,
     move_to_prev_group,
-    autossh_term,
     show_mail,
-    hide_show_bar,
 )
-from dmenu import (
-    dmenu_org,
-    list_bluetooth,
-    list_calendars,
-    dmenu_pushbullet,
-)
-from system import get_hostconfig, get_group_affinity, get_screen_affinity
-from screens import PRIMARY_SCREEN, SECONDARY_SCREEN, TERTIARY_SCREEN
-from system import get_hostconfig
-from themes import current_theme, dmenu_cmd_args
-from os.path import expanduser
 from hooks import set_groups
 from log import logger
-import re
-from subprocess import check_output
-import six
-import shlex
-from extensions import Surf, DmenuRunRecent, BroTab, PassMenu, Inboxes
-from clip import dmenu_xclip
+from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
+from system import get_hostconfig
+from themes import current_theme, dmenu_cmd_args
+
 
 re_vol = re.compile(r"\[(\d?\d?\d?)%\]")
 re_touchpad = re.compile(r".*TouchpadOff\s*= 1", re.DOTALL)
@@ -59,9 +61,7 @@ def brightness_cmd(qtile, cmd):
 
 def get_current_volume():
     current_volume = 0
-    mixer_out = check_output(["amixer", "sget", "Master"])
-    if six.PY3:
-        mixer_out = mixer_out.decode()
+    mixer_out = check_output(["amixer", "sget", "Master"]).decode()
     if "[off]" in mixer_out:
         current_volume = "Muted"
     else:
@@ -104,9 +104,7 @@ def volume_mute(qtile):
 
 
 def touchpad_toggle(qtile):
-    touchpad_state = check_output(["synclient", "-l"])
-    if six.PY3:
-        touchpad_state = touchpad_state.decode()
+    touchpad_state = check_output(["synclient", "-l"]).decode()
     touchpad_state = bool(re_touchpad.search(touchpad_state))
     if touchpad_state:
         check_output(["synclient", "TouchpadOff=0"])
@@ -256,7 +254,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "control"], "p", lazy.function(dmenu_pushbullet)),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
         ([mod, "control"], "l", lazy.spawn(expanduser("~/.bin/lock"))),
-        ([mod], "F1", lazy.spawn("sh -c 'sleep 5;xset dpms force off'")),
+        # ([mod], "F1", lazy.spawn("sh -c 'sleep 5;xset dpms force off'")),
         # ([], "3270_PrintScreen", lazy.spawn("ksnapshot")),
         ([mod, "shift"], "c", lazy.spawn("flameshot gui")),
         ([mod, "shift"], "s", lazy.spawn("spectacle")),
@@ -341,6 +339,19 @@ def get_keys(mod, num_groups, num_monitors):
                 extension.WindowList(
                     dmenu_prompt="windows:",
                     all_groups=False,
+                    dmenu_ignorecase=True,
+                    dmenu_font=current_theme["font"],
+                    **current_theme
+                )
+            ),
+        ),
+        (
+            [mod],
+            "t",
+            lazy.run_extension(
+                BringWindowToGroup(
+                    dmenu_prompt="summon window:",
+                    all_groups=True,
                     dmenu_ignorecase=True,
                     dmenu_font=current_theme["font"],
                     **current_theme

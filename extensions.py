@@ -21,9 +21,13 @@ from system import (
     get_current_group,
 )
 from system import get_redis
+from functools import lru_cache
 
 
-def list_executables():
+@lru_cache()
+def list_executables(ttl_hash=None):
+    del ttl_hash
+    logger.error("getting execs")
     paths = os.environ["PATH"].split(pathsep)
     executables = []
     for path in filter(isdir, paths):
@@ -31,6 +35,35 @@ def list_executables():
             if os.access(join(path, file_), os.X_OK):
                 executables.append(file_)
     return set(executables)
+
+
+class BringWindowToGroup(WindowList):
+    def run(self):
+        self.list_windows()
+        logger.debug("running summon window")
+        items = list(self.item_to_win.keys())
+        logger.debug("running summon window %s", items)
+        out = super().run()
+        logger.debug("running summon window %s", out)
+
+        try:
+            sout = out.rstrip("\n")
+        except AttributeError:
+            # out is not a string (for example it's a Popen object returned
+            # by super(WindowList, self).run() when there are no menu items to
+            # list
+            return
+
+        try:
+            win = self.item_to_win[sout]
+        except KeyError:
+            # The selected window got closed while the menu was open?
+            return
+
+        screen = self.qtile.current_screen
+        win.cmd_togroup(screen.group)
+        # screen.set_group(win.group)
+        win.group.focus(win)
 
 
 class Surf(Dmenu):
@@ -178,23 +211,30 @@ class DmenuRunRecent(DmenuRun):
         ("dbname", "dbname", "the sqlite db to store history."),
         ("dmenu_command", "dmenu", "the dmenu command to be launched"),
     ]
+    qtile = None
+    dbname = "qtile_run"
+    dmenu_command = "dmenu"
 
     def __init__(self, **config):
-        super(DmenuRunRecent, self).__init__(**config)
-        self.add_defaults(super(DmenuRunRecent, self).defaults)
+        super().__init__(**config)
+        self.add_defaults(super().defaults)
 
     def _configure(self, qtile):
         self.qtile = qtile
-        self.dbname = "qtile_run"
-        self.dmenu_command = "dmenu"
-        super(DmenuRunRecent, self)._configure(qtile)
+        super()._configure(qtile)
 
     def run(self):
-        logger.error("running")
+        logger.error("running %s" % self.__class__.__name__)
         recent = RecentRunner(self.dbname)
         selected = (
-            super(DmenuRunRecent, self)
-            .run(items=[x for x in recent.list(list_executables())])
+            super()
+            .run(
+                items=list(
+                    recent.list(
+                        list_executables(datetime.utcnow().strftime("%H:%M"))
+                    )
+                )
+            )
             .strip()
         )
         logger.info("Selected: %s", selected)
@@ -211,6 +251,9 @@ class PassMenu(DmenuRun):
         ("dbname", "dbname", "the sqlite db to store history."),
         ("dmenu_command", "dmenu", "the dmenu command to be launched"),
     ]
+    qtile = None
+    dbname = "pass_menu"
+    dmenu_command = "dmenu"
 
     def __init__(self, **config):
         super().__init__(**config)
@@ -218,8 +261,6 @@ class PassMenu(DmenuRun):
 
     def _configure(self, qtile):
         self.qtile = qtile
-        self.dbname = "pass_menu"
-        self.dmenu_command = "dmenu"
         super()._configure(qtile)
 
     def run(self):
@@ -266,7 +307,8 @@ class Inboxes(DmenuRun):
         inboxes = get_hostconfig("google_accounts", [])
         selected = super().run(items=recent.list(inboxes)).strip()
         logger.info("Selected: %s", selected)
-        if not selected:
+        if not selected or selected not in inboxes:
+            recent.remove(selected)
             return
         recent.insert(selected)
         qtile = self.qtile

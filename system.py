@@ -1,17 +1,21 @@
 """Platform specific configurtation options
 """
-import logging
-import platform
-from plumbum import local
-import subprocess
-import signal
-from os.path import expanduser
-from log import logger
-import os
-import re
 import glob
 import logging
+import os
+import platform
+import re
+import signal
+import subprocess
 from functools import lru_cache
+from os.path import expanduser
+
+from plumbum import local
+
+from log import logger
+
+
+passstore = local["pass"]
 
 # TODO https://confuse.readthedocs.io/en/latest/
 
@@ -97,7 +101,7 @@ default_config = {
         "whatsapp": 8,
         "android-studio": 12,
     },
-    "pushbullet_api_key": "o.erHnfFynMisnu5Cy4X2Klw6y12lJcX26",
+    "pushbullet_api_key": passstore("internet/pushbullet"),
     "brightness_up": "xbacklight -inc 10",
     "brightness_down": "xbacklight -dec 10",
 }

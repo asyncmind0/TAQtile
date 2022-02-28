@@ -47,6 +47,15 @@ def load_sounds():
         )
 
 
+@hook.subscribe.client_new
+def dialogs(window):
+    if (
+        window.window.get_wm_type() == "dialog"
+        or window.window.get_wm_transient_for()
+    ):
+        window.floating = True
+
+
 @hook.subscribe.startup
 def startup(qtile):
     errored = False
