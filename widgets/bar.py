@@ -1,4 +1,5 @@
 from libqtile.bar import Bar as QBar
+from themes import current_theme, default_params
 
 from log import logger
 
@@ -9,8 +10,14 @@ class Bar(QBar):
         ("focused_background", "#FF0000", "Background colour."),
     ]
 
-    def __init__(self, widgets, size, **config):
-        super().__init__(widgets, size, **config)
+    def __init__(self, widgets, **config):
+        bar_defaults = default_params(
+            focused_background=current_theme.get("focused_background"),
+        )
+        bar_defaults.update(config)
+        super().__init__(
+            widgets, current_theme.get("bar_height", 8), **bar_defaults
+        )
         self.add_defaults(Bar.defaults)
         self.default_background = self.background
 
@@ -19,13 +26,13 @@ class Bar(QBar):
         return super()._configure(qtile, screen)
 
     def draw(self):
-        logger.debug("Current screen %s", self.qtile.current_screen.index)
-        logger.debug("Bar screen %s", self.screen.index)
-        logger.debug(
-            "Background %s %s", self.background, self.focused_background
-        )
+        # logger.debug("Current screen %s", self.qtile.current_screen.index)
+        # logger.debug("Bar screen %s", self.screen.index)
+        # logger.debug(
+        #    "Background %s %s", self.background, self.focused_background
+        # )
         if self.qtile.current_screen.index == self.screen.index:
-            logger.debug("Bar is focused screen %s", self.screen.index)
+            # logger.debug("Bar is focused screen %s", self.screen.index)
             self.background = self.focused_background
         else:
             self.background = self.default_background

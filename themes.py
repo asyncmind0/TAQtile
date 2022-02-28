@@ -88,3 +88,9 @@ def dmenu_cmd_args(**overrides):
     opts.update(overrides)
     return dmenu_options % opts
     # return rofi_options
+
+
+def default_params(**kwargs):
+    de = dict(current_theme)
+    de.update(kwargs)
+    return de

@@ -1,16 +1,11 @@
-import logging
-import subprocess
-import threading
-
-from libqtile.widget import NetGraph, Clock
-
-from extra import RaiseWindowOrSpawn
-from pytz import timezone
 from datetime import datetime
-from system import execute_once
 
+from libqtile.widget import Clock as QClock, TextBox as QTextBox
+from pytz import timezone
 
 from log import logger
+from system import execute_once
+from themes import default_params
 
 
 # class ThreadedPacman(widget.Pacman):
@@ -40,7 +35,7 @@ from log import logger
 #        return True
 
 
-class Clock(Clock):
+class Clock(QClock):
     def poll(self):
         # We use None as a sentinel here because C's strftime defaults to UTC
         # if TZ=''.
@@ -79,3 +74,13 @@ class CalClock(Clock):
 #
 #    def push(self, value):
 #        return super().push(value)
+
+
+
+class TextBox(QTextBox):
+    def __init__(self, text=None, **config):
+        config["text"] = text
+        textbox_params = default_params()
+        textbox_params.update(config)
+
+        super().__init__(**textbox_params)

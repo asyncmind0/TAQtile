@@ -12,7 +12,6 @@ import re
 import glob
 import logging
 from functools import lru_cache
-from libqtile import qtile
 
 # TODO https://confuse.readthedocs.io/en/latest/
 
@@ -150,11 +149,11 @@ def get_hostconfig(key, default=None):
 
 
 def get_screen(index):
-    """Get platform specific screen """
+    """Get platform specific screen"""
     monitors = get_num_monitors()
     if monitors == 1:
         return 0
-    return get_hostconfig("screens", {}).get(index, 0)
+    return int(get_hostconfig("screens", {}).get(index, 0))
 
 
 def get_screen_affinity(app):
@@ -201,10 +200,9 @@ def hdmi_connected():
 
 
 def window_exists(qtile, regex):
-    for window in qtile.cmd_windows():
-        if regex.match(window["name"]):
+    for wid, window in get_windows_map(qtile).items():
+        if regex.match(window.name):
             logger.debug("Matched %s", str(window))
-            window = get_windows_map(qtile).get(window["id"])
             return window
     # for window in get_windows_map(qtile).values():
     #    logger.debug("windowname %s", window.name)
@@ -216,7 +214,11 @@ def window_exists(qtile, regex):
     #        return window
 
 
-def execute_once(process, process_filter=None, toggle=False, window_regex=None):
+def execute_once(
+    process, process_filter=None, toggle=False, window_regex=None, qtile=None
+):
+    if not qtile:
+        from libqtile import qtile
     cmd = process.split()
     process_filter = process_filter or cmd[0]
     pid = None
@@ -248,28 +250,28 @@ def execute_once(process, process_filter=None, toggle=False, window_regex=None):
         logger.debug("Not Starting: %s", cmd)
 
 
-def get_current_screen(qtile_):
+def get_current_screen(qtile):
     try:
         return qtile.current_screen
     except AttributeError:
         return qtile.currentScreen
 
 
-def get_current_window(qtile_):
+def get_current_window(qtile):
     try:
         return qtile.current_window
     except AttributeError:
         return qtile.currentWindow
 
 
-def get_current_group(qtile_):
+def get_current_group(qtile):
     try:
         return qtile.current_group
     except AttributeError:
         return qtile.currentGroup
 
 
-def get_windows_map(qtile_):
+def get_windows_map(qtile):
     try:
         return qtile.windows_map
     except AttributeError:

@@ -38,7 +38,7 @@ except:
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
 # _terminal = "alacritty -t {0} "
 _terminal = (
-    'st -f "%(font)s:pixelsize=%(terminal_fontsize)s" -t {0} -c st '
+    'st -f "%(terminal_font)s:pixelsize=%(terminal_fontsize)s" -t {0} -c st '
     % current_theme
 )
 
@@ -276,8 +276,7 @@ class RaiseWindowOrSpawn(object):
             if self.floating:
                 window.floating = self.floating
             execute_once(
-                "transet-df -n %s %s " % (window.name, self.alpha),
-                # qtile=qtile
+                "transet-df -n %s %s " % (window.name, self.alpha), qtile=qtile
             )
 
         logger.debug("No window found spawning: %s", self.cmd)
@@ -402,6 +401,7 @@ class Terminal:
             screen_affinity=self.screen,
             exclusive=False,
             init=True,
+            # layout="max",
             matches=[self.get_match()],
         )
 
@@ -411,6 +411,6 @@ class Terminal:
         return Rule(
             self.get_match(),
             group=self.group,
-            fullscreen=True,
+            fullscreen=False,
             float=False,
         )

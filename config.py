@@ -23,6 +23,7 @@ from screens import (
 from system import get_num_monitors
 from themes import current_theme
 from extra import Terminal
+import hooks  # pylint: disable=unused-import
 
 mod = "mod4"
 num_monitors = get_num_monitors()
@@ -40,7 +41,6 @@ layouts = [
     #                                   fallback=layout.Stack(
     #                                       num_stacks=1, **border_args))),
 ]
-
 
 
 # This allows you to drag windows around with the mouse if you want.
@@ -69,9 +69,9 @@ cursor_warp = False
 auto_fullscreen = True
 widget_defaults = current_theme
 dgroups_app_rules = get_dgroups()
-num_groups = num_monitors * 10
+num_groups = (num_monitors - 1) * 10
 
-groups = generate_groups(num_groups, num_monitors, layouts)
+groups = generate_groups(num_groups, layouts)
 keys = get_keys(mod, num_groups, num_monitors)
 
 
@@ -128,7 +128,7 @@ Terminal(
     keys=keys,
     dgroups=dgroups_app_rules,
     screen=SECONDARY_SCREEN,
-    spawn="jupyter-bison",
+    spawn="~/streethawk/infrastructure/srv/k8s/bin/jupyter-shell.sh",
 )
 
 Terminal(
@@ -141,18 +141,9 @@ Terminal(
     spawn="jupyter-zebra",
 )
 
-screens = get_screens(num_monitors, num_groups, groups)
+screens = get_screens(num_monitors, groups)
 
 
 class NoTimerFilter(logging.Filter):
     def filter(self, record):
         return "timer" not in record.getMessage()
-
-
-def main(self):
-    self.logger = init_log(
-        log_level=logging.DEBUG,
-    )
-
-
-import hooks

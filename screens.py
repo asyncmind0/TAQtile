@@ -1,12 +1,7 @@
 import logging
+from subprocess import check_output
 
-import system
-import themes
 from libqtile.config import Screen
-from widgets import (
-    CalClock,
-    Clock,
-)
 from libqtile.widget import (
     Sep,
     Pomodoro,
@@ -18,18 +13,20 @@ from libqtile.widget import (
     CPUGraph,
     Systray,
     DF,
-    TextBox,
 )
+
+import system
+from themes import current_theme, default_params
+from widgets import CalClock, Clock, TextBox
+from widgets.bar import Bar
+from widgets.multiscreengroupbox import MultiScreenGroupBox
+
 
 # from widgets.bankbalance import BankBalance
 # from widgets.mail import NotmuchCount
-from widgets.multiscreengroupbox import MultiScreenGroupBox
 
 # from widgets.priority_notify import PriorityNotify
 # from widgets.tasklist2 import TaskList2
-from widgets.bar import Bar
-from log import logger
-from subprocess import check_output
 
 
 log = logging.getLogger("qtile")
@@ -46,32 +43,18 @@ except:
     localtimezone = "Australia/Sydney"
 
 
-def get_screens(num_monitors, num_groups, groups):
+def get_screens(num_monitors, groups):
     multi_monitor = num_monitors > 1
 
-    def default_params(**kwargs):
-        de = dict(themes.current_theme)
-        de.update(kwargs)
-        return de
-
-    groupbox_params = default_params(
-        urgent_alert_method="text",
-        rounded=False,
-        border_focus="#FFFFFF",
-        is_line=False,
-        center_aligned=True,
-        hide_unused=True,
-        spacing=2,
-    )
     tasklist_params = default_params(
         selected=("[", "]"),
         rounded=False,
-        border=themes.current_theme["border_focus"],
+        border=current_theme["border_focus"],
         icon_size=0,
         padding=0,
         padding_y=0,
         margin=0,
-        foreground=themes.current_theme["foreground"],
+        foreground=current_theme["foreground"],
     )
 
     # prompt_params = default_params()
@@ -79,7 +62,7 @@ def get_screens(num_monitors, num_groups, groups):
     windowname_params = default_params()
     systray_params = default_params(icon_size=15)
     clock_params = default_params(
-        padding=2,
+        padding=1,
         format="%Y-%m-%d %a %H:%M",
     )
     pacman_params = default_params()
@@ -122,37 +105,17 @@ def get_screens(num_monitors, num_groups, groups):
     memgraph_params["fill_color"] = "80FF00.3"
     memgraph_params["type"] = "linefill"
     netgraph_params = dict(graph_defaults)
-    sep_params = default_params(padding=4, fontsize=9)  # , size_percent=90)
+    sep_params = default_params(padding=4, fontsize=9)
     graph_label_defaults = dict(
         margin=0,
         padding_x=0,
         padding_y=2,
     )
 
-    # netgraph_params['fill_color'] = "80FF00.3"
-
-    group_splits = (
-        (num_groups / num_monitors) if multi_monitor else num_groups,
-    )
-    # change labels of groups for multi monitor support
-    mon_map = {0: {}, 1: {}, 2: {}}
-    mon = 0
-    for i, group in enumerate(groups):
-        if group.name.isdigit():
-            if multi_monitor and int(group.name) - 1 in group_splits:
-                mon += 1
-        groupname = group.name
-        grouplabel = group.name[-1] if group.name.isdigit() else group.name
-        if group.screen_affinity is None or not multi_monitor:
-            mon_map[mon][groupname] = grouplabel
-        else:
-            mon_map[group.screen_affinity][groupname] = grouplabel
-
     primary_bar = [
         TextBox("first"),
         Sep(**sep_params),
-        # GroupBox(**groupbox_params),
-        MultiScreenGroupBox(namemap=mon_map[PRIMARY_SCREEN], **groupbox_params),
+        MultiScreenGroupBox(screen=PRIMARY_SCREEN),
         # Sep(**sep_params),
         # Prompt(**prompt_params),
         Sep(**sep_params),
@@ -216,10 +179,7 @@ def get_screens(num_monitors, num_groups, groups):
     secondary_bar = [
         TextBox("second"),
         Sep(**sep_params),
-        # GroupBox(**groupbox_params),
-        MultiScreenGroupBox(
-            namemap=mon_map[SECONDARY_SCREEN], **groupbox_params
-        ),
+        MultiScreenGroupBox(screen=SECONDARY_SCREEN),
         Sep(**sep_params),
         # TaskList2(**tasklist_params),
         WindowName(**windowname_params),
@@ -233,9 +193,7 @@ def get_screens(num_monitors, num_groups, groups):
     tertiary_bar = [
         TextBox("third"),
         Sep(**sep_params),
-        MultiScreenGroupBox(
-            namemap=mon_map[TERTIARY_SCREEN], **groupbox_params
-        ),
+        MultiScreenGroupBox(screen=TERTIARY_SCREEN),
         # Sep(**sep_params),
         ##TaskList2(**tasklist_params),
         WindowName(**windowname_params),
@@ -246,9 +204,7 @@ def get_screens(num_monitors, num_groups, groups):
     quaternary_bar = [
         TextBox("fourth"),
         Sep(**sep_params),
-        MultiScreenGroupBox(
-            namemap=mon_map[TERTIARY_SCREEN], **groupbox_params
-        ),
+        MultiScreenGroupBox(screen=TERTIARY_SCREEN),
         # Sep(**sep_params),
         ##TaskList2(**tasklist_params),
         WindowName(**windowname_params),
@@ -256,12 +212,6 @@ def get_screens(num_monitors, num_groups, groups):
         CurrentLayout(**current_layout_params),
         CalClock(timezone=localtimezone, **clock_params),
     ]
-    bar_defaults = dict(
-        focused_background=themes.current_theme.get("focused_background"),
-        size=groupbox_params["bar_height"],
-        font="Terminus",
-        fontsize=12,
-    )
 
     clock_params = default_params(
         padding=2, format="%Y-%m-%d %a %H:%M", fontsize=12
@@ -290,34 +240,34 @@ def get_screens(num_monitors, num_groups, groups):
         widgets.extend(
             [
                 Sep(**sep_params),
-                Pomodoro(**groupbox_params),
+                Pomodoro(**default_params()),
             ]
         )
-        return Bar(widgets, **bar_defaults)
+        return Bar(widgets)
 
     # clock_bar.size = 0
     screens = dict()
     if num_monitors == 1:
         primary_bar.append(CalClock(timezone=localtimezone, **clock_params))
         screens[PRIMARY_SCREEN] = Screen(
-            Bar(primary_bar, **bar_defaults),
+            Bar(primary_bar),
             bottom=make_clock_bar(),
         )
     else:
         screens[PRIMARY_SCREEN] = Screen(
-            Bar(primary_bar, **bar_defaults),
+            Bar(primary_bar),
             bottom=make_clock_bar(),
         )
         screens[SECONDARY_SCREEN] = Screen(
-            Bar(secondary_bar, **bar_defaults),
+            Bar(secondary_bar),
             bottom=make_clock_bar(),
         )
         screens[TERTIARY_SCREEN] = Screen(
-            Bar(tertiary_bar, **bar_defaults),
+            Bar(tertiary_bar),
             bottom=make_clock_bar(),
         )
         screens[QUATERNARY_SCREEN] = Screen(
-            Bar(quaternary_bar, **bar_defaults),
+            Bar(quaternary_bar),
             bottom=make_clock_bar(),
         )
     screens = [screens[y] for y in sorted(screens.keys())]

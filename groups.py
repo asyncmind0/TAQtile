@@ -33,20 +33,17 @@ class Rule(QRule):
 
 
 def get_dgroups():
-    return []
     return [
         Rule(
-            Match(title=["TDE World Clock"]),
-            break_on_match=True,
+            Match(
+                title=[
+                    "discord.com is sharing your screen.",
+                ],
+            ),
             float=True,
-        ),
-        Rule(
-            Match(wm_class=[re.compile(".*dunst.*", re.I)]),
-            group="1",
+            intrusive=True,
             break_on_match=True,
-            static=True,
         ),
-        # Everything i want to be float, but don't want to change group
         Rule(
             Match(
                 title=[
@@ -69,11 +66,13 @@ def get_dgroups():
                     "SshAskpass",
                     "ssh-askpass",
                     "spectacle",
+                    re.compile(r"pinentry.*"),
                     # "zoom",
                 ],
             ),
             float=True,
             intrusive=True,
+            break_on_match=True,
         ),
         Rule(
             Match(wm_class=["Pavucontrol", "Wine", "Xephyr", "Gmrun"]),
@@ -189,7 +188,7 @@ def get_dgroups():
     ]
 
 
-def generate_groups(num_groups, num_monitors, layouts):
+def generate_groups(num_groups, layouts):
     is_laptop = get_hostconfig("laptop")
 
     # dgroup rules that not belongs to any group
@@ -286,6 +285,7 @@ def generate_groups(num_groups, num_monitors, layouts):
                     Match(wm_class=["discord"]),
                     Match(title=[re.compile(r".*discord.*", re.I)]),
                     Match(title=[re.compile(r".*whatsapp.*", re.I)]),
+                    Match(wm_class=["telegram-desktop"]),
                     # Match(role=[re.compile("^slack$")], wm_class=["slack"]),
                 ],
             ),
@@ -318,13 +318,16 @@ def generate_groups(num_groups, num_monitors, layouts):
             matches=terminal_matches([r"^ulog$"]),
         )
 
-    for i in chain(range(1, num_groups + 1), group_args.keys()):
+    for i in range(1, num_groups + 1):
         groups.append(
             Group(
                 str(i),
+                label=str(i)[-1] if i > 9 else str(i),
                 **group_args.get(str(i), {"layout": "max", "layouts": layouts})
             )
         )
+    for i, groupargs in group_args.items():
+        groups.append(Group(str(i), **groupargs))
     groups.append(
         ScratchPad(
             "scratch",
