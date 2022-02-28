@@ -1,15 +1,16 @@
 from libqtile import widget
 from system import get_current_screen
 from log import logger
+from themes import default_params
 
 
-class MultiScreenGroupBox(widget.GroupBox):
+class _MultiScreenGroupBox(widget.GroupBox):
     def __init__(self, **config):
-        widget.GroupBox.__init__(self, **config)
-        self.namemap = config.get("namemap", {})
+        self.screen = config.pop("screen", {})
+        super().__init__(**config)
         self.center_aligned = False
 
-    def box_width(self, groups):
+    def _box_width(self, groups):
         width, height = self.drawer.max_layout_size(
             [self.get_label(i.name) for i in groups], self.font, self.fontsize
         )
@@ -20,68 +21,47 @@ class MultiScreenGroupBox(widget.GroupBox):
             + self.borderwidth * 2
         )
 
-    def get_label(self, group):
+    def _get_label(self, group):
         return self.namemap.get(group)
 
-    def draw(self):
-        self.drawer.clear(self.background or self.bar.background)
-        offset = 0
-        for i, g in enumerate(self.groups):
-            gtext = self.get_label(g.name)
-            # logger.debug(gtext)
-            if not gtext:
-                continue
-            to_highlight = False
-            is_block = self.highlight_method == "block"
-            is_line = self.highlight_method == "line"
-
-            bw = self.box_width([g])
-
-            if self.group_has_urgent(g) and self.urgent_alert_method == "text":
-                text_color = self.urgent_text
-            elif g.windows:
-                text_color = self.active
-            else:
-                text_color = self.inactive
-
-            if g.screen:
-                if self.highlight_method == "text":
-                    border = self.bar.background
-                    text_color = self.this_current_screen_border
+    @property
+    def groups(self):
+        grp0 = []
+        grps = super().groups
+        for group in grps:
+            if group.name.isdigit():
+                if len(group.name) == 1:
+                    mon = 0
                 else:
-                    if self.bar.screen.group.name == g.name:
-                        if get_current_screen(self.qtile) == self.bar.screen:
-                            border = self.this_current_screen_border
-                            to_highlight = True
-                        else:
-                            border = self.this_screen_border
-                    else:
-                        border = self.other_screen_border
-            elif self.group_has_urgent(g) and self.urgent_alert_method in (
-                "border",
-                "block",
-                "line",
-            ):
-                border = self.urgent_border
-                if self.urgent_alert_method == "block":
-                    is_block = True
-                elif self.urgent_alert_method == "line":
-                    is_line = True
-            else:
-                border = self.background or self.bar.background
+                    mon = int(group.name[0])
+                if mon != self.screen:
+                    continue
+            # logger.debug(
+            #    "Group screen: %s: GroupBox screen %s"
+            #    % (group.screen.index, self.screen)
+            # )
+            if group.screen and group.screen.index != self.screen:
+                continue
+            grp0.append(group)
+        return grp0
 
-            self.drawbox(
-                self.margin_x + offset,
-                gtext,
-                # g.name,
-                border,
-                text_color,
-                highlight_color=self.highlight_color,
-                width=bw - self.margin_x * 2 - self.padding_x * 2 - 1,
-                rounded=self.rounded,
-                block=is_block,
-                line=is_line,
-                highlighted=to_highlight,
-            )
-            offset += bw
-        self.drawer.draw(offsetx=self.offset, width=self.width)
+
+class MultiScreenGroupBox(_MultiScreenGroupBox):
+    def __init__(self, **config):
+        groupbox_params = default_params(
+            padding=2,
+            urgent_alert_method="text",
+            rounded=False,
+            border_focus="#FFFFFF",
+            is_line=False,
+            center_aligned=True,
+            hide_unused=True,
+            spacing=1,
+        )
+        groupbox_params.update(config)
+
+        super().__init__(**groupbox_params)
+
+
+class __MultiScreenGroupBox(widget.GroupBox):
+    pass
