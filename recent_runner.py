@@ -66,6 +66,11 @@ class RecentRunner:
             sql = "insert into %s values (?, ?, ?)" % self.dbname
             return c.execute(sql, (now, command, 1))
 
+    def remove(self, command):
+        c = self.conn.cursor()
+        sql = "delete from %s  where command = ?" % self.dbname
+        return c.execute(sql, (command))
+
 
 if __name__ == "__main__":
     import sys
