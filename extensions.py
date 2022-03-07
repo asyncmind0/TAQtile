@@ -361,7 +361,7 @@ def on_inbox_close(client):
     inboxes = get_hostconfig("google_accounts", [])
     for inbox, config in inboxes.items():
         mail_regex = config.get("mail_regex", None)
-        logger.error("window close %s", client.name, mail_regex)
+        logger.error("window close %s:%s.", client.name, mail_regex)
         if mail_regex and re.match(mail_regex, client.name):
             rc = get_redis()
             rc.delete(mail_regex)
