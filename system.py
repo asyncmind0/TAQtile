@@ -10,12 +10,13 @@ import subprocess
 from functools import lru_cache
 from os.path import expanduser
 
-from plumbum import local
 
 from log import logger
 
 
-passstore = local["pass"]
+def passstore(path):
+    return subprocess.check_output(["pass", path]).strip().decode("utf8")
+
 
 # TODO https://confuse.readthedocs.io/en/latest/
 
@@ -29,6 +30,7 @@ common_autostart = {
     # "surf 'https://grafana-bison.streethawk.com/d/000000003/bison-rabbitmq?orgId=1&from=now-1h&to=now&refresh=5m'": None,
     # "surf 'https://grafana.streethawk.com/d/000000004/bison-load?orgId=1&from=now-1h&to=now&refresh=15m'": None,
     "dropbox": None,
+    "slack": None,
 }
 
 laptop_autostart = dict(common_autostart)
@@ -37,7 +39,6 @@ laptop_autostart.update(
         #'blueman-applet': None,
         "insync start": None,
         #'parcellite': None,
-        "slack": None,
         "feh --bg-scale ~/.wallpaper": None,
         #'discord': None,
         "whatsapp-web-desktop": dict(
@@ -104,10 +105,11 @@ default_config = {
     "pushbullet_api_key": passstore("internet/pushbullet"),
     "brightness_up": "xbacklight -inc 10",
     "brightness_down": "xbacklight -dec 10",
+    "autostart-once": laptop_autostart,
 }
+
 series9_config = {
     "laptop": True,
-    "autostart-once": laptop_autostart,
     "screen_affinity": {
         "mail": 1,
         "emulator": 2,
@@ -123,7 +125,6 @@ zenbook1 = {
     "battery": "BAT0",
     "kbd_brightness_up": "asus-kbd-backlight up",
     "kbd_brightness_down": "asus-kbd-backlight down",
-    "autostart-once": laptop_autostart,
 }
 razorjack = dict(zenbook1)
 razorjack["battery"] = False
