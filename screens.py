@@ -13,6 +13,7 @@ from libqtile.widget import (
     CPUGraph,
     Systray,
     DF,
+    CryptoTicker,
 )
 
 import system
@@ -124,9 +125,6 @@ def get_screens(num_monitors, groups):
         # widget.TextBox(**layout_textbox_params),
         Sep(**sep_params),
         CurrentLayout(**current_layout_params),
-        # Sep(**sep_params),
-        # BitcoinTicker(**bitcointicker_params),
-        # Sep(**sep_params),
         # ThreadedPacman(**pacman_params),
         # Sep(**sep_params),
         DF(**default_params()),
@@ -183,6 +181,8 @@ def get_screens(num_monitors, groups):
         Sep(**sep_params),
         # TaskList2(**tasklist_params),
         WindowName(**windowname_params),
+        Sep(**sep_params),
+        CryptoTicker(currency="AUD"),
         Sep(**sep_params),
         CurrentLayout(**current_layout_params),
         Sep(**sep_params),
