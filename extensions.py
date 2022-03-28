@@ -305,17 +305,17 @@ class Inboxes(DmenuRun):
     def run(self):
         recent = RecentRunner(self.dbname)
         inboxes = get_hostconfig("google_accounts", [])
+        qtile = self.qtile
+        group = self.group
+        if get_current_group(qtile).name != group:
+            logger.debug("cmd_toggle_group")
+            get_current_screen(qtile).cmd_toggle_group(group)
         selected = super().run(items=recent.list(inboxes)).strip()
         logger.info("Selected: %s", selected)
         if not selected or selected not in inboxes:
             recent.remove(selected)
             return
         recent.insert(selected)
-        qtile = self.qtile
-        group = self.group
-        if get_current_group(qtile).name != group:
-            logger.debug("cmd_toggle_group")
-            get_current_screen(qtile).cmd_toggle_group(group)
         mail_regex = inboxes[selected].get("mail_regex", ".*%s.*" % selected)
         # mail_regex = ".*%s.*" % selected
         window = window_exists(qtile, re.compile(mail_regex, re.I))

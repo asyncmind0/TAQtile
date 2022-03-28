@@ -104,7 +104,7 @@ def list_calendars(qtile):
                 break
         else:
             cmd = (
-                'brave --app="https://calendar.google.com/calendar/b/%s/" --profile-directory=%s'
+                '/usr/sbin//systemd-run --user --slice=browser.slice brave --app="https://calendar.google.com/calendar/b/%s/" --profile-directory=%s'
                 %
                 #'firefox --new-window  --kiosk "https://calendar.google.com/calendar/b/%s/"  -P %s' %
                 (
