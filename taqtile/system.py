@@ -10,7 +10,6 @@ import subprocess
 from functools import lru_cache
 from os.path import expanduser
 
-
 from taqtile.log import logger
 
 
@@ -25,8 +24,6 @@ mod = "mod4"
 common_autostart = {
     "xcompmgr": None,
     expanduser("~/.bin/xstartup"): None,
-    "setxkbmap -option 'ctrl:swapcaps'": None,
-    # "surf 'https://grafana-bison.streethawk.com/d/000000005/bison-riak?refresh=15m'": None,
     # "surf 'https://grafana-bison.streethawk.com/d/000000003/bison-rabbitmq?orgId=1&from=now-1h&to=now&refresh=5m'": None,
     # "surf 'https://grafana.streethawk.com/d/000000004/bison-load?orgId=1&from=now-1h&to=now&refresh=15m'": None,
     "dropbox": None,
@@ -45,6 +42,7 @@ laptop_autostart.update(
             process_filter="whatsapp",
             window_regex=re.compile(r".*whatsapp.*", re.I),
         ),
+        'nvidia-settings -a "[gpu:0]/GpuPowerMizerMode=1"': None,
     }
 )
 

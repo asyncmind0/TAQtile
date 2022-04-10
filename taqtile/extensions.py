@@ -1,28 +1,20 @@
 import os
-from datetime import datetime
 import re
+from datetime import datetime
+from functools import lru_cache
+from getpass import getuser
 from os.path import dirname, join, splitext, expanduser, isdir, pathsep
 from subprocess import Popen
-
-from libqtile.extension.dmenu import Dmenu, DmenuRun
-from libqtile.extension.window_list import WindowList
-from libqtile import hook
 from urllib.parse import quote_plus
 
+from libqtile import hook
+from libqtile.extension.dmenu import Dmenu, DmenuRun
+from libqtile.extension.window_list import WindowList
 from plumbum import local
 
 from taqtile.log import logger
 from taqtile.recent_runner import RecentRunner
-from taqtile.system import (
-    get_current_window,
-    get_hostconfig,
-    window_exists,
-    get_windows_map,
-    get_current_screen,
-    get_current_group,
-)
-from taqtile.system import get_redis
-from functools import lru_cache
+from taqtile.system import get_current_window, get_hostconfig, window_exists, get_current_screen, get_current_group, get_redis
 
 
 @lru_cache()
@@ -69,6 +61,22 @@ class BringWindowToGroup(WindowList):
 
 class History(Dmenu):
     pass
+
+
+class SessionActions(Dmenu):
+    actions = {
+        "lock": "gnome-screensaver-command --lock ;;",
+        "logout": "loginctl terminate-user %s" % getuser(),
+        "shutdown": 'gksu "shutdown -h now" & ;;',
+        "reboot": 'gksu "shutdown -r now" & ;;',
+        "suspend": "gksu pm-suspend && gnome-screensaver-command --lock ;;",
+        "hibernate": "gksu pm-hibernate && gnome-screensaver-command --lock ;;",
+    }
+
+    def run(self):
+        out = super().run(items=self.actions.keys()).strip()
+        logger.debug("selected: %s:%s", out, self.actions[out])
+        self.qtile.cmd_spawn(out)
 
 
 class Surf(Dmenu):
@@ -286,7 +294,7 @@ class PassMenu(DmenuRun):
         recent.insert(selection)
         return Popen(
             [
-                join(dirname(__file__), "bin", "passinsert"),
+                join(dirname(__file__), "..", "bin", "passinsert"),
                 selection,
                 str(get_current_window(self.qtile).window.wid),
             ],

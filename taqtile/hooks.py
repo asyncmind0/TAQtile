@@ -1,8 +1,14 @@
 from __future__ import print_function
+
 import os
+from os.path import splitext, basename
 from random import randint
+from subprocess import check_output
+
 from libqtile import hook
-from libqtile.layout import Slice
+from plumbum import local
+
+from taqtile.log import logger
 from taqtile.system import (
     get_hostconfig,
     get_num_monitors,
@@ -10,11 +16,7 @@ from taqtile.system import (
     hdmi_connected,
     get_windows_map,
 )
-from taqtile.recent_runner import RecentRunner
-from taqtile.log import logger
-from os.path import splitext, basename
-from subprocess import check_output
-from plumbum import local
+
 
 notify_send = local["notify-send"]
 
@@ -67,7 +69,7 @@ def startup():
         logger.debug("Num MONS:%s", num_mons)
         for command, kwargs in commands.items():
             logger.debug("executing command %s", kwargs)
-            execute_once(command, qtile=qtile, **(kwargs if kwargs else {}))
+            execute_once(command, **(kwargs if kwargs else {}))
         load_sounds()
     except:
         logger.exception("error in startup hook")
@@ -122,65 +124,73 @@ def rules_shrapnel(client):
 
 
 @hook.subscribe.client_managed
-def set_groups(qtile, *args, **kwargs):
+def set_group(client):
+    from libqtile import qtile
+
+    for rule in qtile.dgroups.rules:
+        try:
+            if client.__class__.__name__ in [
+                "Icon",
+                "Internal",
+                "Systray",
+            ]:
+                continue
+            if rule and rule.matches(client):
+                logger.info("Matched %s %s", rule, client)
+                if rule.group:
+                    logger.error("to group %s", rule.group)
+                    client.togroup(rule.group)
+                front = getattr(rule, "front", False)
+                if front and hasattr(client, "cmd_bring_to_front"):
+                    logger.error("to front %s", client.window.get_name())
+                    client.cmd_bring_to_front()
+                client.floating = rule.float
+                if getattr(rule, "fullscreen", None):
+                    if rule.fullscreen:
+                        client.fullscreen = True
+                    else:
+                        client.fullscreen = False
+                if getattr(client, "static", False):
+                    client.static(0)
+                if getattr(rule, "opacity", False):
+                    client.cmd_opacity(rule.opacity)
+                center = getattr(rule, "center", False)
+                if center:
+                    logger.debug(dir(get_current_screen(qtile)))
+                    client.tweak_float(
+                        x=(get_current_screen(qtile).width / 2)
+                        - (client.width / 2),
+                        y=(get_current_screen(qtile).height / 2)
+                        - (client.height / 2),
+                    )
+                # current_screen = getattr(rule, 'current_screen', False)
+                # if current_screen:
+                #    client.to_group(hook.get_current_screen(qtile).group)
+                geometry = getattr(rule, "geometry", False)
+                if geometry:
+                    client.place(
+                        geometry["x"],
+                        geometry["y"],
+                        geometry["width"],
+                        geometry["height"],
+                        1,
+                        None,
+                        above=True,
+                        force=True,
+                    )  # , '00C000')
+
+                if rule.break_on_match:
+                    break
+        except Exception as e:
+            logger.exception("error setting rules %s", client)
+
+
+def set_groups(client, *args, **kwargs):
+    from libqtile import qtile
+
     for client in list(get_windows_map(qtile).values()):
         logger.debug("set_groups")
-        for rule in qtile.dgroups.rules:
-            try:
-                if client.__class__.__name__ in [
-                    "Icon",
-                    "Internal",
-                    "Systray",
-                ]:
-                    continue
-                if rule and rule.matches(client):
-                    logger.info("Matched %s %s", rule, client)
-                    if rule.group:
-                        logger.error("to group %s", rule.group)
-                        client.togroup(rule.group)
-                    front = getattr(rule, "front", False)
-                    if front and hasattr(client, "cmd_bring_to_front"):
-                        logger.error("to front %s", client.window.get_name())
-                        client.cmd_bring_to_front()
-                    client.floating = rule.float
-                    if getattr(rule, "fullscreen", None):
-                        if rule.fullscreen:
-                            client.fullscreen = True
-                        else:
-                            client.fullscreen = False
-                    if getattr(client, "static", False):
-                        client.static(0)
-                    if getattr(rule, "opacity", False):
-                        client.cmd_opacity(rule.opacity)
-                    center = getattr(rule, "center", False)
-                    if center:
-                        logger.debug(dir(get_current_screen(qtile)))
-                        client.tweak_float(
-                            x=(get_current_screen(qtile).width / 2)
-                            - (client.width / 2),
-                            y=(get_current_screen(qtile).height / 2)
-                            - (client.height / 2),
-                        )
-                    # current_screen = getattr(rule, 'current_screen', False)
-                    # if current_screen:
-                    #    client.to_group(hook.get_current_screen(qtile).group)
-                    geometry = getattr(rule, "geometry", False)
-                    if geometry:
-                        client.place(
-                            geometry["x"],
-                            geometry["y"],
-                            geometry["width"],
-                            geometry["height"],
-                            1,
-                            None,
-                            above=True,
-                            force=True,
-                        )  # , '00C000')
-
-                    if rule.break_on_match:
-                        break
-            except Exception as e:
-                logger.exception("error setting rules %s", client)
+        set_group(client)
 
 
 # @hook.subscribe.client_urgent_hint_changed

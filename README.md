@@ -8,7 +8,7 @@ predefined screens, windows and workspaces with special keybinds.
 
 # How to use:
 
-Create terminals 
+TODO
 
 ## Default tools:
 

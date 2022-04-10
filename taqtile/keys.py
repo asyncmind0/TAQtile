@@ -20,6 +20,7 @@ from taqtile.extensions import (
     PassMenu,
     Inboxes,
     BringWindowToGroup,
+    SessionActions,
 )
 from taqtile.extra import (
     SwitchToWindowGroup,
@@ -221,7 +222,11 @@ def get_keys(mod, num_groups, num_monitors):
         # multiple stack panes
         ([mod, "shift"], "Return", lazy.layout.toggle_split()),
         (["shift", mod], "q", lazy.shutdown()),
-        ([mod, "control"], "q", lazy.spawn("dmenu-session")),
+        (
+            [mod, "control"],
+            "q",
+            lazy.run_extension(SessionActions(**current_theme)),
+        ),
         (["control"], "space", lazy.spawn("dunstctl close")),
         (["control"], "grave", lazy.spawn("dunstctl history-pop")),
         # Toggle between different layouts as defined below
