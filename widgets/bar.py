@@ -21,9 +21,9 @@ class Bar(QBar):
         self.add_defaults(Bar.defaults)
         self.default_background = self.background
 
-    def _configure(self, qtile, screen):
+    def _configure(self, qtile, screen, reconfigure=False):
         self.default_background = self.background
-        return super()._configure(qtile, screen)
+        return super()._configure(qtile, screen, reconfigure=reconfigure)
 
     def draw(self):
         # logger.debug("Current screen %s", self.qtile.current_screen.index)
