@@ -114,11 +114,6 @@ def get_dgroups():
             break_on_match=True,
         ),
         Rule(
-            Match(role=[re.compile("^browser$")]),
-            group="browser",
-            break_on_match=False,
-        ),
-        Rule(
             Match(
                 title=[
                     re.compile(r"^Hangouts$"),
@@ -264,7 +259,7 @@ def generate_groups(num_groups, layouts):
                     Match(wm_class=["brave-browser"]),
                     Match(wm_class=["qutebrowser"]),
                     Match(wm_instance_class=["surf"]),
-                    Match(role=[re.compile("^browser$")], wm_class=["webmacs"]),
+                    Match(role=["browser"]),
                 ],
             ),
             "slack": dict(
