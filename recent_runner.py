@@ -36,7 +36,7 @@ class RecentRunner:
             itemslist[item] = 0
         c = self.conn.cursor()
         results = c.execute(sql)
-        res = [x[0] for x in results.fetchall()]
+        res = [x[0].strip() for x in results.fetchall()]
         for i, item in enumerate(res, 1):
             itemslist[item] = i
         ret = [x[0] for x in sorted(itemslist.items(), key=lambda x: x[1])]
