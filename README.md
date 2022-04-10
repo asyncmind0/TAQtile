@@ -8,20 +8,35 @@ predefined screens, windows and workspaces with special keybinds.
 
 # How to use:
 
-TODO
+This is an advanced configuration for ![Qtile](https://github.com/qtile)
 
-## Default tools:
+- Extra window and group actions 
+- Customized widgets
+- More dmenu intgration.
+- Mostly things that worked for @jagguli
 
-- Terminal: suckless st
-- Browser: suckless surf
+
+Uses ![suckless](https://suckless.org) tools by default
+
+- st
+- surf
+- dmenu
 
 ## Key binds
 
+For full binding list see `taqtile/keys.py`
+
 | Key  | Action  |
 |:--|:--|
-| F1  | Switch to Browser Group  |
-| F11  | Switch to Open Termial1 |
-| F12  | Switch to Open Termial2 |
+| F1   | Switch/Toggle Browser Group |
+| F11  | Switch/Toggle Open Termial1 |
+| F12  | Switch/Toggle Open Termial2 |
+| Super-0..9  | Switch/Toggle Group n |
+| XF86Launch5  | Switch/Toggle Open Termial3 |
+| Ctrl-Space  | Dmenu Run |
+| Ctrl-Meta-V | Clipboard history |
+| Super-P | Dmenu password store (insert using xdotool)|
+| Super-G | Dmenu browser history and `st` instance list (experimental)|
 
 
 

@@ -106,6 +106,7 @@ def dbus_register():
         logger.exception("error in dbus_register")
 
 
+@hook.subscribe.client_managed
 def rules_shrapnel(client):
     client_name = client.window.get_name()
     if client_name == "shrapnel":
