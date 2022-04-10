@@ -1,7 +1,7 @@
 from libqtile import widget
-from system import get_current_screen
-from log import logger
-from themes import default_params
+from taqtile.system import get_current_screen
+from taqtile.log import logger
+from taqtile.themes import default_params
 
 
 class _MultiScreenGroupBox(widget.GroupBox):

@@ -3,9 +3,9 @@ from datetime import datetime
 from libqtile.widget import Clock as QClock, TextBox as QTextBox
 from pytz import timezone
 
-from log import logger
-from system import execute_once
-from themes import default_params
+from taqtile.log import logger
+from taqtile.system import execute_once
+from taqtile.themes import default_params
 
 
 # class ThreadedPacman(widget.Pacman):
@@ -74,7 +74,6 @@ class CalClock(Clock):
 #
 #    def push(self, value):
 #        return super().push(value)
-
 
 
 class TextBox(QTextBox):

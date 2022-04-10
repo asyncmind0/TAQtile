@@ -11,7 +11,7 @@ from functools import lru_cache
 from os.path import expanduser
 
 
-from log import logger
+from taqtile.log import logger
 
 
 def passstore(path):
@@ -102,7 +102,7 @@ default_config = {
         "whatsapp": 8,
         "android-studio": 12,
     },
-    "pushbullet_api_key": passstore("internet/pushbullet"),
+    # "pushbullet_api_key": passstore("internet/pushbullet"),
     "brightness_up": "xbacklight -inc 10",
     "brightness_down": "xbacklight -dec 10",
     "autostart-once": laptop_autostart,

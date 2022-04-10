@@ -7,12 +7,13 @@ from subprocess import Popen
 from libqtile.extension.dmenu import Dmenu, DmenuRun
 from libqtile.extension.window_list import WindowList
 from libqtile import hook
+from urllib.parse import quote_plus
 
 from plumbum import local
 
-from log import logger
-from recent_runner import RecentRunner
-from system import (
+from taqtile.log import logger
+from taqtile.recent_runner import RecentRunner
+from taqtile.system import (
     get_current_window,
     get_hostconfig,
     window_exists,
@@ -20,7 +21,7 @@ from system import (
     get_current_screen,
     get_current_group,
 )
-from system import get_redis
+from taqtile.system import get_redis
 from functools import lru_cache
 
 
@@ -64,6 +65,10 @@ class BringWindowToGroup(WindowList):
         win.cmd_togroup(screen.group)
         # screen.set_group(win.group)
         win.group.focus(win)
+
+
+class History(Dmenu):
+    pass
 
 
 class Surf(Dmenu):
@@ -113,14 +118,12 @@ class Surf(Dmenu):
 
     def run(self):
         self.list_windows()
-        # logger.info(self.item_to_win)
         recent = RecentRunner(self.dbname)
-        out = super().run(
-            items=(
-                [x for x in self.item_to_win.keys()]
-                + [x for x in recent.list([])]
-            )
-        )
+        items = [x for x in self.item_to_win.keys()] + [
+            x for x in recent.list([])
+        ]
+        out = super().run(items=items)
+        logger.info("surf called %s" % out)
         screen = self.qtile.current_screen
 
         try:
@@ -140,10 +143,13 @@ class Surf(Dmenu):
             if sout.startswith("http"):
                 self.qtile.cmd_spawn("surf %s" % sout.strip())
             elif sout:
-                self.qtile.cmd_spawn(
-                    "surf https://www.google.com/search?q='%s'&ie=utf-8&oe=utf-8"
-                    % sout
-                )
+                gg = "gg "
+                if sout.startswith(gg):
+                    sout = sout.split(gg)[-1]
+                    cmd = "surf https://www.google.com/search?q='%s'&ie=utf-8&oe=utf-8"
+                else:
+                    cmd = "surf https://duckduckgo.com/?t=ffab&q=%s&ia=web"
+                self.qtile.cmd_spawn(cmd % quote_plus(sout))
             return
 
         screen.set_group(win.group)

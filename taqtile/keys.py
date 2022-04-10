@@ -7,21 +7,21 @@ from libqtile import extension
 from libqtile.command import lazy
 from libqtile.config import Key
 
-from clip import dmenu_xclip
-from dmenu import (
+from taqtile.clip import dmenu_xclip
+from taqtile.dmenu import (
     dmenu_org,
     list_bluetooth,
     list_calendars,
     dmenu_pushbullet,
 )
-from extensions import (
+from taqtile.extensions import (
     Surf,
     DmenuRunRecent,
     PassMenu,
     Inboxes,
     BringWindowToGroup,
 )
-from extra import (
+from taqtile.extra import (
     SwitchToWindowGroup,
     check_restart,
     terminal,
@@ -33,11 +33,11 @@ from extra import (
     move_to_prev_group,
     show_mail,
 )
-from hooks import set_groups
-from log import logger
-from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
-from system import get_hostconfig
-from themes import current_theme, dmenu_cmd_args
+from taqtile.hooks import set_groups
+from taqtile.log import logger
+from taqtile.screens import PRIMARY_SCREEN, SECONDARY_SCREEN
+from taqtile.system import get_hostconfig
+from taqtile.themes import current_theme, dmenu_cmd_args
 
 
 re_vol = re.compile(r"\[(\d?\d?\d?)%\]")

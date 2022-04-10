@@ -7,7 +7,7 @@ except Exception as e:
     from future.builtins import str
 
 from libqtile.widget import base
-from log import logger
+from taqtile.log import logger
 
 from .bank import CommBank
 

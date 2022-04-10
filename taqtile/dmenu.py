@@ -5,12 +5,12 @@ from os.path import isdir, join, pathsep, dirname
 
 from plumbum.cmd import dmenu, bluetoothctl, clipmenu, xdotool, pacmd
 
-from log import logger
-from recent_runner import RecentRunner
-from screens import PRIMARY_SCREEN, SECONDARY_SCREEN
-from dbus_bluetooth import get_devices
-from themes import dmenu_cmd_args
-from system import (
+from taqtile.log import logger
+from taqtile.recent_runner import RecentRunner
+from taqtile.screens import PRIMARY_SCREEN, SECONDARY_SCREEN
+from taqtile.dbus_bluetooth import get_devices
+from taqtile.themes import dmenu_cmd_args
+from taqtile.system import (
     get_hostconfig,
     window_exists,
     get_windows_map,

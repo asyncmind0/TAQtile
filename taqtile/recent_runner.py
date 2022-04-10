@@ -2,7 +2,7 @@ import sqlite3
 from os.path import expanduser, isdir, join, pathsep
 import datetime
 import time
-from log import logger
+from taqtile.log import logger
 
 
 def adapt_datetime(ts):

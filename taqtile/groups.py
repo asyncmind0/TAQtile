@@ -1,12 +1,11 @@
 import re
 from collections import OrderedDict
-from itertools import chain
 
 from libqtile.config import Group, Match, Rule as QRule, ScratchPad, DropDown
 
-from log import logger
-from screens import SECONDARY_SCREEN, PRIMARY_SCREEN
-from system import get_hostconfig, get_group_affinity
+from taqtile.log import logger
+from taqtile.screens import SECONDARY_SCREEN, PRIMARY_SCREEN
+from taqtile.system import get_hostconfig, get_group_affinity
 
 
 class Rule(QRule):

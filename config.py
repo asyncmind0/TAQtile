@@ -1,29 +1,22 @@
 # TODO handle MultiScreenGroupBox clicks and events
 import logging
-import os
-from os.path import expanduser
-from log import init_log
-
-logger = init_log(
-    log_level=logging.DEBUG,
-)
 
 from libqtile import layout
 from libqtile.command import lazy
-from libqtile.config import Click, Drag
+from libqtile.config import Drag, Match
 
-from groups import generate_groups, get_dgroups
-from keys import get_keys
-from screens import (
+from taqtile.extra import Terminal
+from taqtile.groups import generate_groups, get_dgroups
+from taqtile.keys import get_keys
+from taqtile.screens import (
     get_screens,
     PRIMARY_SCREEN,
     SECONDARY_SCREEN,
     TERTIARY_SCREEN,
 )
-from system import get_num_monitors
-from themes import current_theme
-from extra import Terminal
-import hooks  # pylint: disable=unused-import
+from taqtile.system import get_num_monitors
+from taqtile.themes import current_theme
+
 
 mod = "mod4"
 num_monitors = get_num_monitors()

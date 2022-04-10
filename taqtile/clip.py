@@ -1,13 +1,12 @@
 from __future__ import print_function
 import shlex
-from themes import dmenu_cmd_args
+from taqtile.themes import dmenu_cmd_args
 import logging
 import os
 from os.path import join
 import json
 from plumbum import local
-from log import logger
-from dmenu import dmenu_show
+from taqtile.log import logger
 import subprocess
 
 use_selection = "CLIPBOARD"

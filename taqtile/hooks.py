@@ -3,21 +3,21 @@ import os
 from random import randint
 from libqtile import hook
 from libqtile.layout import Slice
-from system import (
+from taqtile.system import (
     get_hostconfig,
     get_num_monitors,
     execute_once,
     hdmi_connected,
     get_windows_map,
 )
-from recent_runner import RecentRunner
+from taqtile.recent_runner import RecentRunner
+from taqtile.log import logger
 from os.path import splitext, basename
 from subprocess import check_output
 from plumbum import local
 
 notify_send = local["notify-send"]
 
-from log import logger
 
 num_monitors = get_num_monitors()
 prev_timestamp = 0
@@ -57,7 +57,7 @@ def dialogs(window):
 
 
 @hook.subscribe.startup
-def startup(qtile):
+def startup():
     errored = False
     try:
         # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie

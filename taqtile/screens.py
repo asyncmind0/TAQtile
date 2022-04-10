@@ -16,11 +16,11 @@ from libqtile.widget import (
     CryptoTicker,
 )
 
-import system
-from themes import current_theme, default_params
-from widgets import CalClock, Clock, TextBox
-from widgets.bar import Bar
-from widgets.multiscreengroupbox import MultiScreenGroupBox
+from taqtile import system
+from taqtile.themes import current_theme, default_params
+from taqtile.widgets import CalClock, Clock, TextBox
+from taqtile.widgets.bar import Bar
+from taqtile.widgets.multiscreengroupbox import MultiScreenGroupBox
 
 
 # from widgets.bankbalance import BankBalance

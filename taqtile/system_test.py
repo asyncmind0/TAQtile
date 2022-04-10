@@ -1,4 +1,4 @@
-from system import default_config, get_hostconfig, get_hostconfig_dict
+from taqtile.system import default_config, get_hostconfig, get_hostconfig_dict
 import yaml
 
 

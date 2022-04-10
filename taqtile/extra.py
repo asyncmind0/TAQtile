@@ -13,8 +13,8 @@ from os.path import expanduser, isdir, join, pathsep
 from py_compile import compile
 from subprocess import check_output
 import re
-from themes import current_theme
-from system import (
+from taqtile.themes import current_theme
+from taqtile.system import (
     execute_once,
     window_exists,
     get_hostconfig,
@@ -27,7 +27,7 @@ from time import sleep
 from threading import Thread
 from libqtile.command import lazy
 
-from log import logger
+from taqtile.log import logger
 
 try:
     import notify2
@@ -406,7 +406,7 @@ class Terminal:
         )
 
     def get_dgroup_match(self):
-        from groups import Rule
+        from taqtile.groups import Rule
 
         return Rule(
             self.get_match(),

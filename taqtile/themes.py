@@ -1,4 +1,4 @@
-from log import logger
+from taqtile.log import logger
 
 
 default_theme = dict(

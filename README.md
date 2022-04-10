@@ -1,11 +1,19 @@
-# Qtile Config
+# TAQtile - Tactical Advanced Qtile Config 
 
-This is a multi head qtile config designed for switching focus between predefined screens, windows and workspaces with special keybinds.
+![TAQtile Operator](ghost-in-the-shell-fingers.jpg)
+
+This is a multi head qtile config designed for switching focus between
+predefined screens, windows and workspaces with special keybinds.
+
+
+# How to use:
+
+Create terminals 
 
 ## Default tools:
 
 - Terminal: suckless st
-- Browser: Brave
+- Browser: suckless surf
 
 ## Key binds
 

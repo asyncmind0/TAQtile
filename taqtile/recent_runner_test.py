@@ -1,5 +1,5 @@
 from unittest import TestCase
-from recent_runner import RecentRunner
+from taqtile.recent_runner import RecentRunner
 from dmenu import list_executables
 
 

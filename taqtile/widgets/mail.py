@@ -1,5 +1,5 @@
 from libqtile.widget import base
-from log import logger
+from taqtile.log import logger
 
 try:
     import notmuch
@@ -23,7 +23,7 @@ class NotmuchCount(base.ThreadedPollText):
         try:
             count = query.count_messages()
             if count:
-                return u"\u2709 %s" % count
+                return "\u2709 %s" % count
             else:
                 return ""
         except Exception as e:

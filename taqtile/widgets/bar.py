@@ -1,7 +1,7 @@
 from libqtile.bar import Bar as QBar
-from themes import current_theme, default_params
+from taqtile.themes import current_theme, default_params
 
-from log import logger
+from taqtile.log import logger
 
 
 class Bar(QBar):
