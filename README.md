@@ -39,6 +39,17 @@ For full binding list see `taqtile/keys.py`
 | Super-G | Dmenu browser history and `st` instance list (experimental)|
 
 
+## Screenshots
+
+### Quad head config
+
+![Quad](quad.png)
+
+### Themes
+
+![Star Trek Blue](startrekblue.png)
+
+![Matrix Green](matrixgreen.png)
 
 **TODO**
 - highligh currently focused screen taskbar
