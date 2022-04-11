@@ -36,51 +36,6 @@ def get_dgroups():
         Rule(
             Match(
                 title=[
-                    "discord.com is sharing your screen.",
-                ],
-            ),
-            float=True,
-            intrusive=True,
-            break_on_match=True,
-        ),
-        Rule(
-            Match(
-                title=[
-                    "nested",
-                    "gscreenshot",
-                    "discord.com is sharing your screen.",
-                ],
-                wm_class=[
-                    "Guake.py",
-                    "Exe",
-                    "Onboard",
-                    "Florence",
-                    "Terminal",
-                    "Gpaint",
-                    "Kolourpaint",
-                    "Wrapper",
-                    "Gcr-prompter",
-                    "Ghost",
-                    re.compile("Gnome-keyring-prompt.*?"),
-                    "SshAskpass",
-                    "ssh-askpass",
-                    "spectacle",
-                    re.compile(r"pinentry.*"),
-                    # "zoom",
-                ],
-            ),
-            float=True,
-            intrusive=True,
-            break_on_match=True,
-        ),
-        Rule(
-            Match(wm_class=["Pavucontrol", "Wine", "Xephyr", "Gmrun"]),
-            float=True,
-        ),
-        Rule(Match(wm_class=["Screenkey"])),
-        Rule(
-            Match(
-                title=[
                     re.compile("^Android Emulator.*"),
                     re.compile("^Emulator.*"),
                 ]
@@ -89,7 +44,6 @@ def get_dgroups():
             intrusive=True,
             group=get_group_affinity("emulator"),
         ),
-        Rule(Match(wm_class=["Screenkey"]), float=True, intrusive=True),
         Rule(
             Match(
                 title=[
@@ -131,13 +85,6 @@ def get_dgroups():
             group=get_group_affinity("hangouts"),
             break_on_match=False,
         ),
-        # Rule(
-        #    Match(
-        #        wm_class=[re.compile(".*slack.*", re.I)],
-        #    ),
-        #    group=get_group_affinity("slack"),
-        #    break_on_match=False,
-        # ),
         Rule(
             Match(
                 title=[re.compile(r"whatsapp.*", re.I)],
@@ -156,13 +103,6 @@ def get_dgroups():
             group="webcon",
             break_on_match=False,
         ),
-        # Rule(
-        #    Match(
-        #        wm_class=[re.compile("zoom", re.I)],
-        #    ),
-        #    group=get_group_affinity("zoom"),
-        #    break_on_match=False,
-        # ),
         Rule(
             Match(
                 wm_class=[re.compile("insync.*", re.I)],
@@ -172,13 +112,6 @@ def get_dgroups():
             static=True,
             break_on_match=True,
         ),
-        # Rule(
-        #    Match(title=["shrapnel"]),
-        #    group="1",
-        #    break_on_match=False,
-        #    float=True,
-        #    opacity=0.85,
-        # ),
     ]
 
 
@@ -204,15 +137,6 @@ def generate_groups(num_groups, layouts):
                 screen_affinity=PRIMARY_SCREEN,
                 matches=terminal_matches([r"^comm$"])
                 + [Match(title=[re.compile(r"System Monitor", re.I)])],
-                # matches=terminal_matches([r"^comm$"]) + [
-                #    Match(wm_class=[re.compile(r'psi.*', re.I)])],
-                # layouts=[
-                #    layout.Slice(
-                #        'right', 256,
-                #        wname="Psi+",
-                # wmclass="Psi-plus",
-                #        fallback=layout.Tile(**current_theme))
-                # ]
             ),
             "monitor": dict(
                 screen_affinity=PRIMARY_SCREEN,
@@ -223,20 +147,10 @@ def generate_groups(num_groups, layouts):
                 exclusive=True,
                 init=True,
                 matches=[
-                    # Match(wm_class=["Kmail", "Kontact"]),
-                    # Match(wm_class=[re.compile("mail.google.com__mail_u_.*")]),
-                    # Match(title=[re.compile("^Inbox .*")]),
                     Match(
                         title=[re.compile(".*mail.*", re.I)],
                         wm_class=["brave-browser"],
                     ),
-                    # Match(title=[re.compile(".*StreetHawk Mail.*", re.I)]),
-                    # Match(
-                    #    role=[
-                    #        re.compile("^kmail-mainwindow.*"),
-                    #        re.compile("^kontact-mainwindow.*"),
-                    #    ]
-                    # ),
                 ]
                 + terminal_matches([r"^mail$"]),
             ),

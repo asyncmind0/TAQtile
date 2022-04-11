@@ -1,11 +1,12 @@
 # TODO handle MultiScreenGroupBox clicks and events
 import logging
+from os.path import expanduser
 
 from libqtile import layout
 from libqtile.command import lazy
 from libqtile.config import Drag, Match
 
-from taqtile.extra import Terminal
+from taqtile.extra import Terminal, terminal
 from taqtile.groups import generate_groups, get_dgroups
 from taqtile.keys import get_keys
 from taqtile.screens import (
@@ -101,7 +102,7 @@ Terminal(
     groups=groups,
     keys=keys,
     dgroups=dgroups_app_rules,
-    spawn="salt-bison",
+    spawn=expanduser("~/.bin/salt-bison"),
     screen=SECONDARY_SCREEN,
 )
 
@@ -121,7 +122,9 @@ Terminal(
     keys=keys,
     dgroups=dgroups_app_rules,
     screen=SECONDARY_SCREEN,
-    spawn="~/streethawk/infrastructure/srv/k8s/bin/jupyter-shell.sh",
+    spawn=expanduser(
+        "~/streethawk/infrastructure/srv/k8s/bin/jupyter-shell.sh"
+    ),
 )
 
 Terminal(
@@ -133,13 +136,20 @@ Terminal(
     screen=TERTIARY_SCREEN,
     spawn="jupyter-zebra",
 )
+Terminal(
+    "htop",
+    [
+        ["control"],
+        "Escape",
+    ],
+    groups=groups,
+    keys=keys,
+    dgroups=dgroups_app_rules,
+    screen=TERTIARY_SCREEN,
+    spawn=terminal("htop"),
+)
 
 screens = get_screens(num_monitors, groups)
-
-
-class NoTimerFilter(logging.Filter):
-    def filter(self, record):
-        return "timer" not in record.getMessage()
 
 
 floating_layout = layout.Floating(
@@ -152,5 +162,11 @@ floating_layout = layout.Floating(
         Match(wm_class="ssh-askpass"),  # ssh-askpass
         Match(title="branchdialog"),  # gitk
         Match(wm_class="pinentry-qt"),  # GPG key password entry
+        Match(
+            title=[
+                "discord.com is sharing your screen.",
+            ],
+        ),
+        Match(wm_class=["Pavucontrol", "Wine", "Xephyr", "Gmrun"]),
     ]
 )
