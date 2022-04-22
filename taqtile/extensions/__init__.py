@@ -9,7 +9,10 @@ from urllib.parse import quote_plus
 
 from libqtile import hook
 from libqtile.extension.dmenu import Dmenu, DmenuRun
-from libqtile.extension.window_list import WindowList
+
+from libqtile.extension.window_list import WindowList as QWindowList
+
+# from libqtile.extension.window_list import WindowList
 from plumbum import local
 
 from taqtile.log import logger
@@ -22,8 +25,62 @@ from taqtile.system import (
     get_current_group,
     get_redis,
 )
+from taqtile.groups import Rule, Match
 
 from .surf import Surf  # flake8: noqa
+
+
+@hook.subscribe.client_new
+def set_timestamp(window):
+    window.window.set_property(
+        "QTILE_CREATED", int(datetime.now().timestamp()), type="ATOM", format=32
+    )
+
+
+class WindowList(QWindowList):
+    def run(self):
+        self.list_windows()
+        window_list = []
+        for key, item in self.item_to_win.items():
+            created = item.window.get_property(
+                "QTILE_CREATED", type="ATOM", unpack=int
+            )
+            if created:
+                created = created[0]
+            window_list.append((created, key))
+
+            logger.debug(f"window_list: {item} {created}")
+        out = Dmenu.run(
+            self,
+            items=[
+                x[-1]
+                for x in sorted(window_list, key=lambda x: x[0], reverse=True)
+            ],
+        )
+
+        try:
+            sout = out.rstrip("\n")
+        except AttributeError:
+            # out is not a string (for example it's a Popen object returned
+            # by super(WindowList, self).run() when there are no menu items to
+            # list
+            return
+
+        try:
+            win = self.item_to_win[sout]
+        except KeyError:
+            # The selected window got closed while the menu was open?
+            logger.warning("no window found %s" % sout)
+            return
+        logger.debug(
+            f"window found {win} {win.group}: {self.qtile.current_group}"
+        )
+
+        if self.qtile.current_group.name != win.group.name:
+            screen = self.qtile.current_screen
+            screen.set_group(win.group)
+
+        win.group.focus(win)
 
 
 @lru_cache()
