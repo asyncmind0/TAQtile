@@ -96,6 +96,32 @@ def list_executables(ttl_hash=None):
     return set(executables)
 
 
+class KillWindows(WindowList):
+    def run(self):
+        self.list_windows()
+        self.dmenu_prompt = "Kill selected windows <Ctrk-Ret> to select:"
+        self._configure(self.qtile)
+        windows = Dmenu.run(self, items=self.item_to_win.keys()).split("\n")
+        for win in windows:
+            win = win.strip()
+            if not win:
+                continue
+            self.dmenu_prompt = "Kill %s" % win
+            self._configure(self.qtile)
+            if (
+                Dmenu.run(self, items=["confirm", "cancel"]).strip()
+                == "confirm"
+            ):
+                try:
+                    win = self.item_to_win[win]
+                except KeyError:
+                    logger.warning("window not found %s", win)
+                    # The selected window got closed while the menu was open?
+                else:
+                    logger.debug("killing window: %s", win)
+                    win.cmd_kill()
+
+
 class BringWindowToGroup(WindowList):
     def run(self):
         self.list_windows()
@@ -243,17 +269,9 @@ class PassMenu(DmenuRun):
         ("dbname", "dbname", "the sqlite db to store history."),
         ("dmenu_command", "dmenu", "the dmenu command to be launched"),
     ]
-    qtile = None
+    dmenu_prompt = "pass"
     dbname = "pass_menu"
     dmenu_command = "dmenu"
-
-    def __init__(self, **config):
-        super().__init__(**config)
-        self.add_defaults(super().defaults)
-
-    def _configure(self, qtile):
-        self.qtile = qtile
-        super()._configure(qtile)
 
     def run(self):
         logger.error("running")
@@ -325,9 +343,12 @@ class Inboxes(DmenuRun):
                 "/usr/sbin//systemd-run",
                 "--user",
                 "--slice=browser.slice",
-                "brave",
-                "--app=https://mail.google.com/mail/u/%s/#inbox" % selected,
-                "--profile-directory=%s" % inboxes[selected]["profile"],
+                "surf",
+                # "-u",
+                # "Firefox/99.0",
+                "https://mail.google.com/mail/u/%s/#inbox" % selected,
+                # "--app=https://mail.google.com/mail/u/%s/#inbox" % selected,
+                # "--profile-directory=%s" % inboxes[selected]["profile"],
             )
 
             logger.info(cmd)
@@ -360,7 +381,7 @@ def delete(key):
         logger.exception("redis boost failed")
 
 
-@hook.subscribe.client_name_updated
+# @hook.subscribe.client_name_updated
 def on_inbox_open(client):
     inboxes = get_hostconfig("google_accounts", [])
     for inbox, config in inboxes.items():
@@ -370,7 +391,7 @@ def on_inbox_open(client):
             client.to_group("mail")
 
 
-@hook.subscribe.client_killed
+# @hook.subscribe.client_killed
 def on_inbox_close(client):
     inboxes = get_hostconfig("google_accounts", [])
     for inbox, config in inboxes.items():

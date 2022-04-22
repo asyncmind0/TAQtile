@@ -47,9 +47,9 @@ class RecentRunner:
         sql = "SELECT command FROM %s " % self.dbname
         c = self.conn.cursor()
         if command:
-            sql += "WHERE command LIKE '%s%%'" % command
+            sql += "WHERE command LIKE ?"
         sql += "ORDER BY DATE"
-        results = c.execute(sql)
+        results = c.execute(sql, (command,))
         return [x[0] for x in results.fetchall()]
 
     def insert(self, command):

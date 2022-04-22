@@ -21,6 +21,8 @@ from taqtile.extensions import (
     Inboxes,
     BringWindowToGroup,
     SessionActions,
+    KillWindows,
+    WindowList,
 )
 from taqtile.extra import (
     SwitchToWindowGroup,
@@ -254,7 +256,11 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "Return", lazy.spawn("st")),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         # ([mod, "shift"], "b", lazy.spawn("google-chrome-stable")),
-        ([mod, "shift"], "g", lazy.spawn("google-chrome-stable")),
+        (
+            [mod, "control"],
+            "g",
+            lazy.run_extension(KillWindows(**current_theme)),
+        ),
         ([mod, "shift"], "p", lazy.run_extension(PassMenu(**current_theme))),
         ([mod, "control"], "p", lazy.function(dmenu_pushbullet)),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
@@ -329,7 +335,7 @@ def get_keys(mod, num_groups, num_monitors):
             [mod],
             "w",
             lazy.run_extension(
-                extension.WindowList(
+                WindowList(
                     dmenu_prompt="windows:",
                     dmenu_ignorecase=True,
                     dmenu_font=current_theme["font"],
@@ -341,7 +347,7 @@ def get_keys(mod, num_groups, num_monitors):
             [mod, "shift"],
             "w",
             lazy.run_extension(
-                extension.WindowList(
+                WindowList(
                     dmenu_prompt="windows:",
                     all_groups=False,
                     dmenu_ignorecase=True,

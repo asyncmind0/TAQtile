@@ -31,6 +31,13 @@ class Rule(QRule):
         self.geometry = geometry
 
 
+def is_mailbox(client):
+    surf_uri = client.get_property("_SURF_URI", str)
+    if surf_uri and surf_uri.startswith("https://mail.google.com"):
+        return True
+    return False
+
+
 def get_dgroups():
     return [
         Rule(
@@ -45,6 +52,11 @@ def get_dgroups():
             group=get_group_affinity("emulator"),
         ),
         Rule(
+            Match(func=is_mailbox),
+            group="mail",
+            break_on_match=True,
+        ),
+        Rule(
             Match(
                 title=[
                     re.compile(r"^Developer.*", re.I),
@@ -54,16 +66,6 @@ def get_dgroups():
                 ]
             ),
             group=get_group_affinity("devtools"),
-            break_on_match=True,
-        ),
-        Rule(
-            Match(
-                title=[
-                    re.compile(r".*mail.*", re.I),
-                ],
-                # role="pop-up",
-            ),
-            group="mail",
             break_on_match=True,
         ),
         Rule(

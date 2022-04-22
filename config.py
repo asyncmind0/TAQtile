@@ -57,7 +57,7 @@ mouse = [
 float_windows = [
     "buddy_list",
 ]
-follow_mouse_focus = True
+follow_mouse_focus = True  # pylint: noqa, flake8: noqa
 bring_front_click = True
 cursor_warp = False
 auto_fullscreen = True
@@ -116,25 +116,27 @@ Terminal(
 )
 
 Terminal(
-    "jupyter-bison",
+    "jupyter-bison-blue",
     [[mod], "XF86Launch5"],
     groups=groups,
     keys=keys,
     dgroups=dgroups_app_rules,
     screen=SECONDARY_SCREEN,
     spawn=expanduser(
-        "~/streethawk/infrastructure/srv/k8s/bin/jupyter-shell.sh"
+        "~/streethawk/infrastructure/srv/k8s/bin/jupyter-shell.sh bison-blue"
     ),
 )
 
 Terminal(
-    "jupyter-zebra",
+    "jupyter-zebra-green",
     [[mod], "F11"],
     groups=groups,
     keys=keys,
     dgroups=dgroups_app_rules,
     screen=TERTIARY_SCREEN,
-    spawn="jupyter-zebra",
+    spawn=expanduser(
+        "~/streethawk/infrastructure/srv/k8s/bin/jupyter-shell.sh zebra-green"
+    ),
 )
 Terminal(
     "htop",
@@ -146,7 +148,7 @@ Terminal(
     keys=keys,
     dgroups=dgroups_app_rules,
     screen=TERTIARY_SCREEN,
-    spawn=terminal("htop"),
+    spawn=terminal("htop", cmd="htop"),
 )
 
 screens = get_screens(num_monitors, groups)

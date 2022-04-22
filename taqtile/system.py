@@ -51,8 +51,8 @@ desktop_autostart.update({"jabberel-tray.py": None})
 default_config = {
     "screens": {
         0: 2,
-        1: 1,
-        2: 0,
+        1: 0,
+        2: 1,
         3: 3,
     },
     "term0_key": "F11",

@@ -29,6 +29,8 @@ class Surf(Dmenu):
     Give vertical list of all open windows in dmenu. Switch to selected.
     """
 
+    dmenu_prompt = "Surf"
+
     defaults = [
         ("item_format", "* {window}", "the format for the menu items"),
         (
@@ -64,7 +66,7 @@ class Surf(Dmenu):
                 item = self.item_format.format(
                     group=win.group.label or win.group.name,
                     id=id,
-                    window=win.name,
+                    window=win.name.split("|", 1)[-1],
                 )
                 self.item_to_win[item] = win
                 id += 1
@@ -108,6 +110,9 @@ class Surf(Dmenu):
 
         screen.set_group(win.group)
         win.group.focus(win)
-        logger.info(
-            win.window.get_property("_SURF_URI", "STRING").value.to_string()
-        )
+        try:
+            logger.info(
+                win.window.get_property("_SURF_URI", "STRING").value.to_string()
+            )
+        except AttributeError:
+            pass

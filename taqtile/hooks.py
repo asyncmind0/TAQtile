@@ -1,4 +1,5 @@
 from __future__ import print_function
+from datetime import datetime
 
 import os
 from os.path import splitext, basename
@@ -49,7 +50,6 @@ def load_sounds():
         )
 
 
-@hook.subscribe.client_new
 def dialogs(window):
     if (
         window.window.get_wm_type() == "dialog"
@@ -106,7 +106,7 @@ def dbus_register():
         logger.exception("error in dbus_register")
 
 
-@hook.subscribe.client_managed
+# @hook.subscribe.client_managed
 def rules_shrapnel(client):
     client_name = client.window.get_name()
     if client_name == "shrapnel":
@@ -124,7 +124,14 @@ def rules_shrapnel(client):
         client.cmd_opacity(0.85)
 
 
-@hook.subscribe.client_managed
+@hook.subscribe.client_name_updated
+def trigger_dgroups(client):
+    from libqtile import qtile
+
+    qtile.dgroups._add(client)
+
+
+# @hook.subscribe.client_managed
 def set_group(client):
     from libqtile import qtile
 
@@ -191,7 +198,11 @@ def set_groups(client, *args, **kwargs):
 
     for client in list(get_windows_map(qtile).values()):
         logger.debug("set_groups")
-        set_group(client)
+        # set_group(client)
+        try:
+            qtile.dgroups._add(client)
+        except:
+            logger.exception("error setting rules %s", client)
 
 
 # @hook.subscribe.client_urgent_hint_changed

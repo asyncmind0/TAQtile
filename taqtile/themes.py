@@ -10,12 +10,13 @@ default_theme = dict(
     terminal_fontsize=16,
     # font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
     # font="Inconsolata",
-    font="Terminus",
+    font="Hack",
     # font="ProggySquareTTSZ",
     # font="pango:monospace",
     borderwidth=1,
     bar_height=18,
     dmenu_lines=30,
+    # dmenu_command="dmenu -width 300",
 )
 
 star_trek_blue = dict(

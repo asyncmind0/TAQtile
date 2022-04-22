@@ -16,6 +16,7 @@ from libqtile.widget import (
     CryptoTicker,
     Volume,
     WindowCount,
+    CPU,
 )
 
 from taqtile import system
@@ -146,6 +147,8 @@ def get_screens(num_monitors, groups):
         Sep(**sep_params),
         TextBox("v", **default_params()),
         Volume(update_interval=1, **default_params()),
+        Sep(**sep_params),
+        CPU(**default_params()),
         Sep(**sep_params),
         TextBox(
             "c",
