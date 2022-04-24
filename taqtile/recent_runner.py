@@ -46,10 +46,12 @@ class RecentRunner:
     def recent(self, command=""):
         sql = "SELECT command FROM %s " % self.dbname
         c = self.conn.cursor()
+        args = []
         if command:
             sql += "WHERE command LIKE ?"
+            args.append(command)
         sql += "ORDER BY DATE"
-        results = c.execute(sql, (command,))
+        results = c.execute(sql, args)
         return [x[0] for x in results.fetchall()]
 
     def insert(self, command):

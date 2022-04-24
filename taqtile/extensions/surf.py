@@ -23,6 +23,24 @@ from taqtile.system import (
     get_redis,
 )
 
+SURF_HISTORY_DB = "qtile_surf"
+surf_recent_runner = RecentRunner(SURF_HISTORY_DB)
+
+
+@hook.subscribe.client_name_updated
+def save_history(client):
+    uri = None
+    logger.debug("name updated  %s", client)
+    try:
+        uri = client.window.get_property(
+            "_SURF_URI", "UTF8_STRING"
+        ).value.to_utf8()
+        logger.info(uri)
+        surf_recent_runner.insert(uri)
+
+    except AttributeError:
+        logger.exception("failed to get uri updated ")
+
 
 class Surf(Dmenu):
     """
@@ -30,6 +48,8 @@ class Surf(Dmenu):
     """
 
     dmenu_prompt = "Surf"
+    recent_runner = None
+    dbname = SURF_HISTORY_DB
 
     defaults = [
         ("item_format", "* {window}", "the format for the menu items"),
@@ -44,15 +64,15 @@ class Surf(Dmenu):
     def __init__(self, **config):
         super().__init__(**config)
         self.add_defaults(WindowList.defaults)
+        self.recent_runner = surf_recent_runner
+        self.item_to_win = {}
 
     def _configure(self, qtile):
         Dmenu._configure(self, qtile)
-        self.dbname = "qtile_surf"
 
     def list_windows(self):
         id = 0
         self.item_to_win = {}
-
         if self.all_groups:
             windows = self.qtile.windows_map.values()
         else:
@@ -71,11 +91,10 @@ class Surf(Dmenu):
                 self.item_to_win[item] = win
                 id += 1
 
-    def run(self):
+    def run(self, items=None):
         self.list_windows()
-        recent = RecentRunner(self.dbname)
         items = [x for x in self.item_to_win.keys()] + [
-            x for x in recent.list([])
+            x for x in self.recent_runner.list([])
         ]
         out = super().run(items=items)
         logger.info("surf called %s", out)
@@ -91,10 +110,11 @@ class Surf(Dmenu):
             return
 
         if not sout.startswith("*"):
-            recent.insert(sout.split("|", 1)[-1])
+            self.recent_runner.insert(sout.split("|", 1)[-1])
         try:
             win = self.item_to_win[sout]
         except KeyError:
+            logger.info("surf failed to get window %s", out)
             # The selected window got closed while the menu was open?
             if sout.startswith("http"):
                 self.qtile.cmd_spawn("surf %s" % sout.strip())
@@ -109,10 +129,5 @@ class Surf(Dmenu):
             return
 
         screen.set_group(win.group)
+        logger.info("surf focusing window %s", win)
         win.group.focus(win)
-        try:
-            logger.info(
-                win.window.get_property("_SURF_URI", "STRING").value.to_string()
-            )
-        except AttributeError:
-            pass
