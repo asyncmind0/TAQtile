@@ -13,6 +13,7 @@ from taqtile.dmenu import (
     list_bluetooth,
     list_calendars,
     dmenu_pushbullet,
+    dmenu_kubectl,
 )
 from taqtile.extensions import (
     Surf,
@@ -356,19 +357,7 @@ def get_keys(mod, num_groups, num_monitors):
                 )
             ),
         ),
-        (
-            [mod],
-            "t",
-            lazy.run_extension(
-                BringWindowToGroup(
-                    dmenu_prompt="summon window:",
-                    all_groups=True,
-                    dmenu_ignorecase=True,
-                    dmenu_font=current_theme["font"],
-                    **current_theme
-                )
-            ),
-        ),
+        ([mod, "shift"], "k", lazy.function(dmenu_kubectl)),
     ]
 
     laptop_keys = [

@@ -1,9 +1,12 @@
 import os
+import json
+
 import re
 import shlex
 from os.path import isdir, join, pathsep, dirname
 
-from plumbum.cmd import dmenu, bluetoothctl, clipmenu, xdotool, pacmd
+from plumbum.cmd import dmenu
+from plumbum.cmd import kubectl
 
 from taqtile.log import logger
 from taqtile.recent_runner import RecentRunner
@@ -17,6 +20,8 @@ from taqtile.system import (
     get_current_screen,
     get_current_group,
 )
+from taqtile.extra import terminal
+from taqtile.log import logger
 
 
 def dmenu_show(title, items):
@@ -33,15 +38,19 @@ def dmenu_show(title, items):
 
 def dmenu_org(qtile):
     org_categories = [
+        "emacsclient",
         "todo",
         "event",
         "note",
     ]
     title = dmenu_show("Run", org_categories)
-    cmd_str = (
-        "emacsclient -f xdev -c org-protocol://capture://"
-        "url/%s/etext" % (title,)
-    )
+    if title == "emacsclient":
+        cmd_str = "emacsclient -f xdev -c"
+    else:
+        cmd_str = (
+            "emacsclient -f xdev -c org-protocol://capture://"
+            "url/%s/etext" % (title,)
+        )
     qtile.cmd_spawn(cmd_str)
 
 
@@ -56,6 +65,8 @@ def list_bluetooth(qtile):
         return
     action = dmenu_show("Action", ["connect", "disconnect", "music", "voice"])
     if action in ["music", "voice"]:
+        from plumbum.cmd import pacmd
+
         logger.info(
             "bluez_card.%s",
             all_devices[selected].replace(":", "_"),
@@ -70,6 +81,8 @@ def list_bluetooth(qtile):
             )
         )
     else:
+        from plumbum.cmd import bluetoothctl
+
         (bluetoothctl << "%s %s\nexit\n" % (action, all_devices[selected]))()
     recent.insert(selected)
 
@@ -103,13 +116,13 @@ def list_calendars(qtile):
                 get_current_group(qtile).layout.focus(window)
                 break
         else:
+            #'/usr/sbin//systemd-run --user --slice=browser.slice brave --app="https://calendar.google.com/calendar/b/%s/" --profile-directory=%s'
+            #'firefox --new-window  --kiosk "https://calendar.google.com/calendar/b/%s/"  -P %s' %
             cmd = (
-                '/usr/sbin//systemd-run --user --slice=browser.slice brave --app="https://calendar.google.com/calendar/b/%s/" --profile-directory=%s'
-                %
-                #'firefox --new-window  --kiosk "https://calendar.google.com/calendar/b/%s/"  -P %s' %
-                (
+                '/usr/sbin//systemd-run --user --slice=browser.slice surf "https://calendar.google.com/calendar/b/%s/" '
+                % (
                     selected,
-                    inboxes[selected]["profile"],
+                    # inboxes[selected]["profile"],
                 )
             )
 
@@ -164,5 +177,49 @@ def dmenu_pushbullet(qtile):
     device = pb.get_device(device)
     title = "Select clip item to push: "
     dmenu_args = shlex.split(dmenu_cmd_args(dmenu_lines=min(30, len(items))))
+    from plumbum.cmd import clipmenu
+
     body = clipmenu["-i", "-p", "%s" % title](*dmenu_args).strip()
     device.push_note("Shared from %s" % socket.gethostname(), open(body).read())
+
+
+def dmenu_kubectl(qtile):
+    clusters = kubectl("config", "get-clusters").split()[1:]
+    cluster = dmenu_show("Cluster:", clusters)
+    pods = json.loads(
+        kubectl("--context", cluster, "get", "po", "-o", "json")
+    ).get("items", [])
+    containermap = {}
+    for pod in pods:
+        containermap[pod.get("metadata", {}).get("name", "unknown")] = [
+            cont["name"] for cont in pod["spec"]["containers"]
+        ]
+
+    pod = dmenu_show("Pod:", containermap)
+
+    op = dmenu_show("Operation", ["logs", "describe", "shell"])
+    if op == "logs":
+        container = dmenu_show("Container", containermap[pod])
+        cmd = terminal(
+            "k8s logs - %s - %s" % (pod, cluster),
+            "kubectl --context=%s logs --tail=100 -f %s -c %s"
+            % (cluster, pod, container),
+        )
+        logger.debug("k8s" + str(cmd))
+        qtile.cmd_spawn(cmd)
+    elif op == "describe":
+        cmd = terminal(
+            "k8s describe - %s - %s" % (pod, cluster),
+            "kubectl --context=%s describe po %s;read" % (cluster, pod),
+        )
+        logger.debug("k8s" + str(cmd))
+        qtile.cmd_spawn(cmd)
+    elif op == "shell":
+        container = dmenu_show("Container", containermap[pod])
+        cmd = terminal(
+            "k8s logs - %s - %s" % (pod, cluster),
+            "kubectl --context=%s exec -it %s -c %s sh"
+            % (cluster, pod, container),
+        )
+        logger.debug("k8s" + str(cmd))
+        qtile.cmd_spawn(cmd)

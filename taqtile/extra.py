@@ -38,7 +38,7 @@ except:
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
 # _terminal = "alacritty -t {0} "
 _terminal = (
-    'st -f "%(terminal_font)s:pixelsize=%(terminal_fontsize)s" -t {0} -c st '
+    'st -f "%(terminal_font)s:pixelsize=%(terminal_fontsize)s" -t "{0}" -c st '
     % current_theme
 )
 

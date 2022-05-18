@@ -149,6 +149,7 @@ def generate_groups(num_groups, layouts):
                 exclusive=True,
                 init=True,
                 matches=[
+                    Match(func=is_mailbox),
                     Match(
                         title=[re.compile(".*mail.*", re.I)],
                         wm_class=["brave-browser"],

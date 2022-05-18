@@ -164,11 +164,10 @@ def set_group(client):
                     client.cmd_opacity(rule.opacity)
                 center = getattr(rule, "center", False)
                 if center:
-                    logger.debug(dir(get_current_screen(qtile)))
+                    logger.debug(dir(qtile.current_screen))
                     client.tweak_float(
-                        x=(get_current_screen(qtile).width / 2)
-                        - (client.width / 2),
-                        y=(get_current_screen(qtile).height / 2)
+                        x=(qtile.current_screen.width / 2) - (client.width / 2),
+                        y=(qtile.current_screen.height / 2)
                         - (client.height / 2),
                     )
                 # current_screen = getattr(rule, 'current_screen', False)
@@ -193,16 +192,16 @@ def set_group(client):
             logger.exception("error setting rules %s", client)
 
 
-def set_groups(client, *args, **kwargs):
+def set_groups(qtile):
     from libqtile import qtile
 
     for client in list(get_windows_map(qtile).values()):
         logger.debug("set_groups")
-        # set_group(client)
-        try:
-            qtile.dgroups._add(client)
-        except:
-            logger.exception("error setting rules %s", client)
+        set_group(client)
+        # try:
+        #    qtile.dgroups._add(client)
+        # except:
+        #    logger.exception("error setting rules %s", client)
 
 
 # @hook.subscribe.client_urgent_hint_changed

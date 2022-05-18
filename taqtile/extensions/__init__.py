@@ -31,6 +31,7 @@ from taqtile.system import (
 from taqtile.groups import Rule, Match
 
 from .surf import Surf  # flake8: noqa
+from .kubectl import KubeCtl
 
 
 @hook.subscribe.client_new
@@ -82,7 +83,6 @@ class WindowList(QWindowList):
         if self.qtile.current_group.name != win.group.name:
             screen = self.qtile.current_screen
             screen.set_group(win.group)
-
         win.group.focus(win, force=True)
         # win.cmd_focus()
 

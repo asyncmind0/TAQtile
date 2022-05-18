@@ -114,10 +114,13 @@ class Surf(Dmenu):
         try:
             win = self.item_to_win[sout]
         except KeyError:
-            logger.info("surf failed to get window %s", out)
             # The selected window got closed while the menu was open?
             if sout.startswith("http"):
-                self.qtile.cmd_spawn("surf %s" % sout.strip())
+                self.qtile.cmd_spawn(
+                    # "/usr/sbin//systemd-run --user --slice=browser.slice /usr/local/bin/surf %s"
+                    "surf %s"
+                    % sout.strip()
+                )
             elif sout:
                 gg = "gg "
                 if sout.startswith(gg):
@@ -128,6 +131,8 @@ class Surf(Dmenu):
                 self.qtile.cmd_spawn(cmd % quote_plus(sout))
             return
 
-        screen.set_group(win.group)
+        if self.qtile.current_group.name != win.group.name:
+            screen = self.qtile.current_screen
+            screen.set_group(win.group)
         logger.info("surf focusing window %s", win)
         win.group.focus(win)
