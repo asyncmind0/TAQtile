@@ -22,8 +22,6 @@ def passstore(path):
 mod = "mod4"
 
 common_autostart = {
-    "xcompmgr": None,
-    expanduser("~/.bin/xstartup"): None,
     # "surf 'https://grafana-bison.streethawk.com/d/000000003/bison-rabbitmq?orgId=1&from=now-1h&to=now&refresh=5m'": None,
     # "surf 'https://grafana.streethawk.com/d/000000004/bison-load?orgId=1&from=now-1h&to=now&refresh=15m'": None,
     "dropbox": None,

@@ -7,16 +7,14 @@ default_theme = dict(
     linewidth=2,
     fontsize=12,
     terminal_font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
-    terminal_fontsize=16,
-    # font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
-    # font="Inconsolata",
-    font="Hack",
-    # font="ProggySquareTTSZ",
+    terminal_fontsize=22,  #
+    font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
+    # font="Inconsolata", font="Hack", # font="ProggySquareTTSZ", #
     # font="pango:monospace",
     borderwidth=1,
     bar_height=18,
-    dmenu_lines=30,
-    # dmenu_command="dmenu -width 300",
+    dmenu_lines=30,  #
+    dmenu_command="dmenu -z 1500 -c",
 )
 
 star_trek_blue = dict(
