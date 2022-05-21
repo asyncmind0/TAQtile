@@ -8,7 +8,7 @@ predefined screens, windows and workspaces with special keybinds.
 
 # How to use:
 
-This is an advanced configuration for ![Qtile](https://github.com/qtile)
+This is an advanced configuration for [Qtile](https://gigthub.com/qtile)
 
 - Extra window and group actions 
 - Customized widgets
@@ -16,7 +16,7 @@ This is an advanced configuration for ![Qtile](https://github.com/qtile)
 - Mostly things that worked for @jagguli
 
 
-Uses ![suckless](https://suckless.org) tools by default
+Uses [suckless](https://suckless.org) tools by default
 
 - st
 - surf
