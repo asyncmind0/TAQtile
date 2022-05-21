@@ -5,7 +5,6 @@ from libqtile.config import Screen
 from libqtile.widget import (
     Sep,
     Pomodoro,
-    WindowName,
     CurrentLayout,
     Battery,
     NetGraph,
@@ -23,6 +22,7 @@ from taqtile import system
 from taqtile.themes import current_theme, default_params
 from taqtile.widgets import CalClock, Clock, TextBox
 from taqtile.widgets.bar import Bar
+from taqtile.widgets.windowname import WindowName
 from taqtile.widgets.multiscreengroupbox import MultiScreenGroupBox
 
 
@@ -262,31 +262,31 @@ def get_screens(num_monitors, groups):
                 Pomodoro(**default_params()),
             ]
         )
-        return Bar(widgets)
+        return Bar(widgets, **default_params())
 
     # clock_bar.size = 0
     screens = dict()
     if num_monitors == 1:
         primary_bar.append(CalClock(timezone=localtimezone, **clock_params))
         screens[PRIMARY_SCREEN] = Screen(
-            Bar(primary_bar),
+            Bar(primary_bar, **default_params()),
             bottom=make_clock_bar(),
         )
     else:
         screens[PRIMARY_SCREEN] = Screen(
-            Bar(primary_bar),
+            Bar(primary_bar, **default_params()),
             bottom=make_clock_bar(),
         )
         screens[SECONDARY_SCREEN] = Screen(
-            Bar(secondary_bar),
+            Bar(secondary_bar, **default_params()),
             bottom=make_clock_bar(),
         )
         screens[TERTIARY_SCREEN] = Screen(
-            Bar(tertiary_bar),
+            Bar(tertiary_bar, **default_params()),
             bottom=make_clock_bar(),
         )
         screens[QUATERNARY_SCREEN] = Screen(
-            Bar(quaternary_bar),
+            Bar(quaternary_bar, **default_params()),
             bottom=make_clock_bar(),
         )
     screens = [screens[y] for y in sorted(screens.keys())]

@@ -1,4 +1,5 @@
 from libqtile.bar import Bar as QBar
+from libqtile import bar, hook, pangocffi
 from taqtile.themes import current_theme, default_params
 
 from taqtile.log import logger
@@ -7,36 +8,26 @@ from taqtile.log import logger
 class Bar(QBar):
     default_background = None
     defaults = [
-        ("focused_background", "#FF0000", "Background colour."),
+        ("focused_background", "#000000", "Background colour."),
     ]
 
     def __init__(self, widgets, **config):
-        bar_defaults = default_params(
-            focused_background=current_theme.get("focused_background"),
-        )
-        bar_defaults.update(config)
-        super().__init__(
-            widgets, current_theme.get("bar_height", 8), **bar_defaults
-        )
+        bar_height = config.pop("bar_height", 8) or 8
+        super().__init__(widgets, int(bar_height), **config)
         self.add_defaults(Bar.defaults)
         self.default_background = self.background
+        self.default_foreground = self.foreground
+        hook.subscribe.current_screen_change(self.hook_response)
 
-    def _configure(self, qtile, screen, reconfigure=False):
-        self.default_background = self.background
-        try:
-            return super()._configure(qtile, screen, reconfigure=reconfigure)
-        except:
-            return super()._configure(qtile, screen)
-
-    def draw(self):
-        # logger.debug("Current screen %s", self.qtile.current_screen.index)
-        # logger.debug("Bar screen %s", self.screen.index)
-        # logger.debug(
-        #    "Background %s %s", self.background, self.focused_background
-        # )
-        if self.qtile.current_screen.index == self.screen.index:
-            # logger.debug("Bar is focused screen %s", self.screen.index)
+    def hook_response(self, *args):
+        logger.error("hook_response screen %s", self.qtile.current_screen.index)
+        logger.error("hook_response self.screen %s", self.screen.index)
+        if self.screen == self.qtile.current_screen:
             self.background = self.focused_background
         else:
             self.background = self.default_background
+        self._configure(self.qtile, self.screen, reconfigure=True)
+        self.draw()
+
+    def _draw(self):
         return super().draw()
