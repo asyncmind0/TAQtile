@@ -166,7 +166,9 @@ def get_keys(mod, num_groups, num_monitors):
         # ([mod], "j", lazy.layout.down()),
         # Move windows up or down in current stack
         ([mod, "shift"], "k", lazy.layout.shuffle_up()),
+        ([mod], "Up", lazy.layout.up()),
         ([mod, "shift"], "j", lazy.layout.shuffle_down()),
+        ([mod], "Down", lazy.layout.down()),
         ([mod, "shift"], "h", lazy.layout.client_to_previous().when("stack")),
         ([mod, "shift"], "l", lazy.layout.client_to_next().when("stack")),
         ([mod], "h", lazy.group.prev_window()),
