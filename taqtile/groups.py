@@ -135,14 +135,10 @@ def generate_groups(num_groups, layouts):
     # map og group and prefered screen
     group_args = OrderedDict(
         {
-            "comm": dict(
-                screen_affinity=PRIMARY_SCREEN,
-                matches=terminal_matches([r"^comm$"])
-                + [Match(title=[re.compile(r"System Monitor", re.I)])],
-            ),
             "monitor": dict(
                 screen_affinity=PRIMARY_SCREEN,
-                matches=terminal_matches([r"^monitor$"]),
+                matches=terminal_matches([r"^monitor$"])
+                + [Match(title=[re.compile(r"System Monitor", re.I)])],
             ),
             "mail": dict(
                 screen_affinity=PRIMARY_SCREEN,

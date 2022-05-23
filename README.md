@@ -52,6 +52,6 @@ For full binding list see `taqtile/keys.py`
 ![Matrix Green](matrixgreen.png)
 
 **TODO**
-- highligh currently focused screen taskbar
+- [DONE] highlight currently focused screen taskbar
 - dmenu browser profile selector
 - bring window to monitor dmenu option

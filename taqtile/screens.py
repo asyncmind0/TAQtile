@@ -29,8 +29,7 @@ from taqtile.widgets.multiscreengroupbox import MultiScreenGroupBox
 # from widgets.bankbalance import BankBalance
 # from widgets.mail import NotmuchCount
 
-# from widgets.priority_notify import PriorityNotify
-# from widgets.tasklist2 import TaskList2
+# from taqtile.widgets.priority_notify import PriorityNotify
 
 
 log = logging.getLogger("qtile")
@@ -66,8 +65,7 @@ def get_screens(num_monitors, groups):
     windowname_params = default_params()
     systray_params = default_params(icon_size=15)
     clock_params = default_params(
-        padding=1,
-        format="%Y-%m-%d %a %H:%M",
+        padding=2, format="%Y-%m-%d %a %H:%M", fontsize=12
     )
     pacman_params = default_params()
     notify_params = default_params()
@@ -109,7 +107,9 @@ def get_screens(num_monitors, groups):
     memgraph_params["fill_color"] = "80FF00.3"
     memgraph_params["type"] = "linefill"
     netgraph_params = dict(graph_defaults)
-    sep_params = default_params(padding=4, fontsize=9)
+    sep_params = default_params(
+        size_percent=100, padding=0, fontsize=9, foreground="000000"
+    )
     graph_label_defaults = dict(
         margin=0,
         padding_x=0,
@@ -232,19 +232,18 @@ def get_screens(num_monitors, groups):
         CalClock(timezone=localtimezone, **clock_params),
     ]
 
-    clock_params = default_params(
-        padding=2, format="%Y-%m-%d %a %H:%M", fontsize=12
-    )
     clock_text = default_params(fontsize=12)
+    wclock_params = default_params(padding=2, format="%a %H:%M", fontsize=12)
 
     def make_clock_bar():
         timezones = [
             "UTC",
             "US/Central",
-            "Asia/Ho_Chi_Minh",
             "US/Eastern",
             "Australia/Sydney",
+            "Asia/Ho_Chi_Minh",
             "Asia/Kolkata",
+            "Africa/Lagos",
             "Asia/Riyadh",
         ]
         widgets = []
@@ -252,14 +251,15 @@ def get_screens(num_monitors, groups):
             if timezone == localtimezone:
                 continue
             widgets.append(TextBox("%s:" % timezone, **clock_text))
-            widgets.append(Clock(timezone=timezone, **clock_params))
+            widgets.append(Clock(timezone=timezone, **wclock_params))
             widgets.append(
-                Sep(**default_params(padding=8, fontsize=9)),
+                Sep(**sep_params),
             )
         widgets.extend(
             [
                 Sep(**sep_params),
                 Pomodoro(**default_params()),
+                Sep(**sep_params),
             ]
         )
         return Bar(widgets, **default_params())

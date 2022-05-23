@@ -4,15 +4,15 @@ from taqtile.log import logger
 default_theme = dict(
     padding=1,
     margin=0,
-    linewidth=2,
-    fontsize=12,
+    linewidth=4,
+    fontsize=14,
     terminal_font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
-    terminal_fontsize=22,  #
+    terminal_fontsize=14,  #
     font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
     # font="Inconsolata", font="Hack", # font="ProggySquareTTSZ", #
     # font="pango:monospace",
     borderwidth=1,
-    bar_height=18,
+    bar_height=20,
     dmenu_lines=30,  #
     dmenu_command="dmenu -z 1500 -c",
 )
@@ -33,6 +33,7 @@ star_trek_blue = dict(
     highlight_method="block",
     disable_drag=True,
     focused_background="#5981B9",
+    focused_foreground="#183d56",
 )
 
 matrix_green = dict(

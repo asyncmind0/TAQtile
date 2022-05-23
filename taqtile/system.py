@@ -21,31 +21,6 @@ def passstore(path):
 
 mod = "mod4"
 
-common_autostart = {
-    # "surf 'https://grafana-bison.streethawk.com/d/000000003/bison-rabbitmq?orgId=1&from=now-1h&to=now&refresh=5m'": None,
-    # "surf 'https://grafana.streethawk.com/d/000000004/bison-load?orgId=1&from=now-1h&to=now&refresh=15m'": None,
-    "dropbox": None,
-    "slack": None,
-}
-
-laptop_autostart = dict(common_autostart)
-laptop_autostart.update(
-    {
-        #'blueman-applet': None,
-        "insync start": None,
-        #'parcellite': None,
-        "feh --bg-scale ~/.wallpaper": None,
-        #'discord': None,
-        "whatsapp-web-desktop": dict(
-            process_filter="whatsapp",
-            window_regex=re.compile(r".*whatsapp.*", re.I),
-        ),
-        'nvidia-settings -a "[gpu:0]/GpuPowerMizerMode=1"': None,
-    }
-)
-
-desktop_autostart = dict(common_autostart)
-desktop_autostart.update({"jabberel-tray.py": None})
 default_config = {
     "screens": {
         0: 2,
@@ -101,40 +76,50 @@ default_config = {
     # "pushbullet_api_key": passstore("internet/pushbullet"),
     "brightness_up": "xbacklight -inc 10",
     "brightness_down": "xbacklight -dec 10",
-    "autostart-once": laptop_autostart,
+    "autostart-once": {
+        "grafana-bison": None,
+        "dropbox": None,
+        "slack": None,
+        #'blueman-applet': None,
+        "insync start": None,
+        #'parcellite': None,
+        "feh --bg-scale ~/.wallpaper": None,
+        #'discord': None,
+        "whatsapp-web-desktop": dict(
+            process_filter="whatsapp",
+            window_regex=re.compile(r".*whatsapp.*", re.I),
+        ),
+        'nvidia-settings -a "[gpu:0]/GpuPowerMizerMode=1"': None,
+        "discord": None,
+    },
 }
 
-series9_config = {
-    "laptop": True,
-    "screen_affinity": {
-        "mail": 1,
-        "emulator": 2,
-    },
-    "brightness_up": "sudo /home/steven/.bin/samctl.py -s up",
-    "brightness_down": "sudo /home/steven/.bin/samctl.py -s down",
-    "kbd_brightness_up": "sudo /home/steven/.bin/samctl.py -k up",
-    "kbd_brightness_down": "sudo /home/steven/.bin/samctl.py -skdown",
-    "battery": "BAT1",
-}
-zenbook1 = {
-    "laptop": True,
-    "battery": "BAT0",
-    "kbd_brightness_up": "asus-kbd-backlight up",
-    "kbd_brightness_down": "asus-kbd-backlight down",
-}
-razorjack = dict(zenbook1)
-razorjack["battery"] = False
-yoga0 = {
-    "battery": "BAT0",
-    "laptop": True,
-}
 
 platform_specific = {
-    "series9": series9_config,
-    "zenbook1": zenbook1,
-    "steven-series9": series9_config,
-    "razorjack": razorjack,
-    "yoga0": yoga0,
+    "zenbook1": {
+        "laptop": True,
+        "battery": "BAT0",
+        "kbd_brightness_up": "asus-kbd-backlight up",
+        "kbd_brightness_down": "asus-kbd-backlight down",
+    },
+    "series9": {
+        "laptop": True,
+        "screen_affinity": {
+            "mail": 1,
+            "emulator": 2,
+        },
+        "brightness_up": "sudo /home/steven/.bin/samctl.py -s up",
+        "brightness_down": "sudo /home/steven/.bin/samctl.py -s down",
+        "kbd_brightness_up": "sudo /home/steven/.bin/samctl.py -k up",
+        "kbd_brightness_down": "sudo /home/steven/.bin/samctl.py -skdown",
+        "battery": "BAT1",
+    },
+    "razorjack": {"battery": False},
+    "yoga0": {
+        "battery": "BAT0",
+        "laptop": True,
+    },
+    "threadripper0": {"battery": False},
 }
 
 
@@ -170,9 +155,6 @@ def get_group_affinity(app):
 
 @lru_cache(maxsize=1)
 def get_num_monitors():
-    # import Xlib.display
-    # display = Xlib.display.Display(':0')
-    # return display.screen_count()
     try:
         output = subprocess.Popen(
             'xrandr | grep -e "\ connected" | cut -d" " -f1',
@@ -185,11 +167,6 @@ def get_num_monitors():
         return len(displays)
     except Exception:
         logging.exception("failed to get number of monitors")
-    # for display in displays:
-    #    values = display.split('x')
-    #    width = values[0]
-    #    height = values[1]
-    #    print "Width:" + width + ",height:" + height
 
 
 def hdmi_connected():
@@ -205,14 +182,6 @@ def window_exists(qtile, regex):
         if regex.match(window.name):
             logger.debug("Matched %s", str(window))
             return window
-    # for window in get_windows_map(qtile).values():
-    #    logger.debug("windowname %s", window.name)
-    #    if regex.match(str(window.name)):
-    #        return window
-    #    wm_class = window.window.get_wm_class()
-    #    logger.debug(wm_class)
-    #    if wm_class and any(map(regex.match, wm_class)):
-    #        return window
 
 
 def execute_once(
@@ -236,11 +205,7 @@ def execute_once(
         # spawn the process using a shell command with subprocess.Popen
         logger.debug("Starting: %s", cmd)
         try:
-            # if qtile:
             qtile.cmd_spawn(process)
-            # else:
-            #    cmd = local[process]
-            #    cmd()
             logger.info("Started: %s: %s", cmd, pid)
         except Exception as e:
             logger.exception("Error running %s", cmd)

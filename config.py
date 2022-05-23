@@ -107,7 +107,7 @@ Terminal(
 )
 
 Terminal(
-    "comm",
+    "comms",
     "F9",
     groups=groups,
     keys=keys,
