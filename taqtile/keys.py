@@ -20,6 +20,7 @@ from taqtile.extensions import (
     DmenuRunRecent,
     PassMenu,
     Inboxes,
+    Calendars,
     BringWindowToGroup,
     SessionActions,
     KillWindows,
@@ -232,8 +233,11 @@ def get_keys(mod, num_groups, num_monitors):
             "q",
             lazy.run_extension(SessionActions(**current_theme)),
         ),
-        (["control"], "space", lazy.spawn("dunstctl close")),
-        (["control"], "grave", lazy.spawn("dunstctl history-pop")),
+        (["control"], "space", lazy.widget["notify"].clear()),
+        # (["control"], "space", lazy.spawn("dunstctl close")),
+        (["control"], "grave", lazy.widget["notify"].prev()),
+        (["control", "shift"], "grave", lazy.widget["notify"].next()),
+        # (["control"], "grave", lazy.spawn("dunstctl history-pop")),
         # Toggle between different layouts as defined below
         # ([mod], "space",    lazy.nextlayout()),
         ([mod], "q", lazy.window.kill()),
@@ -256,7 +260,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "o", lazy.function(dmenu_org)),
         # ([mod], "f5", lazy.spawn('st -t {0} -e {0}'.format('ncmpcpp'))),
         ([mod], "r", lazy.spawncmd()),
-        ([mod], "Return", lazy.spawn("st")),
+        ([mod], "Return", lazy.spawn(terminal("st"))),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         # ([mod, "shift"], "b", lazy.spawn("google-chrome-stable")),
         (
@@ -319,7 +323,10 @@ def get_keys(mod, num_groups, num_monitors):
         (
             [mod],
             "0",
-            lazy.function(list_calendars),
+            lazy.run_extension(
+                Calendars(dmenu_ignorecase=True, **current_theme)
+            ),
+            # lazy.function(list_calendars),
         ),
         (
             ["control"],
@@ -336,10 +343,11 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "space", lazy.run_extension(DmenuRunRecent(**current_theme))),
         (
             [mod],
-            "w",
+            "Menu",
             lazy.run_extension(
                 WindowList(
                     dmenu_prompt="windows:",
+                    # all_groups=False,
                     dmenu_ignorecase=True,
                     dmenu_font=current_theme["font"],
                     **current_theme
@@ -348,11 +356,10 @@ def get_keys(mod, num_groups, num_monitors):
         ),
         (
             [mod, "shift"],
-            "w",
+            "Menu",
             lazy.run_extension(
                 WindowList(
                     dmenu_prompt="windows:",
-                    all_groups=False,
                     dmenu_ignorecase=True,
                     dmenu_font=current_theme["font"],
                     **current_theme

@@ -9,6 +9,7 @@ import signal
 import subprocess
 from functools import lru_cache
 from os.path import expanduser
+from plumbum import local
 
 from taqtile.log import logger
 
@@ -32,7 +33,7 @@ default_config = {
     "term1_key": "F12",
     "term2_key": "XF86Launch5",
     "term3_key": "F9",
-    "google_accounts": {
+    "browser_accounts": {
         "melit.stevenjoseph@gmail.com": {
             "calendar_regex": r"^Google Calendar.*$",
             "mail_regex": r".*melit\.stevenjoseph@gmail\.com.*$",
@@ -81,16 +82,17 @@ default_config = {
         "dropbox": None,
         "slack": None,
         #'blueman-applet': None,
-        "insync start": None,
-        #'parcellite': None,
-        "feh --bg-scale ~/.wallpaper": None,
         #'discord': None,
+        #'parcellite': None,
+        "insync start": None,
+        "feh --bg-scale ~/.wallpaper": None,
         "whatsapp-web-desktop": dict(
             process_filter="whatsapp",
             window_regex=re.compile(r".*whatsapp.*", re.I),
         ),
         'nvidia-settings -a "[gpu:0]/GpuPowerMizerMode=1"': None,
         "discord": None,
+        "electrum": None,
     },
 }
 
@@ -196,9 +198,9 @@ def execute_once(
         pid = local["pgrep"]("-f", process_filter)
         pid.wait()
     except Exception as e:
-        logger.debug("Not running: %s", process_filter)
+        logger.error("Not running: %s:%s", process_filter, e)
     if not pid:
-        logger.debug("process not running: %s", process_filter)
+        logger.info("process not running: %s", process_filter)
         if window_regex and window_exists(qtile, window_regex):
             assert not toggle, "cannot toggle no pid"
             return

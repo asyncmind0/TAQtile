@@ -95,7 +95,7 @@ def list_calendars(qtile):
     group = "cal"
     try:
         recent = RecentRunner("qtile_calendar")
-        inboxes = get_hostconfig("google_accounts", [])
+        inboxes = get_hostconfig("browser_accounts", {})
         selected = dmenu_show("Calendars:", recent.list(inboxes.keys()))
         if not selected or selected not in inboxes.keys():
             return
@@ -116,13 +116,14 @@ def list_calendars(qtile):
                 get_current_group(qtile).layout.focus(window)
                 break
         else:
-            #'/usr/sbin//systemd-run --user --slice=browser.slice brave --app="https://calendar.google.com/calendar/b/%s/" --profile-directory=%s'
+            #'/usr/sbin//systemd-run --user --slice=browser.slice surf "https://calendar.google.com/calendar/b/%s/" '
             #'firefox --new-window  --kiosk "https://calendar.google.com/calendar/b/%s/"  -P %s' %
             cmd = (
-                '/usr/sbin//systemd-run --user --slice=browser.slice surf "https://calendar.google.com/calendar/b/%s/" '
+                #'/usr/sbin//systemd-run --user --slice=browser.slice '
+                '/usr/sbin/brave --app="https://calendar.google.com/calendar/b/%s/" --profile-directory=%s'
                 % (
                     selected,
-                    # inboxes[selected]["profile"],
+                    inboxes[selected]["profile"],
                 )
             )
 

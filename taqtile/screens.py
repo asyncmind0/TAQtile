@@ -21,9 +21,12 @@ from libqtile.widget import (
 from taqtile import system
 from taqtile.themes import current_theme, default_params
 from taqtile.widgets import CalClock, Clock, TextBox
+from taqtile.widgets.spotify import Spotify
+from taqtile.widgets.notify import Notify
 from taqtile.widgets.bar import Bar
 from taqtile.widgets.windowname import WindowName
 from taqtile.widgets.multiscreengroupbox import MultiScreenGroupBox
+from taqtile.widgets.gpu import GPU
 
 
 # from widgets.bankbalance import BankBalance
@@ -108,7 +111,7 @@ def get_screens(num_monitors, groups):
     memgraph_params["type"] = "linefill"
     netgraph_params = dict(graph_defaults)
     sep_params = default_params(
-        size_percent=100, padding=0, fontsize=9, foreground="000000"
+        size_percent=100, padding=2, fontsize=9, linewidth=1
     )
     graph_label_defaults = dict(
         margin=0,
@@ -126,6 +129,8 @@ def get_screens(num_monitors, groups):
         # TaskList2(**tasklist_params),
         WindowName(**windowname_params),
         # widget.TextBox(**layout_textbox_params),
+        Sep(**sep_params),
+        Spotify(**default_params()),
         Sep(**sep_params),
         CurrentLayout(**current_layout_params),
         Sep(**sep_params),
@@ -149,6 +154,8 @@ def get_screens(num_monitors, groups):
         Volume(update_interval=1, **default_params()),
         Sep(**sep_params),
         CPU(**default_params()),
+        Sep(**sep_params),
+        GPU(**default_params()),
         Sep(**sep_params),
         TextBox(
             "c",
@@ -235,16 +242,17 @@ def get_screens(num_monitors, groups):
     clock_text = default_params(fontsize=12)
     wclock_params = default_params(padding=2, format="%a %H:%M", fontsize=12)
 
-    def make_clock_bar():
+    def make_clock_bar(notification=False):
         timezones = [
             "UTC",
-            "US/Central",
-            "US/Eastern",
-            "Australia/Sydney",
-            "Asia/Ho_Chi_Minh",
             "Asia/Kolkata",
-            "Africa/Lagos",
             "Asia/Riyadh",
+            "Asia/Ho_Chi_Minh",
+            "Africa/Lagos",
+            "US/Eastern",
+            "US/Pacific",
+            "US/Central",
+            "Europe/London",
         ]
         widgets = []
         for timezone in timezones:
@@ -262,6 +270,13 @@ def get_screens(num_monitors, groups):
                 Sep(**sep_params),
             ]
         )
+        if notification:
+            widgets.extend(
+                [
+                    Notify(**default_params()),
+                    Sep(**sep_params),
+                ]
+            )
         return Bar(widgets, **default_params())
 
     # clock_bar.size = 0
@@ -275,11 +290,11 @@ def get_screens(num_monitors, groups):
     else:
         screens[PRIMARY_SCREEN] = Screen(
             Bar(primary_bar, **default_params()),
-            bottom=make_clock_bar(),
+            bottom=make_clock_bar(notification=True),
         )
         screens[SECONDARY_SCREEN] = Screen(
             Bar(secondary_bar, **default_params()),
-            bottom=make_clock_bar(),
+            bottom=make_clock_bar(notification=True),
         )
         screens[TERTIARY_SCREEN] = Screen(
             Bar(tertiary_bar, **default_params()),

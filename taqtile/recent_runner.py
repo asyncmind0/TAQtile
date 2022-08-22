@@ -71,7 +71,7 @@ class RecentRunner:
     def remove(self, command):
         c = self.conn.cursor()
         sql = "delete from %s  where command = ?" % self.dbname
-        return c.execute(sql, (command))
+        return c.execute(sql, (command,))
 
 
 if __name__ == "__main__":

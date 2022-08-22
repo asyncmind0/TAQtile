@@ -20,6 +20,9 @@ class Bar(QBar):
         hook.subscribe.current_screen_change(self.hook_response)
 
     def hook_response(self, *args):
+        if not self.qtile:
+            return
+        logger.error("hook_response screen %s", args)
         logger.error("hook_response screen %s", self.qtile.current_screen.index)
         logger.error("hook_response self.screen %s", self.screen.index)
         if self.screen == self.qtile.current_screen:
