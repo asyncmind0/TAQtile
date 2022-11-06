@@ -5,7 +5,7 @@ import re
 import shlex
 from os.path import isdir, join, pathsep, dirname
 
-from plumbum.cmd import dmenu
+from plumbum.cmd import dmenu, pactl
 from plumbum.cmd import kubectl
 
 from taqtile.log import logger
@@ -223,3 +223,21 @@ def dmenu_kubectl(qtile):
         )
         logger.debug("k8s" + str(cmd))
         qtile.cmd_spawn(cmd)
+
+
+def switch_wifi(qtile):
+    pass
+
+
+def switch_pulse(qtile):
+    pactl("--format=json", "list")
+    clients = dict(
+        [
+            (
+                x["properties"]["application.name"],
+                x["properties"].get("application.process.id", None),
+            )
+            for x in json.loads(pactl("--format=json", "list", "clients"))
+        ]
+    )
+    cluster = dmenu_show("Clients:", list(clients.keys()))
