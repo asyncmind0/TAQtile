@@ -1,4 +1,5 @@
 import re
+import struct
 from collections import OrderedDict
 
 from libqtile.config import Group, Match, Rule as QRule, ScratchPad, DropDown
@@ -32,7 +33,11 @@ class Rule(QRule):
 
 
 def is_mailbox(client):
-    surf_uri = client.get_property("_SURF_URI", str)
+    try:
+        surf_uri = client.window.get_property("_SURF_URI", str)
+    except struct.error:
+        return False
+
     if surf_uri and surf_uri.startswith("https://mail.google.com"):
         return True
     return False
@@ -204,7 +209,10 @@ def generate_groups(num_groups, layouts):
             "emacs": dict(
                 screen_affinity=PRIMARY_SCREEN,
                 persist=False,
-                matches=[Match(wm_class=["emacs"])],
+                matches=[
+                    Match(wm_class=["emacs"]),
+                    Match(wm_class=["jetbrains-studio"]),
+                ],
             ),
         }
     )

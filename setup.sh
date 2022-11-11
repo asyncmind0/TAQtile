@@ -439,3 +439,4 @@ yay -S notify-osd
 yay -S libnotify
 yay -S python-psutil
 yay -S tzupdate
+yay -S wally

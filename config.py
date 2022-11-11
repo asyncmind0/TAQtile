@@ -57,13 +57,13 @@ mouse = [
 float_windows = [
     "buddy_list",
 ]
-follow_mouse_focus = True  # pylint: noqa, flake8: noqa
+follow_mouse_focus = False  # pylint: noqa, flake8: noqa
 bring_front_click = True
 cursor_warp = False
 auto_fullscreen = True
 widget_defaults = current_theme
 dgroups_app_rules = get_dgroups()
-num_groups = (num_monitors - 1) * 10
+num_groups = (num_monitors) * 10
 
 groups = generate_groups(num_groups, layouts)
 keys = get_keys(mod, num_groups, num_monitors)
@@ -116,27 +116,23 @@ Terminal(
 )
 
 Terminal(
-    "jupyter-bison-blue",
+    "jupyter-bison",
     [[mod], "XF86Launch5"],
     groups=groups,
     keys=keys,
     dgroups=dgroups_app_rules,
     screen=SECONDARY_SCREEN,
-    spawn=expanduser(
-        "~/streethawk/infrastructure/srv/k8s/bin/jupyter-shell.sh bison-blue"
-    ),
+    spawn="jupyter-bison",
 )
 
 Terminal(
-    "jupyter-zebra-green",
+    "jupyter-zebra",
     [[mod], "F11"],
     groups=groups,
     keys=keys,
     dgroups=dgroups_app_rules,
-    screen=TERTIARY_SCREEN,
-    spawn=expanduser(
-        "~/streethawk/infrastructure/srv/k8s/bin/jupyter-shell.sh zebra-green"
-    ),
+    screen=SECONDARY_SCREEN,
+    spawn="jupyter-zebra",
 )
 Terminal(
     "htop",
