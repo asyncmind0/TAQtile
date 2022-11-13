@@ -8,6 +8,7 @@ from libqtile.widget import (
     CurrentLayout,
     Battery,
     NetGraph,
+    Net,
     MemoryGraph,
     CPUGraph,
     Systray,
@@ -157,6 +158,8 @@ def get_screens(num_monitors, groups):
         Sep(**sep_params),
         GPU(**default_params()),
         Sep(**sep_params),
+        Net(format="v{down}/^{up}"),
+        Sep(**sep_params),
         TextBox(
             "c",
             **default_params(
@@ -273,7 +276,7 @@ def get_screens(num_monitors, groups):
         if notification:
             widgets.extend(
                 [
-                    Notify(**default_params()),
+                    # Notify(**default_params()),
                     Sep(**sep_params),
                 ]
             )

@@ -1,5 +1,4 @@
 # TODO handle MultiScreenGroupBox clicks and events
-import logging
 from os.path import expanduser
 
 from libqtile import layout
@@ -17,23 +16,32 @@ from taqtile.screens import (
 )
 from taqtile.system import get_num_monitors
 from taqtile.themes import current_theme
+from taqtile.layouts import Max
 
 
 mod = "mod4"
 num_monitors = get_num_monitors()
 
 layouts = [
-    layout.Max(**current_theme),
+    Max(**current_theme),
     layout.Stack(**current_theme),
     layout.xmonad.MonadTall(ratio=0.50, **current_theme),
     layout.Tile(**current_theme),
     layout.Zoomy(**current_theme),
-    # layout.TreeTab(),
+    layout.TreeTab(),
     # a layout just for gimp
-    # layout.Slice('term1', 192, name='gimp', role='gimp-toolbox',
-    #             fallback=layout.Slice('right', 256, role='gimp-dock',
-    #                                   fallback=layout.Stack(
-    #                                       num_stacks=1, **border_args))),
+    layout.Slice(
+        "term1",
+        192,
+        name="gimp",
+        role="gimp-toolbox",
+        fallback=layout.Slice(
+            "right",
+            256,
+            role="gimp-dock",
+            fallback=layout.Stack(num_stacks=1, **border_args),
+        ),
+    ),
 ]
 
 

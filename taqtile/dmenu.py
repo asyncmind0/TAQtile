@@ -230,15 +230,81 @@ def switch_wifi(qtile):
     pass
 
 
-def switch_pulse(qtile):
-    pactl("--format=json", "list")
+def set_volume(qtile):
     clients = dict(
         [
             (
                 x["properties"]["application.name"],
-                x["properties"].get("application.process.id", None),
+                x["index"]
+                # x["properties"].get("application.process.id", None),
             )
-            for x in json.loads(pactl("--format=json", "list", "clients"))
+            for x in json.loads(pactl("--format=json", "list", "sink-inputs"))
         ]
     )
-    cluster = dmenu_show("Clients:", list(clients.keys()))
+    client = dmenu_show("Sink-inputs:", list(clients.keys()))
+    volume = dmenu_show("Volumes:", list([str(x) for x in range(0, 201, 10)]))
+    pactl(
+        "--format=json", "set-sink-input-volume", clients[client], f"{volume}%"
+    )
+
+
+def switch_pulse_inputs(qtile):
+    source_outputs = dict(
+        [
+            (
+                "%s - %s" % (x["properties"]["application.name"], x["index"]),
+                x
+                # x["properties"].get("application.process.id", None),
+            )
+            for x in json.loads(
+                pactl("--format=json", "list", "source-outputs")
+            )
+        ]
+    )
+    source_output = dmenu_show("source-outputs:", list(source_outputs.keys()))
+    if not source_output:
+        return
+
+    sources = dict(
+        [
+            (x["properties"]["device.product.name"], x["index"])
+            for x in json.loads(pactl("--format=json", "list", "sources"))
+        ]
+    )
+    source = dmenu_show("sources:", list(sources.keys()))
+    pactl(
+        "--format=json",
+        "move-source-output",
+        source_outputs[source_output]["index"],
+        sources[source],
+    )
+
+
+def switch_pulse_outputs(qtile):
+    clients = dict(
+        [
+            (
+                "%s - %s" % (x["properties"]["application.name"], x["index"]),
+                x
+                # x["properties"].get("application.process.id", None),
+            )
+            for x in json.loads(pactl("--format=json", "list", "sink-inputs"))
+        ]
+    )
+    client = dmenu_show("Sink-inputs:", list(clients.keys()))
+    if not client:
+        return
+
+    sinks = dict(
+        [
+            (x["properties"]["device.product.name"], x["index"])
+            for x in json.loads(pactl("--format=json", "list", "sinks"))
+        ]
+    )
+    sink = dmenu_show("Sinks:", list(sinks.keys()))
+    pactl(
+        "--format=json",
+        "move-sink-input",
+        clients[client]["index"],
+        sinks[sink],
+    )

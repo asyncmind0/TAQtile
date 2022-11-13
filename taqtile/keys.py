@@ -5,15 +5,19 @@ from subprocess import check_output
 
 from libqtile import extension
 from libqtile.command import lazy
-from libqtile.config import Key
+from libqtile.config import Key as QKey
 
 from taqtile.clip import dmenu_xclip
 from taqtile.dmenu import (
+    dmenu_show,
     dmenu_org,
     list_bluetooth,
     list_calendars,
     dmenu_pushbullet,
     dmenu_kubectl,
+    switch_pulse_outputs,
+    switch_pulse_inputs,
+    set_volume,
 )
 from taqtile.extensions import (
     Surf,
@@ -47,6 +51,17 @@ from taqtile.themes import current_theme, dmenu_cmd_args
 
 re_vol = re.compile(r"\[(\d?\d?\d?)%\]")
 re_touchpad = re.compile(r".*TouchpadOff\s*= 1", re.DOTALL)
+
+
+class Key(QKey):
+    def __init__(
+        self,
+        modifiers: list[str],
+        key: str,
+        command,
+        desc: str = "",
+    ) -> None:
+        super().__init__(modifiers, key, command, desc=desc)
 
 
 def brightness_cmd(qtile, cmd):
@@ -133,6 +148,17 @@ def notify_spawn(qtile, cmd):
     )
 
 
+def list_keys(qtile, *args):
+
+    from config import keys
+
+    selected = dmenu_show(
+        "Keybindings:",
+        [f"{' '.join(x.modifiers)} {x.key} {x.desc}" for x in keys],
+    )
+    logger.info("selected: {selected}")
+
+
 def get_keys(mod, num_groups, num_monitors):
     logger.debug(dmenu_cmd_args)
     is_laptop = get_hostconfig("laptop")
@@ -143,6 +169,7 @@ def get_keys(mod, num_groups, num_monitors):
             [mod],
             "k",
             lazy.layout.up(),
+            "Layout Up"
             # lazy.layout.up().when('stack'),
             # lazy.layout.up().when('max'),
             ##lazy.layout.up().when('tile'),
@@ -155,6 +182,7 @@ def get_keys(mod, num_groups, num_monitors):
             [mod],
             "j",
             lazy.layout.down(),
+            "Layout Down"
             # lazy.layout.down().when('stack'),
             # lazy.layout.down().when('max'),
             ##lazy.layout.down().when('tile'),
@@ -166,7 +194,7 @@ def get_keys(mod, num_groups, num_monitors):
         # ([mod], "k", lazy.layout.up()),
         # ([mod], "j", lazy.layout.down()),
         # Move windows up or down in current stack
-        ([mod, "shift"], "k", lazy.layout.shuffle_up()),
+        ([mod, "shift"], "k", lazy.layout.shuffle_up(), "Shuffle Up"),
         ([mod], "Up", lazy.layout.up()),
         ([mod, "shift"], "j", lazy.layout.shuffle_down()),
         ([mod], "Down", lazy.layout.down()),
@@ -233,11 +261,11 @@ def get_keys(mod, num_groups, num_monitors):
             "q",
             lazy.run_extension(SessionActions(**current_theme)),
         ),
-        (["control"], "space", lazy.widget["notify"].clear()),
-        # (["control"], "space", lazy.spawn("dunstctl close")),
-        (["control"], "grave", lazy.widget["notify"].prev()),
-        (["control", "shift"], "grave", lazy.widget["notify"].next()),
-        # (["control"], "grave", lazy.spawn("dunstctl history-pop")),
+        # (["control"], "space", lazy.widget["notify"].clear()),
+        (["control"], "space", lazy.spawn("dunstctl close")),
+        (["control"], "grave", lazy.spawn("dunstctl history-pop")),
+        # (["control"], "grave", lazy.widget["notify"].prev()),
+        # (["control", "shift"], "grave", lazy.widget["notify"].next()),
         # Toggle between different layouts as defined below
         # ([mod], "space",    lazy.nextlayout()),
         ([mod], "q", lazy.window.kill()),
@@ -268,6 +296,9 @@ def get_keys(mod, num_groups, num_monitors):
             "g",
             lazy.run_extension(KillWindows(**current_theme)),
         ),
+        ([mod], "v", lazy.function(set_volume)),
+        ([mod], "p", lazy.function(switch_pulse_outputs)),
+        ([mod], "i", lazy.function(switch_pulse_inputs)),
         ([mod, "shift"], "p", lazy.run_extension(PassMenu(**current_theme))),
         ([mod, "control"], "p", lazy.function(dmenu_pushbullet)),
         ([mod, "control"], "b", lazy.spawn("pybrowse")),
@@ -278,9 +309,10 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "shift"], "s", lazy.spawn("spectacle")),
         ([mod, "shift"], "m", lazy.spawn("kmag")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
+        # (["control"], "Escape", lazy.spawn("ksysguard")),
+        ([mod], "Escape", lazy.function(list_keys, [])),
         # ([mod], "b", lazy.function(hide_show_bar)),
         ([mod], "b", lazy.hide_show_bar("bottom")),
-        # (["control"], "Escape", lazy.spawn("ksysguard")),
         # ([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_cmd_args)),
         (["mod1", "control"], "v", lazy.function(dmenu_xclip, dmenu_cmd_args)),
         # (["mod1", "control"], "v", lazy.spawn("clipmenu")),
@@ -313,6 +345,13 @@ def get_keys(mod, num_groups, num_monitors):
             "F7",
             lazy.function(
                 SwitchToScreenGroup("webcon", preferred_screen=SECONDARY_SCREEN)
+            ),
+        ),
+        (
+            [],
+            "F3",
+            lazy.function(
+                SwitchToScreenGroup("social", preferred_screen=SECONDARY_SCREEN)
             ),
         ),
         (
@@ -350,7 +389,7 @@ def get_keys(mod, num_groups, num_monitors):
                     # all_groups=False,
                     dmenu_ignorecase=True,
                     dmenu_font=current_theme["font"],
-                    **current_theme
+                    **current_theme,
                 )
             ),
         ),
@@ -359,10 +398,9 @@ def get_keys(mod, num_groups, num_monitors):
             "Menu",
             lazy.run_extension(
                 WindowList(
-                    dmenu_prompt="windows:",
                     dmenu_ignorecase=True,
                     dmenu_font=current_theme["font"],
-                    **current_theme
+                    **current_theme,
                 )
             ),
         ),
@@ -433,7 +471,7 @@ def get_keys(mod, num_groups, num_monitors):
                 Surf(
                     dmenu_ignorecase=True,
                     item_format="* {window}",
-                    **current_theme
+                    **current_theme,
                 )
             ),
         ),
