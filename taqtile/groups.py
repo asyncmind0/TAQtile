@@ -179,6 +179,15 @@ def generate_groups(num_groups, layouts):
                     Match(role=["browser"]),
                 ],
             ),
+            "social": dict(
+                screen_affinity=PRIMARY_SCREEN,
+                init=True,
+                persist=True,
+                matches=[
+                    Match(title=[re.compile(r".*twitter\.com.*", re.I)]),
+                    Match(title=[re.compile(r".*diamondapp\.com.*", re.I)]),
+                ],
+            ),
             "slack": dict(
                 screen_affinity=PRIMARY_SCREEN,
                 init=True,
