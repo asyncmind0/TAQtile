@@ -31,6 +31,3 @@ class Bar(QBar):
             self.background = self.default_background
         self._configure(self.qtile, self.screen, reconfigure=True)
         self.draw()
-
-    def _draw(self):
-        return super().draw()

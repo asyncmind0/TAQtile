@@ -51,6 +51,12 @@ class WindowList(QWindowList):
             window_list.append((created, key))
 
             logger.debug(f"window_list: {item} {created}")
+        prompt = self.configured_command[
+            self.configured_command.index("-p") + 1
+        ]
+        self.configured_command[
+            self.configured_command.index("-p") + 1
+        ] = "Windows (%s):" % (len(window_list))
         out = Dmenu.run(
             self,
             items=[
@@ -60,7 +66,20 @@ class WindowList(QWindowList):
         )
 
         try:
-            sout = out.rstrip("\n")
+            sout = [x for x in out.split("\n") if x.strip()]
+            if len(sout) > 1:
+                out = Dmenu.run(
+                    self,
+                    items=["kill"],
+                ).strip()
+                if out == "kill":
+                    for win in sout:
+                        win = self.item_to_win[win]
+                        win.kill()
+                return
+            else:
+                sout = sout[0]
+
         except AttributeError:
             # out is not a string (for example it's a Popen object returned
             # by super(WindowList, self).run() when there are no menu items to
@@ -304,7 +323,9 @@ class DmenuRunRecent(DmenuRun):
             return
         recent.insert(selected)
         return Popen(
-            ["nohup", selected], stdout=None, stdin=None, preexec_fn=os.setpgrp
+            ["nohup", selected],
+            stdout=None,
+            stdin=None,  # preexec_fn=os.setpgrp
         )
 
 
@@ -435,7 +456,7 @@ class WindowGroupList(Dmenu):
         items = [x for x in self.item_to_win.keys()] + [
             x for x in self.recent_runner.list([])
         ]
-        out = super().run(items=items)
+        out = super().run(items=list(filter(lambda x: x, items)) or [])
         logger.info("WindowGroupList called %s", out)
         screen = self.qtile.current_screen
 
