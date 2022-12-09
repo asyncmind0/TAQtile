@@ -2,9 +2,12 @@
 
 ![TAQtile Operator](ghost-in-the-shell-fingers.jpg)
 
-This is a multi head qtile config designed for switching focus between
-predefined screens, windows and workspaces with special keybinds.
+Tactical Advanced Qtile Config. This is a multi head qtile config designed for switching focus between predefined screens, windows and workspaces with special keybinds. TAQtile is built on top of the highly programmable Qtile window manager written in python. 
 
+TAQtile is the ultimate solution for advanced users looking to customize and optimize their multi-head setup. Tactical Advanced Qtile allows users to easily switch focus between predefined screens, windows and workspaces with special keybinds, improving productivity and streamlining their workflow.
+
+TAQtile is built on top of the powerful and highly programmable Qtile window manager, written in python. This means that users can easily customize and extend their setup, creating a personalized and efficient workspace.
+Whether you're a power user working with multiple monitors, or simply looking to optimize your single screen setup, TAQtile has you covered. Try it out and see the difference for yourself.
 
 # How to use:
 
