@@ -1,5 +1,4 @@
 from libqtile.extension.dmenu import Dmenu
-from plumbum.cmd import kubectl
 import json
 
 
@@ -11,6 +10,8 @@ class KubeCtl(Dmenu):
     dmenu_prompt = "Kubectl"
 
     def run(self, items=None):
+        from plumbum.cmd import kubectl
+
         clusters = kubectl("config", "get-clusters").split()
         cluster = super().run(clusters)
         pods = json.loads(
