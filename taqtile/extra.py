@@ -47,9 +47,10 @@ _terminal = (
 
 
 def terminal_tmux(level, session):
-    return "{0} -e {1} {2} {3}".format(
+    return "{0} -e {1} -w {2} {3} {4}".format(
         _terminal.format(session),
         expanduser("~/.local/bin/tmux.py"),
+        expanduser("~/.tmux/configs/default.yml"),
         level,
         session,
     )
@@ -75,7 +76,7 @@ class SwitchToScreen(object):
         ):
             screen = qtile.screens[self.preferred_screen]
             if self.preferred_screen != get_current_screen(qtile).index:
-                qtile.cmd_to_screen(self.preferred_screen)
+                qtile.to_screen(self.preferred_screen)
                 if get_current_group(qtile).name == self.name:
                     return
         else:
@@ -96,7 +97,7 @@ class SwitchToScreenGroup(SwitchToScreen):
     def __call__(self, qtile):
         screen, index = super().__call__(qtile)
         if index and screen:
-            screen.cmd_toggle_group(index)
+            screen.toggle_group(index)
 
 
 class SwitchToScreenGroupUrgent(SwitchToScreenGroup):
@@ -124,21 +125,21 @@ class MoveToGroup(object):
         if screenindex > 0:
             index = index + (screenindex * 10)
         index = str(index)
-        get_current_window(qtile).cmd_togroup(index)
+        get_current_window(qtile).togroup(index)
 
 
 def move_to_next_group(qtile):
     index = qtile.groups.index(get_current_group(qtile)) + 1
     if len(qtile.groups) == index:
         index = 0
-    get_current_window(qtile).cmd_togroup(qtile.groups[index].name)
+    get_current_window(qtile).togroup(qtile.groups[index].name)
 
 
 def move_to_prev_group(qtile):
     index = qtile.groups.index(get_current_group(qtile)) - 1
     if index < 0:
         index = len(qtile.groups) - 1
-    get_current_window(qtile).cmd_togroup(qtile.groups[index].name)
+    get_current_window(qtile).togroup(qtile.groups[index].name)
 
 
 class MoveToOtherScreenGroup(object):
@@ -154,7 +155,7 @@ class MoveToOtherScreenGroup(object):
         ) % len(qtile.screens)
         othergroup = qtile.screens[otherscreen].group.name
         if get_current_window(qtile):
-            get_current_window(qtile).cmd_togroup(othergroup)
+            get_current_window(qtile).togroup(othergroup)
 
 
 class SwitchToWindowGroup(object):
@@ -188,7 +189,7 @@ class SwitchToWindowGroup(object):
                         cmds.append(cmd)
             for cmd in cmds:
                 logger.info("Spawn %s", cmd)
-                qtile.cmd_spawn(cmd)
+                qtile.spawn(cmd)
         except Exception as e:
             logger.exception("wierd")
         return False
@@ -202,14 +203,14 @@ class SwitchToWindowGroup(object):
         ):  # and qtile.currentWindow.title != self.title:
             try:
                 logger.info("cmd_to_screen: %s" % self.screen)
-                qtile.cmd_to_screen(self.screen)
+                qtile.to_screen(self.screen)
             except:
                 logger.exception("wierd")
         # TODO if target window exists in current group raise it and exit
         # elif qtile.currentWindow.title :
         else:
             try:
-                get_current_screen(qtile).cmd_toggle_group(self.name)
+                get_current_screen(qtile).toggle_group(self.name)
             except Exception as e:
                 logger.exception("wierd")
         self.raise_window(qtile)
@@ -230,7 +231,7 @@ class RaiseWindowOrSpawn(object):
         floating=False,
         static=False,
         toggle=False,
-        alpha=0.7,
+        alpha=1,
     ):
         self.wmname = wmname
         self.cmd = cmd
@@ -240,7 +241,7 @@ class RaiseWindowOrSpawn(object):
         self.static = static
         self.toggle = toggle
         self.window = None
-        self.alpha = 0.7
+        self.alpha = alpha
         # if wmname:
         #    from config import float_windows
         #    float_windows.append(wmname)
@@ -259,7 +260,7 @@ class RaiseWindowOrSpawn(object):
             ):
                 # window.cmd_to_screen(get_current_screen(qtile).index)
                 logger.debug("Match: %s", self.wmname)
-                window.cmd_togroup(get_current_group(qtile).name)
+                window.togroup(get_current_group(qtile).name)
                 self.window = window
                 break
 
@@ -275,9 +276,9 @@ class RaiseWindowOrSpawn(object):
                     window.hide()
             if self.floating:
                 window.floating = self.floating
-            execute_once(
-                "transet-df -n %s %s " % (window.name, self.alpha), qtile=qtile
-            )
+            # execute_once(
+            #    "transet-df -n %s %s " % (window.name, self.alpha), qtile=qtile
+            # )
 
         logger.debug("No window found spawning: %s", self.cmd)
 
@@ -294,7 +295,7 @@ def check_restart(qtile):
         # import signal
         # signal.signal(signal.SIGCHLD, signal.SIG_DFL)
         logger.info("restarting qtile ...")
-        qtile.cmd_restart()
+        qtile.restart()
 
 
 def autossh_term(title="autossh", port=22, host="localhost", session="default"):
@@ -344,9 +345,9 @@ def show_mail(qtile):
 
 def hide_show_bar(qtile):
     def timer():
-        qtile.cmd_hide_show_bar()
+        qtile.hide_show_bar()
         sleep(1)
-        qtile.cmd_hide_show_bar()
+        qtile.hide_show_bar()
 
     Thread(None, timer).start()
 

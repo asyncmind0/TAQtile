@@ -75,7 +75,7 @@ class Spotify(base.ThreadPoolText):
         """
         # spawn spotify if not already running
         if not self._is_proc_running("spotify"):
-            self.qtile.cmd_spawn("spotify", shell=True)
+            self.qtile.spawn("spotify", shell=True)
             return
 
         all_groups: List[_Group] = self.qtile.groups
@@ -87,7 +87,7 @@ class Spotify(base.ThreadPoolText):
             name = group.name
             if "Spotify" in windows:
                 # switch to 'name' group
-                self.qtile.groups_map[name].cmd_toscreen()
+                self.qtile.groups_map[name].toscreen()
                 break
 
     def poll(self) -> str:

@@ -64,7 +64,7 @@ class Notify(QNotify):
             except:  # noqa: E722
                 logger.exception("parse_text function failed:")
         if self.audiofile and path.exists(self.audiofile):
-            self.qtile.cmd_spawn("aplay -q '%s'" % self.audiofile)
+            self.qtile.spawn("aplay -q '%s'" % self.audiofile)
         self.text = self.text.replace("\n", " ")
         if len(self.text) > 300:
             self.text = self.text[:300] + "..."

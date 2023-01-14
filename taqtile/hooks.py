@@ -38,7 +38,7 @@ def restart_on_randr(qtile, ev):
         check_output(["dualmonitor"])
     elif num_mons == 1:
         check_output(["singlemonitor"])
-    qtile.cmd_restart()
+    qtile.restart()
 
 
 def load_sounds():
@@ -110,7 +110,7 @@ def dbus_register():
 def rules_shrapnel(client):
     client_name = client.window.get_name()
     if client_name == "shrapnel":
-        client.cmd_enable_floating()
+        client.enable_floating()
         client.place(
             randint(500, 550),
             randint(50, 100),
@@ -121,14 +121,26 @@ def rules_shrapnel(client):
             above=True,
             force=True,
         )  # , '00C000')
-        client.cmd_opacity(0.85)
+        client.opacity(0.85)
 
 
 @hook.subscribe.client_name_updated
 def trigger_dgroups(client):
-    from libqtile import qtile
+    try:
+        if client.name and "brave" in client.name.lower():
+            pid = client.window.get_net_wm_pid()
+            logger.info(f"brave pid: {pid}")
+            client.window.set_property(
+                "QTILE_PROFILE",
+                "TEST",
+                type="UTF8_STRING",
+                format=8,
+            )
+        from libqtile import qtile
 
-    qtile.dgroups._add(client)
+        # qtile.dgroups._add(client)
+    except:
+        logger.exception("Error in trigger_dgroups")
 
 
 # @hook.subscribe.client_managed
@@ -151,7 +163,7 @@ def set_group(client):
                 front = getattr(rule, "front", False)
                 if front and hasattr(client, "cmd_bring_to_front"):
                     logger.error("to front %s", client.window.get_name())
-                    client.cmd_bring_to_front()
+                    client.bring_to_front()
                 client.floating = rule.float
                 if getattr(rule, "fullscreen", None):
                     if rule.fullscreen:
@@ -161,7 +173,7 @@ def set_group(client):
                 if getattr(client, "static", False):
                     client.static(0)
                 if getattr(rule, "opacity", False):
-                    client.cmd_opacity(rule.opacity)
+                    client.opacity(rule.opacity)
                 center = getattr(rule, "center", False)
                 if center:
                     logger.debug(dir(qtile.current_screen))

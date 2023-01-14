@@ -217,7 +217,7 @@ def generate_groups(num_groups, layouts):
             ),
             "emacs": dict(
                 screen_affinity=PRIMARY_SCREEN,
-                persist=False,
+                persist=True,
                 matches=[
                     Match(wm_class=["emacs"]),
                     Match(wm_class=["jetbrains-studio"]),

@@ -12,7 +12,7 @@ default_theme = dict(
     # font="Inconsolata", font="Hack", # font="ProggySquareTTSZ", #
     # font="pango:monospace",
     borderwidth=1,
-    bar_height=20,
+    bar_height=24,
     dmenu_lines=30,  #
     dmenu_command="dmenu -z 1500 -c",
     foreground_urgent="#ffffff",

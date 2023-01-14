@@ -24,11 +24,6 @@ from taqtile.system import (
 )
 
 PROFILES = {"home": {}, "work": {}}
-BROWSERS = {
-    "brave": {"args": "--profile-directory=%(profile)s"},
-    "firefox": {"args": "-P %(profile)s"},
-    "surf": {},
-}
 
 
 class Inboxes(DmenuRun):
@@ -50,7 +45,7 @@ class Inboxes(DmenuRun):
         group = self.group
         if get_current_group(qtile).name != group:
             logger.debug("cmd_toggle_group")
-            get_current_screen(qtile).cmd_toggle_group(group)
+            get_current_screen(qtile).toggle_group(group)
         selected = super().run(items=recent.list(inboxes)).strip()
         logger.info(f"Selected: {selected}, Inboxes {inboxes}")
         if not selected or selected not in inboxes:
@@ -64,7 +59,7 @@ class Inboxes(DmenuRun):
         if window:
             # window = get_windows_map(qtile).get(window.window.wid)
             logger.debug("Matched %s", str(window))
-            window.cmd_togroup(group)
+            window.togroup(group)
             logger.debug("layout.focus")
             get_current_group(qtile).focus(window)
         else:
@@ -73,16 +68,16 @@ class Inboxes(DmenuRun):
                 # "/usr/sbin//systemd-run",
                 # "--user",
                 # "--slice=browser.slice",
-                "/usr/sbin/brave",
+                "/usr/sbin/chromium",
                 # "-u",
                 # "Firefox/99.0",
                 # "https://mail.google.com/mail/u/%s/#inbox" % selected,
                 "--app=https://mail.google.com/mail/u/%s/#inbox" % selected,
-                "--profile-directory=%s" % inboxes[selected]["profile"],
+                "--profile-directory=%s" % inboxes[selected]["profile"].lower(),
             )
 
             logger.info(cmd)
-            qtile.cmd_spawn(cmd)
+            qtile.spawn(cmd)
             # rc.set(mail_regex, datetime.now().timestamp())
             # return Popen(cmd, stdout=None, stdin=None, preexec_fn=os.setpgrp)
 
@@ -106,7 +101,7 @@ class Calendars(DmenuRun):
         group = self.group
         if get_current_group(qtile).name != group:
             logger.debug("cmd_toggle_group")
-            get_current_screen(qtile).cmd_toggle_group(group)
+            get_current_screen(qtile).toggle_group(group)
         selected = super().run(items=recent.list(calendars)).strip()
         logger.info(f"Selected: {selected}, Calendars {calendars}")
         if not selected or selected not in calendars:
@@ -119,7 +114,7 @@ class Calendars(DmenuRun):
         if window:
             # window = get_windows_map(qtile).get(window.window.wid)
             logger.debug("Matched %s", str(window))
-            window.cmd_togroup(group)
+            window.togroup(group)
             logger.debug("layout.focus")
             get_current_group(qtile).focus(window)
         else:
@@ -137,4 +132,4 @@ class Calendars(DmenuRun):
             )
 
             logger.info("calendar command: %s", cmd)
-            qtile.cmd_spawn(cmd)
+            qtile.spawn(cmd)

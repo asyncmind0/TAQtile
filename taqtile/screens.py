@@ -14,7 +14,7 @@ from libqtile.widget import (
     Systray,
     DF,
     CryptoTicker,
-    Volume,
+    # PulseVolume as Volume,
     WindowCount,
     CPU,
 )
@@ -67,7 +67,7 @@ def get_screens(num_monitors, groups):
     # prompt_params = default_params()
     current_layout_params = default_params(name="default")
     windowname_params = default_params()
-    systray_params = default_params(icon_size=15)
+    systray_params = default_params(icon_size=16)
     clock_params = default_params(
         padding=2, format="%Y-%m-%d %a %H:%M", fontsize=12
     )
@@ -151,14 +151,11 @@ def get_screens(num_monitors, groups):
         # Sep(**sep_params),
         # NotmuchCount(**default_params()),
         Sep(**sep_params),
-        TextBox("v", **default_params()),
-        Volume(update_interval=1, **default_params()),
-        Sep(**sep_params),
         CPU(**default_params()),
         Sep(**sep_params),
         GPU(**default_params()),
         Sep(**sep_params),
-        Net(format="v{down}/^{up}"),
+        Net(format="\U00002B07{down}/\U00002B06{up}"),
         Sep(**sep_params),
         TextBox(
             "c",
@@ -204,6 +201,9 @@ def get_screens(num_monitors, groups):
         Sep(**sep_params),
         TextBox("w", **default_params()),
         WindowCount(**default_params()),
+        # Sep(**sep_params),
+        # TextBox("\U0001F50A", **default_params()),
+        # Volume(update_interval=1, **default_params()),
         Sep(**sep_params),
         CryptoTicker(currency="AUD"),
         Sep(**sep_params),

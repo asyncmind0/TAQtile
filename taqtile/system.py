@@ -57,8 +57,8 @@ default_config = {
             "profile": "Home",
         },
     },
-    "volume_up": "pactl set-sink-volume @DEFAULT_SINK@ +5000",
-    "volume_down": "pactl set-sink-volume @DEFAULT_SINK@ -5000",
+    "volume_up": "pactl set-sink-volume @DEFAULT_SINK@ +1000",
+    "volume_down": "pactl set-sink-volume @DEFAULT_SINK@ -1000",
     "group_affinity": {
         "emulator": 3,
         "mail": 11,
@@ -78,7 +78,7 @@ default_config = {
     "brightness_up": "xbacklight -inc 10",
     "brightness_down": "xbacklight -dec 10",
     "autostart-once": {
-        "grafana-bison": None,
+        # "grafana-bison": None,
         "dropbox": None,
         "slack": None,
         #'blueman-applet': None,
@@ -93,6 +93,11 @@ default_config = {
         'nvidia-settings -a "[gpu:0]/GpuPowerMizerMode=1"': None,
         "discord": None,
         "electrum": None,
+        "bitcoin-qt": None,
+        # "kdeconnect-app": None,
+        # "pasystray": None,
+        "antimicrox --tray": None,
+        "monero-wallet-gui": None,
     },
 }
 
@@ -181,9 +186,12 @@ def hdmi_connected():
 
 def window_exists(qtile, regex):
     for wid, window in get_windows_map(qtile).items():
-        if regex.match(window.name):
-            logger.debug("Matched %s", str(window))
-            return window
+        try:
+            if regex.match(window.name):
+                logger.debug("Matched %s", str(window))
+                return window
+        except:
+            pass
 
 
 def execute_once(
@@ -207,7 +215,7 @@ def execute_once(
         # spawn the process using a shell command with subprocess.Popen
         logger.debug("Starting: %s", cmd)
         try:
-            qtile.cmd_spawn(process)
+            qtile.spawn(process)
             logger.info("Started: %s: %s", cmd, pid)
         except Exception as e:
             logger.exception("Error running %s", cmd)

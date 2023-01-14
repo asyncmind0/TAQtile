@@ -26,6 +26,15 @@ from taqtile.extensions.base import WindowGroupList
 
 SURF_HISTORY_DB = "qtile_surf"
 surf_recent_runner = RecentRunner(SURF_HISTORY_DB)
+BROWSER_MAP = {
+    "twitter.com": "qutebrowser",
+}
+BROWSERS = {
+    "brave": {"args": "--profile-directory=%(profile)s"},
+    "firefox": {"args": "-P %(profile)s"},
+    "surf": {},
+    "qutebrowser": {},
+}
 
 
 @hook.subscribe.client_name_updated
@@ -78,7 +87,7 @@ class Surf(WindowGroupList):
 
     def spawn(self, sout):
         if sout.startswith("http"):
-            self.qtile.cmd_spawn(
+            self.qtile.spawn(
                 # "/usr/sbin//systemd-run --user --slice=browser.slice /usr/local/bin/surf %s"
                 "surf %s"
                 % sout.strip()
@@ -90,7 +99,7 @@ class Surf(WindowGroupList):
                 cmd = "surf https://www.google.com/search?q='%s'&ie=utf-8&oe=utf-8"
             else:
                 cmd = "surf https://duckduckgo.com/?t=ffab&q=%s&ia=web"
-            self.qtile.cmd_spawn(cmd % quote_plus(sout))
+            self.qtile.spawn(cmd % quote_plus(sout))
 
 
 class Calendars(WindowGroupList):

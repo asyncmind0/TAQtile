@@ -94,6 +94,20 @@ def get_current_volume():
     return current_volume
 
 
+def switch_window(qtile, cmd):
+    getattr(qtile.current_layout, cmd)()
+    check_output(
+        [
+            "dunstify",
+            "-t",
+            "1000",
+            "-r",
+            "1999990",
+            "Window: %s" % qtile.current_window.name,
+        ]
+    )
+
+
 def volume_cmd(qtile, cmd):
     check_output(shlex.split(cmd))
     check_output(
@@ -143,7 +157,7 @@ def touchpad_toggle(qtile):
 
 
 def notify_spawn(qtile, cmd):
-    qtile.cmd_spawn(
+    qtile.spawn(
         "sh -c 'notify-send %s;pactl play-sample audio-volume-change ;%s'" % cmd
     )
 
@@ -326,14 +340,15 @@ def get_keys(mod, num_groups, num_monitors):
         (
             [mod],
             "e",
-            lazy.function(
-                SwitchToWindowGroup(
-                    "krusader",
-                    "krusader",
-                    screen=SECONDARY_SCREEN,
-                    spawn="krusader",
-                )
-            ),
+            lazy.spawn("dolphin")
+            # lazy.function(
+            #    SwitchToWindowGroup(
+            #        "krusader",
+            #        "krusader",
+            #        screen=SECONDARY_SCREEN,
+            #        spawn="krusader",
+            #    )
+            # ),
         ),
         # Switch groups
         ([], "F1", lazy.function(SwitchToScreenGroup("browser"))),
@@ -380,6 +395,18 @@ def get_keys(mod, num_groups, num_monitors):
             ),
         ),
         ([mod], "space", lazy.run_extension(DmenuRunRecent(**current_theme))),
+        (
+            ["mod1"],
+            "XF86AudioLowerVolume",
+            lazy.function(switch_window, "down"),
+            "Layout Down",
+        ),
+        (
+            ["mod1"],
+            "XF86AudioRaiseVolume",
+            lazy.function(switch_window, "up"),
+            "Layout Up",
+        ),
         (
             [mod],
             "Menu",
@@ -436,6 +463,8 @@ def get_keys(mod, num_groups, num_monitors):
             "XF86AudioLowerVolume",
             lazy.function(volume_cmd, get_hostconfig("volume_down")),
         ),
+        ([mod], "XF86AudioLowerVolume", lazy.function(set_volume)),
+        ([mod], "XF86AudioRaiseVolume", lazy.function(set_volume)),
         (
             [],
             "XF86AudioRaiseVolume",
@@ -453,6 +482,13 @@ def get_keys(mod, num_groups, num_monitors):
             "XF86Launch1",
             lazy.function(
                 RaiseWindowOrSpawn(wmclass="Pavucontrol", cmd="pavucontrol")
+            ),
+        ),
+        (
+            [mod],
+            "XF86AudioMute",
+            lazy.spawn(
+                "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause"
             ),
         ),
         ([], "XF86AudioMute", lazy.function(volume_mute)),

@@ -182,7 +182,7 @@ class KillWindows(Dmenu):
                     # The selected window got closed while the menu was open?
                 else:
                     logger.debug("killing window: %s", win)
-                    win.cmd_kill()
+                    win.kill()
 
 
 class BringWindowToGroup(WindowList):
@@ -209,7 +209,7 @@ class BringWindowToGroup(WindowList):
             return
 
         screen = self.qtile.current_screen
-        win.cmd_togroup(screen.group)
+        win.togroup(screen.group)
         # screen.set_group(win.group)
         win.group.focus(win)
 
@@ -231,7 +231,7 @@ class SessionActions(Dmenu):
     def run(self):
         out = super().run(items=self.actions.keys()).strip()
         logger.debug("selected: %s:%s", out, self.actions[out])
-        self.qtile.cmd_spawn(out)
+        self.qtile.spawn(out)
 
 
 class BroTab(Dmenu):
@@ -284,7 +284,7 @@ class BroTab(Dmenu):
         recent.insert(sout)
         brotab(["activate", str(bid)])
         # self.qtile.group["browser"].toscreen()
-        self.qtile.cmd_toggle_group("browser")
+        self.qtile.toggle_group("browser")
 
 
 class DmenuRunRecent(DmenuRun):

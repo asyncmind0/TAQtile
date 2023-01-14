@@ -51,7 +51,7 @@ def dmenu_org(qtile):
             "emacsclient -f xdev -c org-protocol://capture://"
             "url/%s/etext" % (title,)
         )
-    qtile.cmd_spawn(cmd_str)
+    qtile.spawn(cmd_str)
 
 
 def list_bluetooth(qtile):
@@ -103,10 +103,10 @@ def list_calendars(qtile):
         match = re.compile(inboxes[selected]["calendar_regex"], re.I)
         if get_current_screen(qtile).index != SECONDARY_SCREEN:
             logger.debug("cmd_to_screen")
-            qtile.cmd_to_screen(SECONDARY_SCREEN)
+            qtile.to_screen(SECONDARY_SCREEN)
         if get_current_group(qtile).name != group:
             logger.debug("cmd_toggle_group")
-            get_current_screen(qtile).cmd_toggle_group(group)
+            get_current_screen(qtile).toggle_group(group)
         for window in qtile.cmd_windows():
             if match.match(window["name"]):
                 logger.debug("Matched %s", str(window))
@@ -128,7 +128,7 @@ def list_calendars(qtile):
             )
 
             logger.debug(cmd)
-            qtile.cmd_spawn(cmd)
+            qtile.spawn(cmd)
 
     except:
         logger.exception("error list_calendars")
@@ -144,10 +144,10 @@ def dmenu_web(qtile):
         recent.insert(selected)
         if get_current_screen(qtile).index != SECONDARY_SCREEN:
             logger.debug("cmd_to_screen")
-            qtile.cmd_to_screen(SECONDARY_SCREEN)
+            qtile.to_screen(SECONDARY_SCREEN)
         if get_current_group(qtile).name != group:
             logger.debug("cmd_toggle_group")
-            get_current_screen(qtile).cmd_toggle_group(group)
+            get_current_screen(qtile).toggle_group(group)
         window = window_exists(
             qtile, re.compile(r"mail.google.com__mail_u_%s" % selected, re.I)
         )
@@ -164,7 +164,7 @@ def dmenu_web(qtile):
             )
 
             logger.debug(cmd)
-            qtile.cmd_spawn(cmd)
+            qtile.spawn(cmd)
     except:
         logger.exception("error list_inboxes")
 
@@ -207,14 +207,14 @@ def dmenu_kubectl(qtile):
             % (cluster, pod, container),
         )
         logger.debug("k8s" + str(cmd))
-        qtile.cmd_spawn(cmd)
+        qtile.spawn(cmd)
     elif op == "describe":
         cmd = terminal(
             "k8s describe - %s - %s" % (pod, cluster),
             "kubectl --context=%s describe po %s;read" % (cluster, pod),
         )
         logger.debug("k8s" + str(cmd))
-        qtile.cmd_spawn(cmd)
+        qtile.spawn(cmd)
     elif op == "shell":
         container = dmenu_show("Container", containermap[pod])
         cmd = terminal(
@@ -223,7 +223,7 @@ def dmenu_kubectl(qtile):
             % (cluster, pod, container),
         )
         logger.debug("k8s" + str(cmd))
-        qtile.cmd_spawn(cmd)
+        qtile.spawn(cmd)
 
 
 def switch_wifi(qtile):

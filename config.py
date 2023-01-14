@@ -25,23 +25,23 @@ num_monitors = get_num_monitors()
 layouts = [
     Max(**current_theme),
     layout.Stack(**current_theme),
-    layout.xmonad.MonadTall(ratio=0.50, **current_theme),
-    layout.Tile(**current_theme),
-    layout.Zoomy(**current_theme),
-    layout.TreeTab(),
-    # a layout just for gimp
-    layout.Slice(
-        "term1",
-        192,
-        name="gimp",
-        role="gimp-toolbox",
-        fallback=layout.Slice(
-            "right",
-            256,
-            role="gimp-dock",
-            fallback=layout.Stack(num_stacks=1, **border_args),
-        ),
-    ),
+    # layout.xmonad.MonadTall(ratio=0.50, **current_theme),
+    # layout.Tile(**current_theme),
+    # layout.Zoomy(**current_theme),
+    # layout.TreeTab(),
+    ## a layout just for gimp
+    # layout.Slice(
+    #    "term1",
+    #    192,
+    #    name="gimp",
+    #    role="gimp-toolbox",
+    #    fallback=layout.Slice(
+    #        "right",
+    #        256,
+    #        role="gimp-dock",
+    #        fallback=layout.Stack(num_stacks=1, **border_args),
+    #    ),
+    # ),
 ]
 
 
