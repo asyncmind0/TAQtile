@@ -6,7 +6,6 @@ import shlex
 from os.path import isdir, join, pathsep, dirname
 
 from plumbum.cmd import dmenu, pactl
-from plumbum.cmd import kubectl
 
 from taqtile.log import logger
 from taqtile.recent_runner import RecentRunner
@@ -185,6 +184,8 @@ def dmenu_pushbullet(qtile):
 
 
 def dmenu_kubectl(qtile):
+    from plumbum.cmd import kubectl
+
     clusters = kubectl("config", "get-clusters").split()[1:]
     cluster = dmenu_show("Cluster:", clusters)
     pods = json.loads(
