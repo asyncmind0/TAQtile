@@ -121,7 +121,7 @@ def rules_shrapnel(client):
             above=True,
             force=True,
         )  # , '00C000')
-        client.opacity(0.85)
+        client.set_opacity(0.85)
 
 
 @hook.subscribe.client_name_updated
@@ -173,7 +173,7 @@ def set_group(client):
                 if getattr(client, "static", False):
                     client.static(0)
                 if getattr(rule, "opacity", False):
-                    client.opacity(rule.opacity)
+                    client.set_opacity(rule.opacity)
                 center = getattr(rule, "center", False)
                 if center:
                     logger.debug(dir(qtile.current_screen))

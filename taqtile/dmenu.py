@@ -88,7 +88,7 @@ def list_bluetooth(qtile):
 
 
 def get_window_titles(qtile):
-    return [w["name"] for w in qtile.cmd_windows() if w["name"] != "<no name>"]
+    return [w["name"] for w in qtile.windows() if w["name"] != "<no name>"]
 
 
 def list_calendars(qtile):
@@ -107,7 +107,7 @@ def list_calendars(qtile):
         if get_current_group(qtile).name != group:
             logger.debug("cmd_toggle_group")
             get_current_screen(qtile).toggle_group(group)
-        for window in qtile.cmd_windows():
+        for window in qtile.windows():
             if match.match(window["name"]):
                 logger.debug("Matched %s", str(window))
                 window = get_windows_map(qtile).get(window["id"])
@@ -154,7 +154,7 @@ def dmenu_web(qtile):
         if window:
             window = get_windows_map(qtile).get(window.window.wid)
             logger.debug("Matched" + str(window))
-            window.cmd_togroup(group)
+            window.togroup(group)
             logger.debug("layout.focus")
             get_current_group(qtile).focus(window)
         else:
