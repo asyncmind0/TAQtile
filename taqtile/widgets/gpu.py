@@ -59,7 +59,7 @@ class GPU(base.ThreadPoolText):
             try:
                 return int(text)
             except ValueError:
-                return float(text)
+                return round(float(text), 2)
 
         i = 0
 
@@ -74,7 +74,7 @@ class GPU(base.ThreadPoolText):
         d["gpu_util"] = extract(util, "gpu_util", "%")
 
         d["mem_used"] = extract(gpu.find("fb_memory_usage"), "used", "MiB")
-        d["mem_used_per"] = d["mem_used"] * 100 / 11171
+        d["mem_used_per"] = round(d["mem_used"] * 100 / 11171, 2)
 
         if d["gpu_util"] < 15 and d["mem_used"] < 2816:
             d["msg"] = "GPU status: Idle \n"
