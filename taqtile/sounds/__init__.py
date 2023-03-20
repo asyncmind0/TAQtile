@@ -1,5 +1,4 @@
 import threading
-import pygame
 import numpy as np
 import simpleaudio as sa
 from pydub import AudioSegment, generators
@@ -10,6 +9,14 @@ import simpleaudio as sa
 from scipy.signal import butter, lfilter
 from libqtile.hook import subscribe
 from taqtile.widgets.togglebtn import requires_toggle_button_active
+import pulsectl
+from subprocess import check_output
+
+import alsaaudio
+import simpleaudio as sa
+
+pulse = pulsectl.Pulse("volume-adjustment")
+mixer = alsaaudio.Mixer()
 
 
 def tick0(duration=0.01, volume=0.5):
@@ -67,6 +74,7 @@ def thud(duration=0.5, frequency=300, volume=1):
     play_obj = sa.play_buffer(
         waveform, num_channels=1, bytes_per_sample=2, sample_rate=44100
     )
+    play_obj.wait_done()
 
 
 def tone(duration=1, frequency=440):
@@ -129,11 +137,6 @@ def bong(duration=1, base_frequency=50, volume=0.5):
     play_obj = sa.play_buffer(audio_data, 1, 2, sample_rate)
 
 
-def tick():
-    thud()
-    # threading.Thread(target=thud, args=()).start()
-
-
 def _context_switch_sound(duration=0.15, volume=0.3):
     sample_rate = 44100
     t = np.linspace(0, duration, int(sample_rate * duration), False)
@@ -194,6 +197,10 @@ def context_switch_sound(duration=15, volume=-30):
     play(context_switch_wave)
 
 
+def play_effect(effect):
+    threading.Thread(target=thud, args=()).start()
+
+
 def play_sound(filename):
     # Create a new thread and start playing the sound
     sound_thread = threading.Thread(target=_play_sound, args=(filename,))
@@ -203,10 +210,36 @@ def play_sound(filename):
     print("Sound playing in the background...")
 
 
-def _play_sound(filename):
-    pygame.mixer.init()
-    pygame.mixer.music.load(filename)
-    pygame.mixer.music.play()
+def get_current_volume():
+    current_volumes = []
+
+    sinks = pulse.sink_list()
+    for sink in sinks:
+        current_volumes.append(sink.volume.value_flat)
+    return max(current_volumes)
+
+
+def change_sink_volume(qtile, increment):
+    sinks = pulse.sink_list()
+    new_volumes = [
+        max(min(sink.volume.value_flat + increment, 1.0), 0.0) for sink in sinks
+    ]
+    for sink, new_volume in zip(sinks, new_volumes):
+        pulse.volume_set_all_chans(sink, new_volume)
+    current_volume = mixer.getvolume()[0]  # get the current volume
+    new_volume = max(min(current_volume + int(increment * 100), 100), 0)
+    mixer.setvolume(new_volume)  # set the volume
+    check_output(
+        [
+            "dunstify",
+            "-t",
+            "1000",
+            "-r",
+            "1999990",
+            f"Volume:  {int(get_current_volume() * 100)} {new_volume}",
+        ]
+    )
+    play_effect("volume_dial")
 
 
 @requires_toggle_button_active("sound_effects")
@@ -215,7 +248,7 @@ def setgroup():
     # sounds.context_switch_sound()
     from taqtile.sounds import drums
 
-    drums.snare_drum()
+    threading.Thread(target=drums.snare_drum, args=()).start()
 
 
 @requires_toggle_button_active("sound_effects")
@@ -223,7 +256,7 @@ def setgroup():
 def client_focused(window):
     from taqtile.sounds import drums
 
-    drums.hihat_closed()
+    threading.Thread(target=drums.hihat_closed, args=()).start()
 
 
 @requires_toggle_button_active("sound_effects")
@@ -231,7 +264,7 @@ def client_focused(window):
 def client_killed(window):
     from taqtile.sounds import drums
 
-    drums.hihat_open1()
+    threading.Thread(target=drums.hihat_open1, args=()).start()
 
 
 @requires_toggle_button_active("sound_effects")
@@ -239,7 +272,7 @@ def client_killed(window):
 def screen_change():
     from taqtile.sounds import drums
 
-    drums.bass_drum()
+    threading.Thread(target=drums.bass_drum, args=()).start()
 
 
 @requires_toggle_button_active("sound_effects")
@@ -247,4 +280,16 @@ def screen_change():
 def set_group(client):
     from taqtile.sounds import drums
 
-    drums.hihat_open0()
+    threading.Thread(target=drums.hihat_open0, args=()).start()
+
+
+def _reset_volume():
+    with pulsectl.Pulse("volume-adjustment") as pulse:
+        sinks = pulse.sink_list()
+        for sink in sinks:
+            pulse.volume_set_all_chans(sink, 0.3)
+
+
+@subscribe.startup
+def startup():
+    threading.Thread(target=_reset_volume, args=()).start()

@@ -34,6 +34,7 @@ def hihat_open0(duration=0.4, volume=0.5):
 
     # Play the audio using the simpleaudio library
     play_obj = sa.play_buffer(audio_data, 1, 2, sample_rate)
+    play_obj.wait_done()
 
 
 def hihat_open1(duration=0.4, volume=0.5):
@@ -77,6 +78,7 @@ def hihat_open1(duration=0.4, volume=0.5):
 
     # Play the audio using the simpleaudio library
     play_obj = sa.play_buffer(audio_data, 1, 2, sample_rate)
+    play_obj.wait_done()
 
 
 def snare_drum(duration=0.5, volume=0.02):
@@ -102,6 +104,7 @@ def snare_drum(duration=0.5, volume=0.02):
 
     # Play the audio using the simpleaudio library
     play_obj = sa.play_buffer(audio_data, 1, 2, sample_rate)
+    play_obj.wait_done()
 
 
 def bass_drum(duration=0.5, frequency=60, volume=0.8):
@@ -123,6 +126,7 @@ def bass_drum(duration=0.5, frequency=60, volume=0.8):
 
     # Play the audio using the simpleaudio library
     play_obj = sa.play_buffer(audio_data, 1, 2, sample_rate)
+    play_obj.wait_done()
 
 
 def hihat_closed(duration=0.1, volume=0.5):
@@ -156,3 +160,4 @@ def hihat_closed(duration=0.1, volume=0.5):
 
     # Play the audio using the simpleaudio library
     play_obj = sa.play_buffer(audio_data, 1, 2, sample_rate)
+    play_obj.wait_done()
