@@ -173,6 +173,6 @@ floating_layout = layout.Floating(
                 "discord.com is sharing your screen.",
             ],
         ),
-        Match(wm_class=["Pavucontrol", "Wine", "Xephyr", "Gmrun"]),
+        Match(wm_class=["Wine", "Xephyr", "Gmrun"]),
     ]
 )

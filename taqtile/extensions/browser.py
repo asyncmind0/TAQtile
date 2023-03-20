@@ -72,8 +72,10 @@ class Inboxes(DmenuRun):
                 # "-u",
                 # "Firefox/99.0",
                 # "https://mail.google.com/mail/u/%s/#inbox" % selected,
+                # "--class=email",
                 "--app=https://mail.google.com/mail/u/%s/#inbox" % selected,
-                "--profile-directory=%s" % inboxes[selected]["profile"].lower(),
+                "--user-data-dir=/home/steven/.config/chromium.%s"
+                % inboxes[selected]["profile"].lower(),
             )
 
             logger.info(cmd)

@@ -41,16 +41,44 @@ from taqtile.extra import (
     move_to_next_group,
     move_to_prev_group,
     show_mail,
+    float_to_front,
 )
 from taqtile.hooks import set_groups
 from taqtile.log import logger
 from taqtile.screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from taqtile.system import get_hostconfig
 from taqtile.themes import current_theme, dmenu_cmd_args
+from taqtile.sounds import play_effect, change_sink_volume
+from libqtile import hook
+import pulsectl
 
 
 re_vol = re.compile(r"\[(\d?\d?\d?)%\]")
 re_touchpad = re.compile(r".*TouchpadOff\s*= 1", re.DOTALL)
+win_list = []
+
+
+def stick_win(qtile):
+    global win_list
+    win_list.append(qtile.current_window)
+
+
+def unstick_win(qtile):
+    global win_list
+    if qtile.current_window in win_list:
+        try:
+            win_list.remove(qtile.current_window)
+        except ValueError:
+            pass
+
+
+@hook.subscribe.setgroup
+def move_win():
+    from libqtile import qtile
+
+    for w in win_list:
+        w.togroup(qtile.current_group.name)
+        w.focus()
 
 
 class Key(QKey):
@@ -79,21 +107,6 @@ def brightness_cmd(qtile, cmd):
     )
 
 
-def get_current_volume():
-    current_volume = 0
-    mixer_out = check_output(["amixer", "sget", "Master"]).decode()
-    if "[off]" in mixer_out:
-        current_volume = "Muted"
-    else:
-        volgroups = re_vol.search(mixer_out)
-        if volgroups:
-            current_volume = int(volgroups.groups()[0])
-        else:
-            # this shouldn't happen
-            current_volume = -1
-    return current_volume
-
-
 def switch_window(qtile, cmd):
     getattr(qtile.current_layout, cmd)()
     check_output(
@@ -120,7 +133,8 @@ def volume_cmd(qtile, cmd):
             "Volume: %s" % get_current_volume(),
         ]
     )
-    check_output(["pactl", "play-sample", "audio-volume-change"])
+    play_effect("volume_dial")
+    # check_output(["pactl", "play-sample", "audio-volume-change"])
 
 
 def volume_mute(qtile):
@@ -351,8 +365,8 @@ def get_keys(mod, num_groups, num_monitors):
             # ),
         ),
         # Switch groups
-        ([], "F1", lazy.function(SwitchToScreenGroup("browser"))),
-        ([], "F2", lazy.function(SwitchToScreenGroup("emacs"))),
+        ([], "F1", lazy.function(SwitchToScreenGroup("work"))),
+        ([], "F2", lazy.function(SwitchToScreenGroup("home"))),
         ([], "F6", lazy.function(SwitchToScreenGroup("slack"))),
         ([mod], "F6", lazy.function(list_bluetooth)),
         (
@@ -412,6 +426,7 @@ def get_keys(mod, num_groups, num_monitors):
             "Menu",
             lazy.run_extension(
                 WindowList(
+                    item_format="{window}",
                     dmenu_prompt="windows:",
                     # all_groups=False,
                     dmenu_ignorecase=True,
@@ -432,6 +447,9 @@ def get_keys(mod, num_groups, num_monitors):
             ),
         ),
         ([mod, "shift"], "k", lazy.function(dmenu_kubectl)),
+        ([mod, "shift"], "f", lazy.function(float_to_front)),
+        ([mod], "o", lazy.function(stick_win), "stick win"),
+        ([mod, "shift"], "o", lazy.function(unstick_win), "unstick win"),
     ]
 
     laptop_keys = [
@@ -461,14 +479,14 @@ def get_keys(mod, num_groups, num_monitors):
         (
             [],
             "XF86AudioLowerVolume",
-            lazy.function(volume_cmd, get_hostconfig("volume_down")),
+            lazy.function(change_sink_volume, -0.01),
         ),
         ([mod], "XF86AudioLowerVolume", lazy.function(set_volume)),
         ([mod], "XF86AudioRaiseVolume", lazy.function(set_volume)),
         (
             [],
             "XF86AudioRaiseVolume",
-            lazy.function(volume_cmd, get_hostconfig("volume_up")),
+            lazy.function(change_sink_volume, 0.01),
         ),
         (
             [],

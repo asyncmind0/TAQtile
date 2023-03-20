@@ -14,7 +14,7 @@ from libqtile.widget import (
     Systray,
     DF,
     CryptoTicker,
-    # PulseVolume as Volume,
+    PulseVolume as Volume,
     WindowCount,
     CPU,
 )
@@ -28,6 +28,9 @@ from taqtile.widgets.bar import Bar
 from taqtile.widgets.windowname import WindowName
 from taqtile.widgets.multiscreengroupbox import MultiScreenGroupBox
 from taqtile.widgets.gpu import GPU
+from taqtile.widgets.exchange import ExchangeRate
+
+from taqtile.widgets.togglebtn import ToggleButton
 
 
 # from widgets.bankbalance import BankBalance
@@ -112,7 +115,7 @@ def get_screens(num_monitors, groups):
     memgraph_params["type"] = "linefill"
     netgraph_params = dict(graph_defaults)
     sep_params = default_params(
-        size_percent=100, padding=2, fontsize=9, linewidth=1
+        size_percent=100, padding=4, fontsize=9, linewidth=1
     )
     graph_label_defaults = dict(
         margin=0,
@@ -199,11 +202,17 @@ def get_screens(num_monitors, groups):
         # TaskList2(**tasklist_params),
         WindowName(**windowname_params),
         Sep(**sep_params),
+        ToggleButton("sound_effects"),
+        Sep(**sep_params),
         TextBox("w", **default_params()),
         WindowCount(**default_params()),
-        # Sep(**sep_params),
-        # TextBox("\U0001F50A", **default_params()),
-        # Volume(update_interval=1, **default_params()),
+        Sep(**sep_params),
+        TextBox("\U0001F50A", **default_params()),
+        Volume(update_interval=1, **default_params()),
+        Sep(**sep_params),
+        ExchangeRate(
+            from_currency="AUD", to_currency="XMR", update_interval=60
+        ),
         Sep(**sep_params),
         CryptoTicker(currency="AUD"),
         Sep(**sep_params),
@@ -261,7 +270,11 @@ def get_screens(num_monitors, groups):
         for timezone in timezones:
             if timezone == localtimezone:
                 continue
-            widgets.append(TextBox("%s:" % timezone, **clock_text))
+            widgets.append(
+                TextBox(
+                    "<span font='Terminus'>%s</span>:" % timezone, **clock_text
+                )
+            )
             widgets.append(Clock(timezone=timezone, **wclock_params))
             widgets.append(
                 Sep(**sep_params),

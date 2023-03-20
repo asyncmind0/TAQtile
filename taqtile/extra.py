@@ -415,3 +415,17 @@ class Terminal:
             fullscreen=False,
             float=False,
         )
+
+
+def float_to_front(qtile):
+    """
+    Bring all floating windows of the group to front
+    """
+    logger.info("float_to_front called")
+    global floating_windows
+    floating_windows = []
+    for window in qtile.windows_map.values():
+        if getattr(window, "floating", False):
+            window.bring_to_front()
+            floating_windows.append(window)
+    floating_windows[-1].focus()

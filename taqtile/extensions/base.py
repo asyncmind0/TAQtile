@@ -5,6 +5,7 @@ from functools import lru_cache
 from getpass import getuser
 from os.path import dirname, join, splitext, expanduser, isdir, pathsep
 from subprocess import Popen
+import subprocess
 from urllib.parse import quote_plus
 
 from libqtile import hook
@@ -29,6 +30,7 @@ from taqtile.system import (
     get_redis,
 )
 from taqtile.groups import Rule, Match
+from taqtile import sounds
 
 
 @hook.subscribe.client_new
@@ -56,7 +58,8 @@ class WindowList(QWindowList):
         ]
         self.configured_command[
             self.configured_command.index("-p") + 1
-        ] = "Windows (%s):" % (len(window_list))
+        ] = "[%s]:" % (len(window_list))
+        sounds.bong()
         out = Dmenu.run(
             self,
             items=[
@@ -322,10 +325,17 @@ class DmenuRunRecent(DmenuRun):
         if not selected:
             return
         recent.insert(selected)
+        # return Popen(
+        #    ["nohup", selected],
+        #    stdout=None,
+        #    stdin=None,  # preexec_fn=os.setpgrp
+        # )
         return Popen(
-            ["nohup", selected],
-            stdout=None,
-            stdin=None,  # preexec_fn=os.setpgrp
+            selected.split(),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
+            stdin=subprocess.PIPE,
+            close_fds=True,
         )
 
 

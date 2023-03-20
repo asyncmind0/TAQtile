@@ -20,6 +20,7 @@ class Rule(QRule):
         center=False,
         current_screen=False,
         geometry=None,
+        sticky=False,
         **kwargs
     ):
         super().__init__(match, **kwargs)
@@ -30,6 +31,7 @@ class Rule(QRule):
         self.center = center
         self.current_screen = current_screen
         self.geometry = geometry
+        self.sticky = False
 
 
 def is_mailbox(client):
@@ -119,6 +121,16 @@ def get_dgroups():
             static=True,
             break_on_match=True,
         ),
+        Rule(
+            Match(
+                wm_class="pavucontrol-qt",
+                wm_instance_class="pavucontrol-qt",
+            ),
+            float=True,
+            sticky=True,
+            # static=True,
+            break_on_match=True,
+        ),
     ]
 
 
@@ -147,16 +159,11 @@ def generate_groups(num_groups, layouts):
             ),
             "mail": dict(
                 screen_affinity=PRIMARY_SCREEN,
-                exclusive=True,
+                exclusive=False,
                 init=True,
                 matches=[
-                    Match(func=is_mailbox),
-                    Match(
-                        title=[re.compile(".*mail.*", re.I)],
-                        wm_class=["brave-browser"],
-                    ),
-                ]
-                + terminal_matches([r"^mail$"]),
+                    Match(wm_instance_class=[re.compile("mail.google.com.*")]),
+                ],
             ),
             "cal": dict(
                 screen_affinity=PRIMARY_SCREEN,
@@ -168,15 +175,30 @@ def generate_groups(num_groups, layouts):
                     )
                 ],
             ),
-            "browser": dict(
+            "work": dict(
                 screen_affinity=SECONDARY_SCREEN,
                 init=True,
                 persist=True,
                 matches=[
-                    Match(wm_class=["brave-browser"]),
-                    Match(wm_class=["qutebrowser"]),
-                    Match(wm_instance_class=["surf"]),
-                    Match(role=["browser"]),
+                    Match(
+                        wm_instance_class=[
+                            "chromium (~/.config/chromium.work)",
+                            "chromium (/home/steven/.config/chromium.work)",
+                        ]
+                    ),
+                ],
+            ),
+            "home": dict(
+                screen_affinity=SECONDARY_SCREEN,
+                init=True,
+                persist=True,
+                matches=[
+                    Match(
+                        wm_instance_class=[
+                            "chromium (~/.config/chromium.home)",
+                            "chromium (/home/steven/.config/chromium.home)",
+                        ]
+                    ),
                 ],
             ),
             "social": dict(

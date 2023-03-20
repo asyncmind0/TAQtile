@@ -10,6 +10,7 @@ from libqtile import hook
 from plumbum import local
 
 from taqtile.log import logger
+from taqtile.extra import float_to_front
 from taqtile.system import (
     get_hostconfig,
     get_num_monitors,
@@ -41,15 +42,6 @@ def restart_on_randr(qtile, ev):
     qtile.restart()
 
 
-def load_sounds():
-    for sound in [
-        "/usr/share/sounds/freedesktop/stereo/audio-volume-change.oga"
-    ]:
-        check_output(
-            ["pactl", "upload-sample", sound, splitext(basename(sound))[0]]
-        )
-
-
 def dialogs(window):
     if (
         window.window.get_wm_type() == "dialog"
@@ -70,7 +62,6 @@ def startup():
         for command, kwargs in commands.items():
             logger.debug("executing command %s", kwargs)
             execute_once(command, **(kwargs if kwargs else {}))
-        load_sounds()
     except:
         logger.exception("error in startup hook")
         errored = True
@@ -143,7 +134,26 @@ def trigger_dgroups(client):
         logger.exception("Error in trigger_dgroups")
 
 
-# @hook.subscribe.client_managed
+# @hook.subscribe.current_screen_change
+# def screen_change():
+#    from libqtile import qtile
+#
+#    for client in qtile.windows_map.values():
+#        for rule in qtile.dgroups.rules:
+#            try:
+#                if rule and rule.matches(client):
+#                    if getattr(rule, "sticky", False) or getattr(
+#                        client, "sticky", False
+#                    ):
+#                        logger.info(
+#                            f" setting sticky {client}:{qtile.current_group}"
+#                        )
+#                        client.togroup(qtile.current_group)
+#            except Exception as e:
+#                logger.error("error setting sticky %s", client)
+
+
+@hook.subscribe.client_managed
 def set_group(client):
     from libqtile import qtile
 
@@ -170,7 +180,7 @@ def set_group(client):
                         client.fullscreen = True
                     else:
                         client.fullscreen = False
-                if getattr(client, "static", False):
+                if getattr(rule, "static", False):
                     client.static(0)
                 if getattr(rule, "opacity", False):
                     client.set_opacity(rule.opacity)
