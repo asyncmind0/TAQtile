@@ -8,12 +8,12 @@ from subprocess import Popen
 from urllib.parse import quote_plus
 
 from libqtile import hook
-from libqtile.extension.dmenu import Dmenu, DmenuRun
 from libqtile.extension.window_list import WindowList
 from plumbum import local
 
 from taqtile.log import logger
 from taqtile.recent_runner import RecentRunner
+from libqtile.extension.dmenu import Dmenu, DmenuRun
 from taqtile.system import (
     get_current_window,
     get_hostconfig,
@@ -23,115 +23,73 @@ from taqtile.system import (
     get_redis,
 )
 
-PROFILES = {"home": {}, "work": {}}
 
-
-class Inboxes(DmenuRun):
-    defaults = [
-        ("dbname", "list_inboxes", "the sqlite db to store history."),
-        ("dmenu_command", "dmenu", "the dmenu command to be launched"),
-        ("group", "mail", "the group to use."),
-    ]
+class BrowserAppLauncher(DmenuRun):
+    config_key = "browser_accounts"
 
     def __init__(self, **config):
         super().__init__(**config)
-        self.add_defaults(Inboxes.defaults)
-        self.launched = {}
+        self.add_defaults(self.defaults)
+        self.accounts = get_hostconfig("browser_accounts", [])
 
-    def run(self):
-        recent = RecentRunner(self.dbname)
-        inboxes = get_hostconfig("browser_accounts", [])
+    def handle_selected_item(self, selected, regex, logger) -> None:
         qtile = self.qtile
         group = self.group
-        if get_current_group(qtile).name != group:
-            logger.debug("cmd_toggle_group")
-            get_current_screen(qtile).toggle_group(group)
-        selected = super().run(items=recent.list(inboxes)).strip()
-        logger.info(f"Selected: {selected}, Inboxes {inboxes}")
-        if not selected or selected not in inboxes:
-            recent.remove(selected)
+        if not selected or selected not in self.accounts:
+            self.recent.remove(selected)
             return
-        recent.insert(selected)
-        mail_regex = inboxes[selected].get("mail_regex", ".*%s.*" % selected)
-        # mail_regex = ".*%s.*" % selected
-        window = window_exists(qtile, re.compile(mail_regex, re.I))
-        logger.debug("mail window exists %s regex %s ", window, mail_regex)
+        self.recent.insert(selected)
+        if get_current_group(qtile).name != group:
+            get_current_screen(qtile).toggle_group(group)
+        window = window_exists(self.qtile, re.compile(regex, re.I))
+        logger.debug("Window exists with regex %s: %s", regex, window)
         if window:
-            # window = get_windows_map(qtile).get(window.window.wid)
-            logger.debug("Matched %s", str(window))
-            window.togroup(group)
-            logger.debug("layout.focus")
-            get_current_group(qtile).focus(window)
+            window.togroup(self.group)
+            get_current_group(self.qtile).focus(window)
         else:
-            cmd = (
-                # "google-chrome-stable",
-                # "/usr/sbin//systemd-run",
-                # "--user",
-                # "--slice=browser.slice",
-                "/usr/sbin/chromium",
-                # "-u",
-                # "Firefox/99.0",
-                # "https://mail.google.com/mail/u/%s/#inbox" % selected,
-                # "--class=email",
-                "--app=https://mail.google.com/mail/u/%s/#inbox" % selected,
-                "--user-data-dir=/home/steven/.config/chromium.%s"
-                % inboxes[selected]["profile"].lower(),
-            )
+            cmd = [
+                "browser.py",
+                f"--profile=%s" % self.accounts[selected]["profile"].lower(),
+                self.url_template % selected,
+            ]
+            logger.info("Command: %s", cmd)
+            return qtile.cmd_spawn(cmd)
 
-            logger.info(cmd)
-            qtile.spawn(cmd)
-            # rc.set(mail_regex, datetime.now().timestamp())
-            # return Popen(cmd, stdout=None, stdin=None, preexec_fn=os.setpgrp)
+    def run(self):
+        self.recent = RecentRunner(self.dbname)
+        logger.info(f"Accounts: {self.accounts}")
+        selected = super().run(items=self.recent.list(self.accounts)).strip()
+        logger.info(f"Selected: {selected}")
+        self.handle_selected_item(
+            selected,
+            (
+                self.accounts[selected]
+                .get(self.config_key, {"regex": ".*%s.*" % selected})
+                .get("regex")
+            ),
+            logger,
+        )
 
 
-class Calendars(DmenuRun):
+class Inboxes(BrowserAppLauncher):
     defaults = [
-        ("dbname", "list_calendars", "the sqlite db to store history."),
-        ("dmenu_command", "dmenu", "the dmenu command to be launched"),
-        ("group", "cal", "the group to use."),
+        ("dbname", "list_inboxes", "The SQLite database to store the history."),
+        ("dmenu_command", "dmenu", "The dmenu command to be launched."),
     ]
+    config_key = "mail"
+    group = "mail"
+    url_template = "https://mail.google.com/mail/u/%s/#inbox"
 
-    def __init__(self, **config):
-        super().__init__(**config)
-        self.add_defaults(Calendars.defaults)
-        self.launched = {}
 
-    def run(self):
-        recent = RecentRunner(self.dbname)
-        calendars = get_hostconfig("browser_accounts", [])
-        qtile = self.qtile
-        group = self.group
-        if get_current_group(qtile).name != group:
-            logger.debug("cmd_toggle_group")
-            get_current_screen(qtile).toggle_group(group)
-        selected = super().run(items=recent.list(calendars)).strip()
-        logger.info(f"Selected: {selected}, Calendars {calendars}")
-        if not selected or selected not in calendars:
-            recent.remove(selected)
-            return
-        recent.insert(selected)
-        regex = calendars[selected].get("calendar_regex", ".*%s.*" % selected)
-        window = window_exists(qtile, re.compile(regex, re.I))
-        logger.debug("calendar window exists %s regex %s ", window, regex)
-        if window:
-            # window = get_windows_map(qtile).get(window.window.wid)
-            logger.debug("Matched %s", str(window))
-            window.togroup(group)
-            logger.debug("layout.focus")
-            get_current_group(qtile).focus(window)
-        else:
-            cmd = (
-                # "google-chrome-stable",
-                # "/usr/sbin//systemd-run",
-                # "--user",
-                # "--slice=browser.slice",
-                "/usr/sbin/brave",
-                # "-u",
-                # "Firefox/99.0",
-                # "https://mail.google.com/mail/u/%s/#inbox" % selected,
-                "--app=https://calendar.google.com/calendar/b/%s/" % selected,
-                "--profile-directory=%s" % calendars[selected]["profile"],
-            )
-
-            logger.info("calendar command: %s", cmd)
-            qtile.spawn(cmd)
+class Calendars(BrowserAppLauncher):
+    defaults = [
+        (
+            "dbname",
+            "list_calendars",
+            "The SQLite database to store the history.",
+        ),
+        ("dmenu_command", "dmenu", "The dmenu command to be launched."),
+    ]
+    config_key = "calendar"
+    group = "cal"
+    url_template = "https://calendar.google.com/calendar/b/%s/"

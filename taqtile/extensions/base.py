@@ -428,6 +428,7 @@ class WindowGroupList(Dmenu):
     recent_runner = None
     dbname = None
     GROUP = "windows"
+    item_to_win = {}
 
     defaults = [
         ("item_format", "* {window}", "the format for the menu items"),
@@ -442,14 +443,12 @@ class WindowGroupList(Dmenu):
     def __init__(self, **config):
         super().__init__(**config)
         self.add_defaults(WindowList.defaults)
-        self.item_to_win = {}
 
     def _configure(self, qtile):
         Dmenu._configure(self, qtile)
 
     def list_windows(self):
         id = 0
-        self.item_to_win = {}
         if self.all_groups:
             windows = self.qtile.windows_map.values()
         else:

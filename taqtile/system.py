@@ -35,24 +35,33 @@ default_config = {
     "term3_key": "F9",
     "browser_accounts": {
         "melit.stevenjoseph@gmail.com": {
-            "calendar_regex": r"^Google Calendar.*$",
-            "mail_regex": r".*melit\.stevenjoseph@gmail\.com.*$",
+            "calendar": {
+                "regex": r"^Google Calendar.*$",
+            },
+            "mail": {
+                "mail": r".*melit\.stevenjoseph@gmail\.com.*$",
+            },
             # "profile": "default-release",
             "profile": "Home",
         },
         "steven@stevenjoseph.in": {
-            "calendar_regex": r"^stevenjoseph - Calendar.*$",
-            "mail_regex": r".*steven@stevenjoseph.*$",
+            "calendar": {
+                "regex": r"^stevenjoseph - Calendar.*$",
+            },
+            "mail": {
+                "regex": r".*steven@stevenjoseph.*$",
+            },
             # "profile": "default-release",
             "profile": "Home",
         },
         "steven@streethawk.co": {
-            "calendar_regex": r"Streethawk - Calendar.*$",
-            "mail_regex": r".*Streethawk Mail.*$",
+            "calendar": {"regex": r".*Streethawk - Calendar.*$"},
+            "mail": {"regex": r".*Streethawk Mail.*$"},
             "profile": "Work",
         },
         "stevenjose@gmail.com": {
-            "calendar_regex": r"stevenjose - Calendar.*$",
+            "calendar": {"regex": r"stevenjose - Calendar.*$"},
+            "mail": {"regex": r".*Stevenjose Mail.*$"},
             # "profile": "default-release",
             "profile": "Home",
         },
