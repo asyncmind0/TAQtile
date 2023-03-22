@@ -48,9 +48,8 @@ from taqtile.log import logger
 from taqtile.screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from taqtile.system import get_hostconfig
 from taqtile.themes import current_theme, dmenu_cmd_args
-from taqtile.sounds import play_effect, change_sink_volume
+from taqtile.sounds import play_effect, change_sink_volume, volume_mute
 from libqtile import hook
-import pulsectl
 
 
 re_vol = re.compile(r"\[(\d?\d?\d?)%\]")
@@ -121,36 +120,6 @@ def switch_window(qtile, cmd):
     )
 
 
-def volume_cmd(qtile, cmd):
-    check_output(shlex.split(cmd))
-    check_output(
-        [
-            "dunstify",
-            "-t",
-            "1000",
-            "-r",
-            "1999990",
-            "Volume: %s" % get_current_volume(),
-        ]
-    )
-    play_effect("volume_dial")
-    # check_output(["pactl", "play-sample", "audio-volume-change"])
-
-
-def volume_mute(qtile):
-    check_output(["amixer", "-q", "sset", "Master", "toggle"])
-    check_output(
-        [
-            "dunstify",
-            "-t",
-            "1000",
-            "-r",
-            "1999990",
-            "Volume: %s" % get_current_volume(),
-        ]
-    )
-
-
 def touchpad_toggle(qtile):
     touchpad_state = check_output(["synclient", "-l"]).decode()
     touchpad_state = bool(re_touchpad.search(touchpad_state))
@@ -167,12 +136,6 @@ def touchpad_toggle(qtile):
             "1999990",
             "Touch Pad %s" % ("On" if touchpad_state else "Off"),
         ]
-    )
-
-
-def notify_spawn(qtile, cmd):
-    qtile.spawn(
-        "sh -c 'notify-send %s;pactl play-sample audio-volume-change ;%s'" % cmd
     )
 
 
@@ -338,7 +301,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod, "shift"], "m", lazy.spawn("kmag")),
         ([mod, "control"], "Escape", lazy.spawn("xkill")),
         # (["control"], "Escape", lazy.spawn("ksysguard")),
-        ([mod], "Escape", lazy.function(list_keys, [])),
+        ([mod, "shift"], "h", lazy.function(list_keys, [])),
         # ([mod], "b", lazy.function(hide_show_bar)),
         ([mod], "b", lazy.hide_show_bar("bottom")),
         # ([mod, "shift"], "F2", lazy.function(dmenu_xclip, dmenu_cmd_args)),
@@ -423,7 +386,7 @@ def get_keys(mod, num_groups, num_monitors):
         ),
         (
             [mod],
-            "Menu",
+            "Escape",
             lazy.run_extension(
                 WindowList(
                     item_format="{window}",

@@ -9,9 +9,9 @@ import simpleaudio as sa
 from scipy.signal import butter, lfilter
 from libqtile.hook import subscribe
 from taqtile.widgets.togglebtn import requires_toggle_button_active
-import pulsectl
 from subprocess import check_output
 
+import pulsectl
 import alsaaudio
 import simpleaudio as sa
 
@@ -283,13 +283,34 @@ def set_group(client):
     threading.Thread(target=drums.hihat_open0, args=()).start()
 
 
-def _reset_volume():
+def mute():
+    for sink in pulse.sink_list():
+        pulse.mute(sink, not sink.mute)
+
+
+def set_all_volume(volume):
     with pulsectl.Pulse("volume-adjustment") as pulse:
         sinks = pulse.sink_list()
         for sink in sinks:
-            pulse.volume_set_all_chans(sink, 0.3)
+            pulse.volume_set_all_chans(sink, volume)
+
+
+def volume_mute(qtile):
+    for sink in pulse.sink_list():
+        pulse.mute(sink, not sink.mute)
+    # check_output(["amixer", "-q", "sset", "Master", "toggle"])
+    check_output(
+        [
+            "dunstify",
+            "-t",
+            "1000",
+            "-r",
+            "1999990",
+            "Volume: %s" % get_current_volume(),
+        ]
+    )
 
 
 @subscribe.startup
 def startup():
-    threading.Thread(target=_reset_volume, args=()).start()
+    threading.Thread(target=set_all_volume, args=(0.3)).start()
