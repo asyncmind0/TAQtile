@@ -1,8 +1,9 @@
+import logging
 from libqtile.bar import Bar as QBar
 from libqtile import bar, hook, pangocffi
 from taqtile.themes import current_theme, default_params
 
-from taqtile.log import logger
+logger = logging.getLogger("taqtile")
 
 
 class Bar(QBar):

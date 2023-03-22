@@ -12,7 +12,7 @@ class NoParsingFilter(logging.Filter):
 
 def init_log(**kwargs):
     global logger
-    logger = default_init_log(
+    default_init_log(
         log_path="~/.%s.user.log",
         # logger=logger,
         **kwargs

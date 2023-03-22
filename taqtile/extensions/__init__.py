@@ -13,3 +13,5 @@ from taqtile.extensions.browser import (
     Inboxes,
     Calendars,
 )
+
+from taqtile.extensions.qute import Qute
