@@ -39,7 +39,7 @@ default_config = {
                 "regex": r"^Google Calendar.*$",
             },
             "mail": {
-                "mail": r".*melit\.stevenjoseph@gmail\.com.*$",
+                "regex": r".*melit\.stevenjoseph@gmail\.com.*$",
             },
             # "profile": "default-release",
             "profile": "Home",
