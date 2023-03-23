@@ -1,27 +1,65 @@
+import logging
+import subprocess
 from libqtile.widget import base
+from libqtile.widget.generic_poll_text import GenPollText
 from libqtile.command import lazy
 from functools import wraps
+import shlex
+import threading
+import time
+import logging
+
+logger = logging.getLogger("taqtile")
+
 
 TOGGLE_BUTTON_STATES = {}
 
 
-class ToggleButton(base._TextBox):
+class ToggleButton(GenPollText):
     def __init__(self, name, **config):
-        base._TextBox.__init__(self, **config)
+        super().__init__(**config)
         self.name = name
         self.font = "FontAwesome"
         self.add_defaults(
             [
                 ("active", False),
-                ("active_text", "\uf028 ON"),  # Speaker icon with ON text
-                ("inactive_text", "\uf026 OFF"),  # Speaker icon with OFF text
+                ("active_text", "\uf205"),  # use fontawesome
+                ("inactive_text", "\uf204"),
+                ("on_command", "notify-send switch %(name)s on"),
+                ("off_command", "notify-send switch %(name)s off"),
+                (
+                    "check_state_command",
+                    None,
+                ),
+                (
+                    "update_interval",
+                    3,
+                    "Update interval in seconds, if none, the widget updates only once.",
+                ),
+                ("func", self.check_state, "Poll Function"),
             ]
         )
-        self.update_text()
+        self.check_state_delay = 3
+        self.check_state()
+
+    def check_state(self):
+        global TOGGLE_BUTTON_STATES
+        # logger.debug(f"calling {self.check_state_command}")
+        if self.check_state_command:
+            if (
+                status := subprocess.call(shlex.split(self.check_state_command))
+                is 0
+            ):
+                self.active = True
+            else:
+                # logger.debug(f"status {status} {self.check_state_command}")
+                self.active = False
+        TOGGLE_BUTTON_STATES[self.name] = self.active
+        return self.active_text if self.active else self.inactive_text
 
     def _configure(self, qtile, bar):
         global TOGGLE_BUTTON_STATES
-        base._TextBox._configure(self, qtile, bar)
+        super()._configure(qtile, bar)
         TOGGLE_BUTTON_STATES[self.name] = self.active
 
     def button_press(self, x, y, button):
@@ -29,7 +67,14 @@ class ToggleButton(base._TextBox):
         if button == 1:  # Left mouse button
             self.active = not self.active
             TOGGLE_BUTTON_STATES[self.name] = self.active
-            self.update_text()
+            self.execute()
+        self.update_text()
+
+    def execute(self):
+        if self.active:
+            self.qtile.spawn(self.on_command)
+        else:
+            self.qtile.spawn(self.off_command)
 
     def update_text(self):
         self.text = self.active_text if self.active else self.inactive_text
