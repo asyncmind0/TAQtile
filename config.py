@@ -1,4 +1,5 @@
 # TODO handle MultiScreenGroupBox clicks and events
+import logging
 from os.path import expanduser
 
 from libqtile import layout
@@ -18,6 +19,19 @@ from taqtile.system import get_num_monitors
 from taqtile.themes import current_theme
 from taqtile.layouts import Max
 
+
+log_file_path = expanduser("~/.local/share/qtile/qtile.taqtile.log")
+handler = logging.FileHandler(log_file_path)
+formatter = logging.Formatter(
+    "%(asctime)s %(levelname)s [%(name)s] %(message)s"
+)
+handler.setFormatter(formatter)
+
+logger = logging.getLogger("taqtile")
+
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
+logger.info("Logger initialized")
 
 mod = "mod4"
 num_monitors = get_num_monitors()
