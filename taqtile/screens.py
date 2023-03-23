@@ -17,6 +17,11 @@ from libqtile.widget import (
     PulseVolume as Volume,
     WindowCount,
     CPU,
+    Spacer,
+)
+from qtile_extras.widget import (
+    Visualiser,
+    Syncthing,
 )
 
 from taqtile import system
@@ -123,27 +128,15 @@ def get_screens(num_monitors, groups):
         padding_y=2,
     )
 
-    primary_bar = [
-        TextBox("first"),
-        Sep(**sep_params),
-        MultiScreenGroupBox(screen=PRIMARY_SCREEN),
-        # Sep(**sep_params),
-        # Prompt(**prompt_params),
-        Sep(**sep_params),
-        # TaskList2(**tasklist_params),
-        WindowName(**windowname_params),
-        # widget.TextBox(**layout_textbox_params),
-        Sep(**sep_params),
-        Spotify(**default_params()),
-        Sep(**sep_params),
-        CurrentLayout(**current_layout_params),
-        Sep(**sep_params),
-        TextBox("w", **default_params()),
-        WindowCount(**default_params()),
-        Sep(**sep_params),
+    monitoring_bar = [
+        Spacer(**default_params()),
         # ThreadedPacman(**pacman_params),
-        # Sep(**sep_params),
-        DF(visible_on_warn=False, **default_params()),
+        Sep(**sep_params),
+        DF(
+            format="\uf0a0 {uf}{m} {r:.0f}%",
+            visible_on_warn=False,
+            **default_params()
+        ),
         # Sep(**sep_params),
         # BankBalance(account='credit', **default_params()),
         # Sep(**sep_params),
@@ -157,20 +150,20 @@ def get_screens(num_monitors, groups):
         CPU(
             **default_params(
                 font="Fontawesome",
-                format="\uf2db{freq_current:04.1f}GHz {load_percent:04.1f}%",
+                format="\uf2db{freq_current:03.1f}GHz {load_percent:05.1f}%",
             )
         ),
         Sep(**sep_params),
         GPU(
             **default_params(
                 font="Fontawesome",
-                format="\uf108{gpu_util:04.1f}GHz {mem_used_per:04.1f}%",
+                format="\uf108{gpu_util:05.1f}GHz {mem_used_per:05.1f}%",
             )
         ),
         Sep(**sep_params),
         Net(
             font="Fontawesome",
-            format="\uf093{down:06.2f}/\uf019{up:06.2f}",
+            format="\uf093{down:06.1f}kB/\uf019{up:06.1f}kB",
         ),
         Sep(**sep_params),
         TextBox(
@@ -199,9 +192,31 @@ def get_screens(num_monitors, groups):
             )
         ),
         NetGraph(**netgraph_params),
+    ]
+    primary_bar = [
+        TextBox("first"),
         Sep(**sep_params),
-        # Notify(width=30, **notify_params),
+        MultiScreenGroupBox(screen=PRIMARY_SCREEN),
+        # Prompt(**prompt_params),
+        # TaskList2(**tasklist_params),
         Sep(**sep_params),
+        WindowName(**windowname_params),
+        Sep(**sep_params),
+        Spotify(**default_params()),
+        # Sep(**sep_params),
+        # Visualiser(**default_params()),
+        # Sep(**sep_params),
+        # Syncthing(
+        #    api_key=system.passstore("/syncthing/threadripper0/apikey"),
+        #    **default_params()
+        # ),
+        CalClock(timezone=localtimezone, **clock_params),
+        Sep(**sep_params),
+        WindowCount(
+            text_format="\uf2d2{num}", show_zero=True, **default_params()
+        ),
+        Sep(**sep_params),
+        CurrentLayout(**current_layout_params),
     ]
     if system.get_hostconfig("battery"):
         primary_bar.append(Battery(**batteryicon_params))
@@ -215,10 +230,20 @@ def get_screens(num_monitors, groups):
         # TaskList2(**tasklist_params),
         WindowName(**windowname_params),
         Sep(**sep_params),
-        ToggleButton("sound_effects"),
+        ToggleButton(
+            "aeternity_miner",
+            active_text="ae ",
+            inactive_text="ae ",
+            on_command="systemctl --user start aeternity-miner.service",
+            off_command="systemctl --user stop aeternity-miner.service",
+            check_state_command="systemctl --user status aeternity-miner.service",
+        ),
         Sep(**sep_params),
-        TextBox("w", **default_params()),
-        WindowCount(**default_params()),
+        ToggleButton(
+            "sound_effects",
+            active_text="\uf0f3",
+            inactive_text="\uf1f6",
+        ),
         Sep(**sep_params),
         TextBox("\U0001F50A", **default_params()),
         Volume(update_interval=1, **default_params()),
@@ -228,6 +253,10 @@ def get_screens(num_monitors, groups):
         ),
         Sep(**sep_params),
         CryptoTicker(currency="AUD"),
+        Sep(**sep_params),
+        WindowCount(
+            text_format="\uf2d2{num}", show_zero=True, **default_params()
+        ),
         Sep(**sep_params),
         CurrentLayout(**current_layout_params),
         Sep(**sep_params),
@@ -243,8 +272,9 @@ def get_screens(num_monitors, groups):
         ##TaskList2(**tasklist_params),
         WindowName(**windowname_params),
         Sep(**sep_params),
-        TextBox("w", **default_params()),
-        WindowCount(**default_params()),
+        WindowCount(
+            text_format="\uf2d2{num}", show_zero=True, **default_params()
+        ),
         Sep(**sep_params),
         CurrentLayout(**current_layout_params),
         CalClock(timezone=localtimezone, **clock_params),
@@ -257,8 +287,9 @@ def get_screens(num_monitors, groups):
         ##TaskList2(**tasklist_params),
         WindowName(**windowname_params),
         Sep(**sep_params),
-        TextBox("w", **default_params()),
-        WindowCount(**default_params()),
+        WindowCount(
+            text_format="\uf2d2{num}", show_zero=True, **default_params()
+        ),
         Sep(**sep_params),
         CurrentLayout(**current_layout_params),
         CalClock(timezone=localtimezone, **clock_params),
@@ -267,7 +298,7 @@ def get_screens(num_monitors, groups):
     clock_text = default_params(fontsize=12)
     wclock_params = default_params(padding=2, format="%a %H:%M", fontsize=12)
 
-    def make_clock_bar(notification=False):
+    def make_clock_bar():
         timezones = [
             "UTC",
             "Asia/Kolkata",
@@ -285,7 +316,7 @@ def get_screens(num_monitors, groups):
                 continue
             widgets.append(
                 TextBox(
-                    "<span font='Terminus'>%s</span>:" % timezone, **clock_text
+                    "<span font='Proggy'>%s</span>:" % timezone, **clock_text
                 )
             )
             widgets.append(Clock(timezone=timezone, **wclock_params))
@@ -299,39 +330,31 @@ def get_screens(num_monitors, groups):
                 Sep(**sep_params),
             ]
         )
-        if notification:
-            widgets.extend(
-                [
-                    # Notify(**default_params()),
-                    Sep(**sep_params),
-                ]
-            )
-        return Bar(widgets, **default_params())
+        return widgets
 
     # clock_bar.size = 0
     screens = dict()
     if num_monitors == 1:
-        primary_bar.append(CalClock(timezone=localtimezone, **clock_params))
         screens[PRIMARY_SCREEN] = Screen(
-            Bar(primary_bar, **default_params()),
-            bottom=make_clock_bar(),
+            Bar(secondary_bar, **default_params()),
+            bottom=Bar(make_clock_bar() + monitoring_bar, **default_params()),
         )
     else:
         screens[PRIMARY_SCREEN] = Screen(
             Bar(primary_bar, **default_params()),
-            bottom=make_clock_bar(notification=True),
+            bottom=Bar(make_clock_bar(), **default_params()),
         )
         screens[SECONDARY_SCREEN] = Screen(
             Bar(secondary_bar, **default_params()),
-            bottom=make_clock_bar(notification=True),
+            bottom=Bar(make_clock_bar() + monitoring_bar, **default_params()),
         )
         screens[TERTIARY_SCREEN] = Screen(
             Bar(tertiary_bar, **default_params()),
-            bottom=make_clock_bar(),
+            bottom=Bar(make_clock_bar(), **default_params()),
         )
         screens[QUATERNARY_SCREEN] = Screen(
             Bar(quaternary_bar, **default_params()),
-            bottom=make_clock_bar(),
+            bottom=Bar(make_clock_bar(), **default_params()),
         )
     screens = [screens[y] for y in sorted(screens.keys())]
     log.error("Screens: %s ", screens)

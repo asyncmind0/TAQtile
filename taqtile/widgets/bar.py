@@ -18,14 +18,15 @@ class Bar(QBar):
         self.add_defaults(Bar.defaults)
         self.default_background = self.background
         self.default_foreground = self.foreground
-        hook.subscribe.current_screen_change(self.hook_response)
+        hook.subscribe.current_screen_change(self._hook_current_screen_change)
 
-    def hook_response(self, *args):
+    def _hook_current_screen_change(self, *args):
         if not self.qtile:
             return
-        logger.error("hook_response screen %s", args)
-        logger.error("hook_response screen %s", self.qtile.current_screen.index)
-        logger.error("hook_response self.screen %s", self.screen.index)
+        logger.debug(
+            f"current_screen_change current_screen: {self.qtile.current_screen.index} self.screen:{self.screen.index}"
+        )
+
         if self.screen == self.qtile.current_screen:
             self.background = self.focused_background
         else:
