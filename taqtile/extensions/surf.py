@@ -1,4 +1,5 @@
 import os
+import subprocess
 import re
 from datetime import datetime
 from functools import lru_cache
@@ -64,6 +65,7 @@ class Surf(WindowGroupList):
     recent_runner = surf_recent_runner
     dbname = SURF_HISTORY_DB
     GROUP = "surf"
+    item_to_win = {"clipboard": 0, "--": 0}
 
     defaults = [
         ("item_format", "* {window}", "the format for the menu items"),
@@ -74,6 +76,15 @@ class Surf(WindowGroupList):
         ),
         ("dmenu_lines", "80", "Give lines vertically. Set to None get inline"),
     ]
+
+    def _configure(self, qtile):
+        Dmenu._configure(self, qtile)
+        try:
+            self.item_to_win["clipboard"] = subprocess.check_output(
+                ["xclip", "-o"]
+            ).decode()
+        except:
+            pass
 
     def match_item(self, win):
         # logger.info(dir(win.window))
@@ -86,25 +97,20 @@ class Surf(WindowGroupList):
         )
 
     def spawn(self, sout):
+        if sout.startswith("clipboard:"):
+            sout = sout.split("clipboard:")[-1]
+
         if sout.startswith("http"):
             self.qtile.spawn(
                 # "/usr/sbin//systemd-run --user --slice=browser.slice /usr/local/bin/surf %s"
-                "surf %s"
+                "browser.py %s"
                 % sout.strip()
             )
         elif sout:
             gg = "gg "
             if sout.startswith(gg):
                 sout = sout.split(gg)[-1]
-                cmd = "surf https://www.google.com/search?q='%s'&ie=utf-8&oe=utf-8"
+                cmd = "browser.py https://www.google.com/search?q='%s'&ie=utf-8&oe=utf-8"
             else:
-                cmd = "surf https://duckduckgo.com/?t=ffab&q=%s&ia=web"
+                cmd = "browser.py https://duckduckgo.com/?t=ffab&q=%s&ia=web"
             self.qtile.spawn(cmd % quote_plus(sout))
-
-
-class Calendars(WindowGroupList):
-
-    dmenu_prompt = "Calendars"
-    recent_runner = None
-    dbname = "calendars"
-    GROUP = "cal"

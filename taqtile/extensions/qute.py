@@ -5,15 +5,21 @@ from taqtile.system import (
     get_hostconfig,
 )
 from libqtile import qtile
+import logging
+
+logger = logging.getLogger("taqtile")
 
 
 @subscribe.client_name_updated
 def trigger_dgroups(client):
-    profiles = [
-        x["profile"] for x in get_hostconfig("browser_accounts", {}).values()
-    ]
+    profiles = set(
+        [
+            x["profile"].lower()
+            for x in get_hostconfig("browser_accounts", {}).values()
+        ]
+    )
     for profile in profiles:
-        if qtile.groups_map.get("profile") and profile in client.name:
+        if qtile.groups_map.get(profile) and profile in str(client.name):
             client.togroup(profile)
 
 

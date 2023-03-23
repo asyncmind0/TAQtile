@@ -11,7 +11,6 @@ from libqtile import hook
 from libqtile.extension.window_list import WindowList
 from plumbum import local
 
-from taqtile.log import logger
 from taqtile.recent_runner import RecentRunner
 from libqtile.extension.dmenu import Dmenu, DmenuRun
 from taqtile.system import (
@@ -22,6 +21,9 @@ from taqtile.system import (
     get_current_group,
     get_redis,
 )
+import logging
+
+logger = logging.getLogger("taqtile")
 
 
 class BrowserAppLauncher(DmenuRun):
@@ -41,17 +43,23 @@ class BrowserAppLauncher(DmenuRun):
         self.recent.insert(selected)
         if get_current_group(qtile).name != group:
             get_current_screen(qtile).toggle_group(group)
+        logger.debug("Does Window exists with regex %s", regex)
         window = window_exists(self.qtile, re.compile(regex, re.I))
         logger.debug("Window exists with regex %s: %s", regex, window)
         if window:
             window.togroup(self.group)
             get_current_group(self.qtile).focus(window)
         else:
-            cmd = [
-                "browser.py",
-                f"--profile=%s" % self.accounts[selected]["profile"].lower(),
-                self.url_template % selected,
-            ]
+            cmd = " ".join(
+                [
+                    "browser.py",
+                    "--use-default",
+                    f"--profile=%s"
+                    % self.accounts[selected]["profile"].lower(),
+                    self.url_template % selected,
+                ]
+            )
+
             logger.info("Command: %s", cmd)
             return qtile.cmd_spawn(cmd)
 
