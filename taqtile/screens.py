@@ -154,11 +154,24 @@ def get_screens(num_monitors, groups):
         # Sep(**sep_params),
         # NotmuchCount(**default_params()),
         Sep(**sep_params),
-        CPU(**default_params()),
+        CPU(
+            **default_params(
+                font="Fontawesome",
+                format="\uf2db{freq_current:04.1f}GHz {load_percent:04.1f}%",
+            )
+        ),
         Sep(**sep_params),
-        GPU(**default_params()),
+        GPU(
+            **default_params(
+                font="Fontawesome",
+                format="\uf108{gpu_util:04.1f}GHz {mem_used_per:04.1f}%",
+            )
+        ),
         Sep(**sep_params),
-        Net(format="\U00002B07{down}/\U00002B06{up}"),
+        Net(
+            font="Fontawesome",
+            format="\uf093{down:06.2f}/\uf019{up:06.2f}",
+        ),
         Sep(**sep_params),
         TextBox(
             "c",
