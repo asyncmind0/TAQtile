@@ -41,6 +41,33 @@ def set_timestamp(window):
 
 
 class WindowList(QWindowList):
+    def list_windows(self):
+        id = 0
+        self.item_to_win = {}
+
+        if self.all_groups:
+            windows = [
+                w
+                for w in self.qtile.windows_map.values()
+                if isinstance(w, base.Window)
+            ]
+        else:
+            windows = self.qtile.current_group.windows
+
+        for win in windows:
+            if win.group and not isinstance(win.group, ScratchPad):
+                item = self.item_format.format(
+                    group=win.group.label or win.group.name,
+                    id=id,
+                    window=win.name,
+                )
+                if win.window.get_wm_class()[0] == "qutebrowser":
+                    item = f"🌏 {item}"
+                elif win.window.get_wm_class()[0] == "st":
+                    item = f"👽 {item}"
+                self.item_to_win[item] = win
+                id += 1
+
     def run(self):
         self.list_windows()
         window_list = []
