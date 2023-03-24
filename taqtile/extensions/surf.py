@@ -5,7 +5,6 @@ from datetime import datetime
 from functools import lru_cache
 from getpass import getuser
 from os.path import dirname, join, splitext, expanduser, isdir, pathsep
-from subprocess import Popen
 from urllib.parse import quote_plus
 
 from libqtile import hook
@@ -100,17 +99,15 @@ class Surf(WindowGroupList):
         if sout.startswith("clipboard:"):
             sout = sout.split("clipboard:")[-1]
 
+        url = ""
         if sout.startswith("http"):
-            self.qtile.spawn(
-                # "/usr/sbin//systemd-run --user --slice=browser.slice /usr/local/bin/surf %s"
-                "browser.py %s"
-                % sout.strip()
-            )
+            url = sout.strip()
         elif sout:
             gg = "gg "
             if sout.startswith(gg):
                 sout = sout.split(gg)[-1]
-                cmd = "browser.py https://www.google.com/search?q='%s'&ie=utf-8&oe=utf-8"
+                url = "https://www.google.com/search?q='%s'&ie=utf-8&oe=utf-8"
             else:
-                cmd = "browser.py https://duckduckgo.com/?t=ffab&q=%s&ia=web"
-            self.qtile.spawn(cmd % quote_plus(sout))
+                url = "https://duckduckgo.com/?t=ffab&q=%s&ia=web"
+            url = url % quote_plus(sout)
+        self.qtile.spawn(f"systemd-run --user browser.py {url}")

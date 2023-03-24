@@ -89,7 +89,7 @@ default_config = {
     "autostart-once": {
         # "grafana-bison": None,
         "dropbox": None,
-        "slack": None,
+        # "slack": None,
         #'blueman-applet': None,
         #'discord': None,
         #'parcellite': None,
@@ -224,7 +224,7 @@ def execute_once(
         # spawn the process using a shell command with subprocess.Popen
         logger.debug("Starting: %s", cmd)
         try:
-            qtile.spawn(process)
+            qtile.spawn(f"systemd-run --user {process}")
             logger.info("Started: %s: %s", cmd, pid)
         except Exception as e:
             logger.exception("Error running %s", cmd)

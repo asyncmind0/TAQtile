@@ -14,4 +14,4 @@ from taqtile.extensions.browser import (
     Calendars,
 )
 
-from taqtile.extensions.qute import Qute
+import taqtile.extensions.qute

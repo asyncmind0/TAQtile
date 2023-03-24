@@ -325,14 +325,15 @@ class DmenuRunRecent(DmenuRun):
         if not selected:
             return
         recent.insert(selected)
+        # return qtile.spawn(f"systemd-run --user {selected}")
         # return Popen(
         #    ["nohup", selected],
         #    stdout=None,
         #    stdin=None,  # preexec_fn=os.setpgrp
         # )
         return Popen(
-            selected.split(),
-            stdout=subprocess.DEVNULL,
+            ["systemd-run", "--user"] + selected.split(),
+            stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             stdin=subprocess.PIPE,
             close_fds=True,

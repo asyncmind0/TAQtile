@@ -189,7 +189,7 @@ class SwitchToWindowGroup(object):
                         cmds.append(cmd)
             for cmd in cmds:
                 logger.info("Spawn %s", cmd)
-                qtile.spawn(cmd)
+                qtile.spawn(f"systemd-run --user {cmd}")
         except Exception as e:
             logger.exception("wierd")
         return False

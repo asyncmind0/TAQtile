@@ -75,7 +75,7 @@ class Spotify(base.ThreadPoolText):
         """
         # spawn spotify if not already running
         if not self._is_proc_running("spotify"):
-            self.qtile.spawn("spotify", shell=True)
+            self.qtile.spawn("systemd-run --user spotify", shell=True)
             return
 
         all_groups: List[_Group] = self.qtile.groups
