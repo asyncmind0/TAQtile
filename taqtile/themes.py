@@ -20,6 +20,7 @@ default_theme = dict(
 )
 
 star_trek_blue = dict(
+    # padding=1,
     border="#5981B9",
     border_focus="#263767",
     # this_current_screen_border="#1C294C",

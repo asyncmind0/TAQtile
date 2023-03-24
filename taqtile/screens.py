@@ -58,6 +58,12 @@ except:
     localtimezone = "Australia/Sydney"
 
 
+class ScreenNameTextBox(TextBox):
+    def __init__(self, *args, **config):
+        config["padding"] = 8
+        super().__init__(*args, **config)
+
+
 def get_screens(num_monitors, groups):
     multi_monitor = num_monitors > 1
 
@@ -74,7 +80,7 @@ def get_screens(num_monitors, groups):
 
     # prompt_params = default_params()
     current_layout_params = default_params(name="default")
-    windowname_params = default_params()
+    windowname_params = default_params(padding=4)
     systray_params = default_params(icon_size=16)
     clock_params = default_params(
         padding=2, format="%Y-%m-%d %a %H:%M", fontsize=12
@@ -120,7 +126,7 @@ def get_screens(num_monitors, groups):
     memgraph_params["type"] = "linefill"
     netgraph_params = dict(graph_defaults)
     sep_params = default_params(
-        size_percent=100, padding=4, fontsize=9, linewidth=1
+        size_percent=100, padding=8, fontsize=9, linewidth=1
     )
     graph_label_defaults = dict(
         margin=0,
@@ -150,20 +156,20 @@ def get_screens(num_monitors, groups):
         CPU(
             **default_params(
                 font="Fontawesome",
-                format="\uf2db{freq_current:03.1f}GHz {load_percent:05.1f}%",
+                format="\uf2db {freq_current:03.1f}GHz {load_percent:05.1f}%",
             )
         ),
         Sep(**sep_params),
         GPU(
             **default_params(
                 font="Fontawesome",
-                format="\uf108{gpu_util:05.1f}GHz {mem_used_per:05.1f}%",
+                format="\uf108 {gpu_util:05.1f}GHz {mem_used_per:05.1f}%",
             )
         ),
         Sep(**sep_params),
         Net(
             font="Fontawesome",
-            format="\uf093{down:06.1f}kB/\uf019{up:06.1f}kB",
+            format="\uf093 {down:06.1f}kB / \uf019 {up:06.1f}kB",
         ),
         Sep(**sep_params),
         TextBox(
@@ -194,7 +200,7 @@ def get_screens(num_monitors, groups):
         NetGraph(**netgraph_params),
     ]
     primary_bar = [
-        TextBox("first"),
+        TextBox("first", padding=4),
         Sep(**sep_params),
         MultiScreenGroupBox(screen=PRIMARY_SCREEN),
         # Prompt(**prompt_params),
@@ -223,7 +229,7 @@ def get_screens(num_monitors, groups):
         primary_bar.append(Sep(**sep_params))
 
     secondary_bar = [
-        TextBox("second"),
+        ScreenNameTextBox("second"),
         Sep(**sep_params),
         MultiScreenGroupBox(screen=SECONDARY_SCREEN),
         Sep(**sep_params),
@@ -255,7 +261,7 @@ def get_screens(num_monitors, groups):
         CryptoTicker(currency="AUD"),
         Sep(**sep_params),
         WindowCount(
-            text_format="\uf2d2{num}", show_zero=True, **default_params()
+            text_format="\uf2d2 {num}", show_zero=True, **default_params()
         ),
         Sep(**sep_params),
         CurrentLayout(**current_layout_params),
@@ -265,7 +271,7 @@ def get_screens(num_monitors, groups):
         CalClock(timezone=localtimezone, **clock_params),
     ]
     tertiary_bar = [
-        TextBox("third"),
+        ScreenNameTextBox("third"),
         Sep(**sep_params),
         MultiScreenGroupBox(screen=TERTIARY_SCREEN),
         # Sep(**sep_params),
@@ -273,14 +279,14 @@ def get_screens(num_monitors, groups):
         WindowName(**windowname_params),
         Sep(**sep_params),
         WindowCount(
-            text_format="\uf2d2{num}", show_zero=True, **default_params()
+            text_format="\uf2d2 {num}", show_zero=True, **default_params()
         ),
         Sep(**sep_params),
         CurrentLayout(**current_layout_params),
         CalClock(timezone=localtimezone, **clock_params),
     ]
     quaternary_bar = [
-        TextBox("fourth"),
+        ScreenNameTextBox("fourth"),
         Sep(**sep_params),
         MultiScreenGroupBox(screen=TERTIARY_SCREEN),
         # Sep(**sep_params),
@@ -288,7 +294,7 @@ def get_screens(num_monitors, groups):
         WindowName(**windowname_params),
         Sep(**sep_params),
         WindowCount(
-            text_format="\uf2d2{num}", show_zero=True, **default_params()
+            text_format="\uf2d2 {num}", show_zero=True, **default_params()
         ),
         Sep(**sep_params),
         CurrentLayout(**current_layout_params),
