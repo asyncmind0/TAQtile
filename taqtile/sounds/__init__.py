@@ -242,8 +242,8 @@ def change_sink_volume(qtile, increment):
     play_effect("volume_dial")
 
 
-@requires_toggle_button_active("sound_effects")
 @subscribe.setgroup
+@requires_toggle_button_active("sound_effects")
 def setgroup():
     # sounds.context_switch_sound()
     from taqtile.sounds import drums
@@ -251,32 +251,32 @@ def setgroup():
     threading.Thread(target=drums.snare_drum, args=()).start()
 
 
-@requires_toggle_button_active("sound_effects")
 @subscribe.client_focus
+@requires_toggle_button_active("sound_effects")
 def client_focused(window):
     from taqtile.sounds import drums
 
     threading.Thread(target=drums.hihat_closed, args=()).start()
 
 
-@requires_toggle_button_active("sound_effects")
 @subscribe.client_killed
+@requires_toggle_button_active("sound_effects")
 def client_killed(window):
     from taqtile.sounds import drums
 
     threading.Thread(target=drums.hihat_open1, args=()).start()
 
 
-@requires_toggle_button_active("sound_effects")
 @subscribe.current_screen_change
+@requires_toggle_button_active("sound_effects")
 def screen_change():
     from taqtile.sounds import drums
 
     threading.Thread(target=drums.bass_drum, args=()).start()
 
 
-@requires_toggle_button_active("sound_effects")
 @subscribe.client_managed
+@requires_toggle_button_active("sound_effects")
 def set_group(client):
     from taqtile.sounds import drums
 

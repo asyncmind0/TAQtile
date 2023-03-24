@@ -89,8 +89,9 @@ def requires_toggle_button_active(name):
         @wraps(func)
         def wrapper(*args, **kwargs):
             global TOGGLE_BUTTON_STATES
+            logger.debug(f"toggle buttons {TOGGLE_BUTTON_STATES}")
             if TOGGLE_BUTTON_STATES.get(name, False):
-                return func(qtile, *args, **kwargs)
+                return func(*args, **kwargs)
 
         return wrapper
 
