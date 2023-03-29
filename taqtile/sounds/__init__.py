@@ -35,6 +35,7 @@ def tick0(duration=0.01, volume=0.5):
     play_obj = sa.play_buffer(
         waveform, num_channels=1, bytes_per_sample=2, sample_rate=44100
     )
+    play_obj.wait_done()
 
 
 def metallic_click(duration=0.005, frequency=6500, volume=1):
@@ -54,6 +55,7 @@ def metallic_click(duration=0.005, frequency=6500, volume=1):
     play_obj = sa.play_buffer(
         waveform, num_channels=1, bytes_per_sample=2, sample_rate=44100
     )
+    play_obj.wait_done()
 
 
 def thud(duration=0.5, frequency=300, volume=1):
@@ -95,6 +97,7 @@ def tone(duration=1, frequency=440):
 
     # Play the audio using the simpleaudio library
     play_obj = sa.play_buffer(audio_data, 1, 2, sample_rate)
+    play_obj.wait_done()
 
 
 def bong(duration=1, base_frequency=50, volume=0.5):
@@ -135,6 +138,7 @@ def bong(duration=1, base_frequency=50, volume=0.5):
 
     # Play the audio using the simpleaudio library
     play_obj = sa.play_buffer(audio_data, 1, 2, sample_rate)
+    play_obj.wait_done()
 
 
 def _context_switch_sound(duration=0.15, volume=0.3):
@@ -163,6 +167,7 @@ def _context_switch_sound(duration=0.15, volume=0.3):
 
     # Play the audio using the simpleaudio library
     play_obj = sa.play_buffer(audio_data, 1, 2, sample_rate)
+    play_obj.wait_done()
 
 
 def context_switch_sound(duration=15, volume=-30):

@@ -46,7 +46,7 @@ from taqtile.extra import (
 from taqtile.hooks import set_groups
 from taqtile.log import logger
 from taqtile.screens import PRIMARY_SCREEN, SECONDARY_SCREEN
-from taqtile.system import get_hostconfig
+from taqtile.system import get_hostconfig, show_process_stats
 from taqtile.themes import current_theme, dmenu_cmd_args
 from taqtile.sounds import play_effect, change_sink_volume, volume_mute
 from libqtile import hook
@@ -476,6 +476,7 @@ def get_keys(mod, num_groups, num_monitors):
                 "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause"
             ),
         ),
+        ([mod, "shift"], "d", lazy.function(show_process_stats)),
         ([], "XF86AudioMute", lazy.function(volume_mute)),
         ([], "XF86AudioPlay", lazy.spawn("sp play")),
         ([], "XF86AudioPause", lazy.spawn("sp pause")),
