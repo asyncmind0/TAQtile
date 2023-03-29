@@ -10,8 +10,12 @@ import subprocess
 from functools import lru_cache
 from os.path import expanduser
 from plumbum import local
+import os
+import psutil
+import notify2
 
 from taqtile.log import logger
+from guppy import hpy
 
 
 def passstore(path):
@@ -269,3 +273,28 @@ def get_redis():
 
     client = Redis(connection_pool=BlockingConnectionPool())
     return client
+
+
+def show_process_stats(qtile):
+    pid = os.getpid()
+    p = psutil.Process(pid)
+    threads = p.num_threads()
+    mem_info = p.memory_info()
+    rss = mem_info.rss / 1024 / 1024  # convert to MB
+    vms = mem_info.vms / 1024 / 1024  # convert to MB
+    h = hpy()
+    message = f"""
+    Process ID: {pid}
+    Number of Threads: {threads}
+    Resident Set Size: {rss} MB
+    Virtual Memory Size: {vms} MB
+    {h.heap()}
+    """
+    logger.info(message)
+    send_notification(message)
+
+
+def send_notification(message):
+    notify2.init("qtile")
+    n = notify2.Notification("qtile stats", message)
+    n.show()

@@ -39,7 +39,6 @@ class ToggleButton(GenPollText):
                 ("func", self.check_state, "Poll Function"),
             ]
         )
-        self.check_state_delay = 3
         self.check_state()
 
     def check_state(self):
