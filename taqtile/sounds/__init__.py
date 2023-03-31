@@ -14,8 +14,23 @@ from subprocess import check_output
 import pulsectl
 import alsaaudio
 import simpleaudio as sa
+import logging
 
-pulse = pulsectl.Pulse("volume-adjustment")
+logger = logging.getLogger("taqtile")
+
+pulse = None
+
+
+def get_pulse():
+    global pulse
+    try:
+        pulse = pulsectl.Pulse("volume-adjustment")
+    except:
+        logger.error("Failed to connect to pulseaudio")
+    return pulse
+
+
+pulse = get_pulse()
 mixer = alsaaudio.Mixer()
 
 

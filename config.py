@@ -43,7 +43,7 @@ layouts = [
     # layout.Tile(**current_theme),
     # layout.Zoomy(**current_theme),
     # layout.TreeTab(),
-    ## a layout just for gimp
+    # a layout just for gimp
     # layout.Slice(
     #    "term1",
     #    192,

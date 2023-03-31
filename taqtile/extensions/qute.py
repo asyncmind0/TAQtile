@@ -18,6 +18,9 @@ def trigger_dgroups(client):
             for x in get_hostconfig("browser_accounts", {}).values()
         ]
     )
+    if "WhatsApp - web.whatsapp.com" in client.name:
+        client.togroup("webcon")
+        return
     for profile in profiles:
         if qtile.groups_map.get(profile) and profile in str(client.name):
             client.togroup(profile)
