@@ -60,12 +60,12 @@ default_config = {
         },
         "steven@streethawk.co": {
             "calendar": {"regex": r".*Streethawk - Calendar.*$"},
-            "mail": {"regex": r".*Streethawk Mail.*$"},
+            "mail": {"regex": r".*StreetHawk Mail.*$"},
             "profile": "Work",
         },
         "stevenjose@gmail.com": {
             "calendar": {"regex": r"stevenjose - Calendar.*$"},
-            "mail": {"regex": r".*Stevenjose Mail.*$"},
+            "mail": {"regex": r".*stevenjose@gmail\.com.*mail\.google\.com.*$"},
             # "profile": "default-release",
             "profile": "Home",
         },
