@@ -237,6 +237,16 @@ def get_screens(num_monitors, groups):
         WindowName(**windowname_params),
         Sep(**sep_params),
         ToggleButton(
+            "dunst",
+            active_text="<span color='green'>\uf0f3</span>",
+            inactive_text="<span color='green'>\uf1f6</span>",
+            on_command="dunstctl set-paused false",
+            off_command="dunstctl set-paused true",
+            # the command 'dunstctl is-paused' prints string "false" in stdout how to set exit status 1, make it a oneliner
+            check_state_command="dunstctl is-paused | grep -q false",
+        ),
+        Sep(**sep_params),
+        ToggleButton(
             "aeternity_miner",
             active_text="ae ",
             inactive_text="ae ",

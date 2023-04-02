@@ -44,11 +44,17 @@ class ToggleButton(GenPollText):
     def check_state(self):
         global TOGGLE_BUTTON_STATES
         # logger.debug(f"calling {self.check_state_command}")
+        # python check status of command string executed in a shell
         if self.check_state_command:
-            if (
-                status := subprocess.call(shlex.split(self.check_state_command))
-                is 0
-            ):
+
+            # Execute the command
+            with subprocess.Popen(
+                self.check_state_command, shell=True
+            ) as process:
+
+                # Wait for the command to complete and get the return code
+                return_code = process.wait()
+            if return_code == 0:
                 self.active = True
             else:
                 # logger.debug(f"status {status} {self.check_state_command}")
