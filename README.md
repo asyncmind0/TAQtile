@@ -25,6 +25,11 @@ Uses [suckless](https://suckless.org) tools by default
 - surf
 - dmenu
 
+And other nice rice ...
+
+- qutebrowser
+- rofi
+
 ## Key binds
 
 For full binding list see `taqtile/keys.py`
@@ -44,9 +49,11 @@ For full binding list see `taqtile/keys.py`
 
 ## Screenshots
 
-### Quad head config
+### Cerberus config
 
-![Quad](quad.png)
+Three headed [Cerberus](https://en.wikipedia.org/wiki/Cerberus) config.
+
+![Cerberus](cerberus.png)
 
 ### Themes
 
