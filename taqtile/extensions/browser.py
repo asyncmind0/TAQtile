@@ -99,5 +99,5 @@ class Calendars(BrowserAppLauncher):
         ("dmenu_command", "dmenu", "The dmenu command to be launched."),
     ]
     config_key = "calendar"
-    group = "cal"
+    group = "calendar"
     url_template = "https://calendar.google.com/calendar/b/%s/"

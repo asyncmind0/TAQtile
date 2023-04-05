@@ -100,7 +100,7 @@ def get_dgroups():
                 wm_class=[re.compile(".*whatsapp.*", re.I)],
             ),
             group=get_group_affinity("whatsapp"),
-            break_on_match=False,
+            break_on_match=True,
         ),
         Rule(
             Match(title=[re.compile(r"klipper", re.I)]),
@@ -165,7 +165,7 @@ def generate_groups(num_groups, layouts):
                     Match(wm_instance_class=[re.compile("mail.google.com.*")]),
                 ],
             ),
-            "cal": dict(
+            "calendar": dict(
                 screen_affinity=PRIMARY_SCREEN,
                 exclusive=False,
                 init=True,

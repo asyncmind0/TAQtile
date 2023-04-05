@@ -12,7 +12,6 @@ from taqtile.dmenu import (
     dmenu_show,
     dmenu_org,
     list_bluetooth,
-    list_calendars,
     dmenu_pushbullet,
     dmenu_kubectl,
     switch_pulse_outputs,
@@ -357,7 +356,6 @@ def get_keys(mod, num_groups, num_monitors):
             lazy.run_extension(
                 Calendars(dmenu_ignorecase=True, **current_theme)
             ),
-            # lazy.function(list_calendars),
         ),
         (
             ["control"],

@@ -90,49 +90,6 @@ def get_window_titles(qtile):
     return [w["name"] for w in qtile.windows() if w["name"] != "<no name>"]
 
 
-def list_calendars(qtile):
-    group = "cal"
-    try:
-        recent = RecentRunner("qtile_calendar")
-        inboxes = get_hostconfig("browser_accounts", {})
-        selected = dmenu_show("Calendars:", recent.list(inboxes.keys()))
-        if not selected or selected not in inboxes.keys():
-            return
-        recent.insert(selected)
-        match = re.compile(inboxes[selected]["calendar_regex"], re.I)
-        if get_current_screen(qtile).index != SECONDARY_SCREEN:
-            logger.debug("cmd_to_screen")
-            qtile.to_screen(SECONDARY_SCREEN)
-        if get_current_group(qtile).name != group:
-            logger.debug("cmd_toggle_group")
-            get_current_screen(qtile).toggle_group(group)
-        for window in qtile.windows():
-            if match.match(window["name"]):
-                logger.debug("Matched %s", str(window))
-                window = get_windows_map(qtile).get(window["id"])
-                get_current_group(qtile).layout.current = window
-                logger.debug("layout.focus")
-                get_current_group(qtile).layout.focus(window)
-                break
-        else:
-            #'/usr/sbin//systemd-run --user --slice=browser.slice surf "https://calendar.google.com/calendar/b/%s/" '
-            #'firefox --new-window  --kiosk "https://calendar.google.com/calendar/b/%s/"  -P %s' %
-            cmd = (
-                #'/usr/sbin//systemd-run --user --slice=browser.slice '
-                '/usr/sbin/brave --app="https://calendar.google.com/calendar/b/%s/" --profile-directory=%s'
-                % (
-                    selected,
-                    inboxes[selected]["profile"],
-                )
-            )
-
-            logger.debug(cmd)
-            qtile.spawn(cmd)
-
-    except:
-        logger.exception("error list_calendars")
-
-
 def dmenu_web(qtile):
     group = "monit"
     try:
