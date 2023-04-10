@@ -107,6 +107,8 @@ default_config = {
         "discord": None,
         "electrum": None,
         "bitcoin-qt": None,
+        "pavucontrol-qt": None,
+        "qpwgraph": None,
         # "kdeconnect-app": None,
         # "pasystray": None,
         "antimicrox --tray": None,

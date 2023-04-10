@@ -121,16 +121,6 @@ def get_dgroups():
             static=True,
             break_on_match=True,
         ),
-        Rule(
-            Match(
-                wm_class="pavucontrol-qt",
-                wm_instance_class="pavucontrol-qt",
-            ),
-            float=True,
-            sticky=True,
-            # static=True,
-            break_on_match=True,
-        ),
     ]
 
 
@@ -243,6 +233,24 @@ def generate_groups(num_groups, layouts):
                 matches=[
                     Match(wm_class=["emacs"]),
                     Match(wm_class=["jetbrains-studio"]),
+                ],
+            ),
+            "audio": dict(
+                screen_affinity=PRIMARY_SCREEN,
+                persist=True,
+                matches=[
+                    Match(wm_class=["pavucontrol-qt"]),
+                    Match(wm_class=["qpwgraph"]),
+                    Match(wm_class=["spotify"]),
+                ],
+            ),
+            "crypto": dict(
+                screen_affinity=SECONDARY_SCREEN,
+                persist=True,
+                matches=[
+                    Match(wm_class=["electrum"]),
+                    Match(wm_class=["monero-wallet-gui"]),
+                    Match(wm_class=["bitcoin-qt"]),
                 ],
             ),
         }

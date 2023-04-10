@@ -3,7 +3,7 @@ from libqtile.layout.max import Max as QMax
 from libqtile.command.base import expose_command
 from taqtile.log import logger
 
-# logger = logging.getLogger(__name__)
+logger = logging.getLogger("taqtile")
 
 
 class Max(QMax):

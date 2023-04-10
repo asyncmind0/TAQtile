@@ -329,6 +329,7 @@ def get_keys(mod, num_groups, num_monitors):
         # Switch groups
         ([], "F1", lazy.function(SwitchToScreenGroup("work"))),
         ([], "F2", lazy.function(SwitchToScreenGroup("home"))),
+        ([], "F3", lazy.function(SwitchToScreenGroup("audio"))),
         ([], "F6", lazy.function(SwitchToScreenGroup("slack"))),
         ([mod], "F6", lazy.function(list_bluetooth)),
         (
@@ -336,13 +337,6 @@ def get_keys(mod, num_groups, num_monitors):
             "F7",
             lazy.function(
                 SwitchToScreenGroup("webcon", preferred_screen=SECONDARY_SCREEN)
-            ),
-        ),
-        (
-            [],
-            "F3",
-            lazy.function(
-                SwitchToScreenGroup("social", preferred_screen=SECONDARY_SCREEN)
             ),
         ),
         (
