@@ -18,21 +18,6 @@ import logging
 
 logger = logging.getLogger("taqtile")
 
-pulse = None
-
-
-def get_pulse():
-    global pulse
-    try:
-        pulse = pulsectl.Pulse("volume-adjustment")
-    except:
-        logger.error("Failed to connect to pulseaudio")
-    return pulse
-
-
-pulse = get_pulse()
-mixer = alsaaudio.Mixer()
-
 
 def tick0(duration=0.01, volume=0.5):
     # Calculate the time values for the waveform
@@ -232,34 +217,39 @@ def play_sound(filename):
 
 def get_current_volume():
     current_volumes = []
-
-    sinks = pulse.sink_list()
-    for sink in sinks:
-        current_volumes.append(sink.volume.value_flat)
-    return max(current_volumes)
+    with pulsectl.Pulse("volume-adjustment") as pulse:
+        sinks = pulse.sink_list()
+        for sink in sinks:
+            current_volumes.append(sink.volume.value_flat)
+    return int(max(current_volumes) * 100)
 
 
 def change_sink_volume(qtile, increment):
-    sinks = pulse.sink_list()
-    new_volumes = [
-        max(min(sink.volume.value_flat + increment, 1.0), 0.0) for sink in sinks
-    ]
-    for sink, new_volume in zip(sinks, new_volumes):
-        pulse.volume_set_all_chans(sink, new_volume)
-    current_volume = mixer.getvolume()[0]  # get the current volume
-    new_volume = max(min(current_volume + int(increment * 100), 100), 0)
-    mixer.setvolume(new_volume)  # set the volume
-    check_output(
-        [
-            "dunstify",
-            "-t",
-            "1000",
-            "-r",
-            "1999990",
-            f"Volume:  {int(get_current_volume() * 100)} {new_volume}",
+    with pulsectl.Pulse("volume-adjustment") as pulse:
+        sinks = pulse.sink_list()
+        new_volumes = [
+            max(min(sink.volume.value_flat + increment, 1.0), 0.0)
+            for sink in sinks
         ]
-    )
-    play_effect("volume_dial")
+        for sink, new_volume in zip(sinks, new_volumes):
+            pulse.volume_set_all_chans(sink, new_volume)
+        # mixer = alsaaudio.Mixer()
+        # current_volume = mixer.getvolume()[0]  # get the current volume
+        # new_volume = max(min(current_volume + int(increment * 100), 100), 0)
+        # mixer.setvolume(new_volume)  # set the volume
+        check_output(
+            [
+                "dunstify",
+                "-a",
+                "qtile",
+                "-t",
+                "1000",
+                "-r",
+                "1999990",
+                f"Volume:  {get_current_volume()}",
+            ]
+        )
+        play_effect("volume_dial")
 
 
 @subscribe.setgroup
@@ -303,11 +293,6 @@ def set_group(client):
     threading.Thread(target=drums.hihat_open0, args=()).start()
 
 
-def mute():
-    for sink in pulse.sink_list():
-        pulse.mute(sink, not sink.mute)
-
-
 def set_all_volume(volume):
     with pulsectl.Pulse("volume-adjustment") as pulse:
         sinks = pulse.sink_list()
@@ -316,19 +301,22 @@ def set_all_volume(volume):
 
 
 def volume_mute(qtile):
-    for sink in pulse.sink_list():
-        pulse.mute(sink, not sink.mute)
-    # check_output(["amixer", "-q", "sset", "Master", "toggle"])
+    with pulsectl.Pulse("volume-adjustment") as pulse:
+        for sink in pulse.sink_list():
+            pulse.mute(sink, not sink.mute)
     check_output(
         [
             "dunstify",
+            "-a",
+            "qtile",
             "-t",
             "1000",
             "-r",
             "1999990",
-            "Volume: %s" % get_current_volume(),
+            "Volume: %s" % ("Muted" if sink.mute else get_current_volume()),
         ]
     )
+    play_effect("thud")
 
 
 @subscribe.startup
