@@ -1,4 +1,5 @@
 import os
+import logging
 import re
 from datetime import datetime
 from functools import lru_cache
@@ -19,7 +20,6 @@ from libqtile.backend import base
 # from libqtile.extension.window_list import WindowList
 from plumbum import local
 
-from taqtile.log import logger
 from taqtile.recent_runner import RecentRunner
 from taqtile.system import (
     get_current_window,
@@ -32,6 +32,8 @@ from taqtile.system import (
 from taqtile.groups import Rule, Match
 from taqtile import sounds
 
+logger = logging.getLogger("taqtile")
+
 
 @hook.subscribe.client_new
 def set_timestamp(window):
@@ -41,52 +43,47 @@ def set_timestamp(window):
 
 
 class WindowList(QWindowList):
-    def list_windows(self):
-        id = 0
-        self.item_to_win = {}
+    show_icons = True
 
-        if self.all_groups:
-            windows = [
-                w
-                for w in self.qtile.windows_map.values()
-                if isinstance(w, base.Window)
-            ]
+    def __init__(self, **config):
+        config["markup"] = True
+        super().__init__(**config)
+
+    def _configure(self, qtile):
+        super()._configure(qtile)
+        # insert as second item in the list
+        # self.configured_command.insert(1, "-markup")
+        if self.show_icons:
+            self.configured_command.insert(1, "-show-icons")
+            self.configured_command.insert(2, "-icon-theme")
+            self.configured_command.insert(3, "breeze-dark")
+        logger.debug(f"configured_command: {self.configured_command}")
+
+    def format_item(self, win, key):
+        icon = ""
+        if win.window.get_wm_class()[0] == "st":
+            icon = "utilities-terminal"
         else:
-            windows = self.qtile.current_group.windows
-
-        for win in windows:
-            if win.group and not isinstance(win.group, ScratchPad):
-                item = self.item_format.format(
-                    group=win.group.label or win.group.name,
-                    id=id,
-                    window=win.name,
-                )
-                if win.window.get_wm_class()[0] == "qutebrowser":
-                    item = f"🌏 {item}"
-                elif win.window.get_wm_class()[0] == "st":
-                    item = f"👽 {item}"
-                self.item_to_win[item] = win
-                id += 1
+            icon = win.window.get_wm_class()[0].lower()
+        return f" {key}\0icon\x1f{icon}"
 
     def run(self):
         self.list_windows()
         window_list = []
-        for key, item in self.item_to_win.items():
-            created = item.window.get_property(
+        for key, win in self.item_to_win.items():
+            created = win.window.get_property(
                 "QTILE_CREATED", type="ATOM", unpack=int
             )
             if created:
                 created = created[0]
-            window_list.append((created, key))
-
-            logger.debug(f"window_list: {item} {created}")
+            window_list.append((created, self.format_item(win, key)))
         prompt = self.configured_command[
             self.configured_command.index("-p") + 1
         ]
         self.configured_command[
             self.configured_command.index("-p") + 1
         ] = "[%s]:" % (len(window_list))
-        sounds.bong()
+        sounds.play_effect("window_list")
         out = Dmenu.run(
             self,
             items=[
@@ -96,11 +93,11 @@ class WindowList(QWindowList):
         )
 
         try:
-            sout = [x for x in out.split("\n") if x.strip()]
+            sout = [x.strip() for x in out.split("\n") if x.strip()]
             if len(sout) > 1:
                 out = Dmenu.run(
                     self,
-                    items=["kill"],
+                    items=["kill", "move to group"],
                 ).strip()
                 if out == "kill":
                     for win in sout:
@@ -498,12 +495,14 @@ class WindowGroupList(Dmenu):
         screen = self.qtile.current_screen
 
         try:
-            sout = out.rstrip("\n")
+            sout = out.strip()
         except AttributeError:
             # out is not a string (for example it's a Popen object returned
             # by super(WindowList, self).run() when there are no menu items to
             # list
             screen.set_group(self.GROUP)
+            return
+        if not out:
             return
 
         if not sout.startswith("*"):
