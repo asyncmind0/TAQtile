@@ -11,6 +11,7 @@ default_theme = dict(
     font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
     # font="Inconsolata", font="Hack", # font="ProggySquareTTSZ", #
     # font="pango:monospace",
+    # font="Terminus",
     borderwidth=1,
     bar_height=24,
     dmenu_lines=30,  #
@@ -19,6 +20,7 @@ default_theme = dict(
     background_urgent="#ff007f",
 )
 
+# generate a rofi theme matching qtile colors below
 star_trek_blue = dict(
     # padding=1,
     border="#5981B9",
@@ -28,6 +30,7 @@ star_trek_blue = dict(
     border_normal="#0000A0",
     foreground="#06B4E7",
     background="#010F2C",
+    # convert to rgba notation
     background_alt="#010F2C",
     hl_foreground="#FFFFFF",
     hl_background="#011846",
@@ -89,8 +92,8 @@ rofi_options = (
 def dmenu_cmd_args(**overrides):
     opts = dict(current_theme)
     opts.update(overrides)
-    return dmenu_options % opts
-    # return rofi_options
+    # return dmenu_options % opts
+    return rofi_options
 
 
 def default_params(**kwargs):
