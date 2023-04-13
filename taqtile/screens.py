@@ -44,7 +44,7 @@ from taqtile.widgets.togglebtn import ToggleButton
 # from taqtile.widgets.priority_notify import PriorityNotify
 
 
-log = logging.getLogger("qtile")
+logger = logging.getLogger("taqtile")
 
 PRIMARY_SCREEN = system.get_screen(0)
 SECONDARY_SCREEN = system.get_screen(1)
@@ -125,9 +125,7 @@ def get_screens(num_monitors, groups):
     memgraph_params["fill_color"] = "80FF00.3"
     memgraph_params["type"] = "linefill"
     netgraph_params = dict(graph_defaults)
-    sep_params = default_params(
-        size_percent=100, padding=8, fontsize=9, linewidth=1
-    )
+    sep_params = default_params(size_percent=100, padding=8, linewidth=1)
     graph_label_defaults = dict(
         margin=0,
         padding_x=0,
@@ -311,8 +309,8 @@ def get_screens(num_monitors, groups):
         CalClock(timezone=localtimezone, **clock_params),
     ]
 
-    clock_text = default_params(fontsize=12)
-    wclock_params = default_params(padding=2, format="%a %H:%M", fontsize=12)
+    clock_text = default_params()
+    wclock_params = default_params(padding=2, format="%a %H:%M")
 
     def make_clock_bar():
         timezones = [
