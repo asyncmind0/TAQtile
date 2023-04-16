@@ -10,6 +10,12 @@ class WindowName(QWindowName):
     defaults = [
         ("focused_background", "#FF0000", "Focused background colour."),
         ("focused_foreground", "#000000", "Focused foreground colour."),
+        ("use_mouse_wheel", True, "Whether to use mouse wheel events"),
+        (
+            "invert_mouse_wheel",
+            False,
+            "Whether to invert mouse wheel group movement",
+        ),
     ]
 
     def __init__(self, **config):
@@ -17,6 +23,25 @@ class WindowName(QWindowName):
         self.add_defaults(WindowName.defaults)
         self.default_background = self.background
         self.default_foreground = self.foreground
+        default_callbacks = {}
+        if self.use_mouse_wheel:
+            default_callbacks.update(
+                {
+                    "Button5"
+                    if self.invert_mouse_wheel
+                    else "Button4": self.prev_window,
+                    "Button4"
+                    if self.invert_mouse_wheel
+                    else "Button5": self.next_window,
+                }
+            )
+        self.add_callbacks(default_callbacks)
+
+    def next_window(self):
+        self.qtile.current_group.next_window()
+
+    def prev_window(self):
+        self.qtile.current_group.prev_window()
 
     def _configure(self, qtile, bar):
         super()._configure(qtile, bar)
