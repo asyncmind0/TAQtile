@@ -15,6 +15,8 @@ import pulsectl
 import alsaaudio
 import simpleaudio as sa
 import logging
+from taqtile.utils import send_notification
+
 
 logger = logging.getLogger("taqtile")
 
@@ -237,17 +239,9 @@ def change_sink_volume(qtile, increment):
         # current_volume = mixer.getvolume()[0]  # get the current volume
         # new_volume = max(min(current_volume + int(increment * 100), 100), 0)
         # mixer.setvolume(new_volume)  # set the volume
-        check_output(
-            [
-                "dunstify",
-                "-a",
-                "qtile",
-                "-t",
-                "1000",
-                "-r",
-                "1999990",
-                f"Volume:  {get_current_volume()}",
-            ]
+        send_notification(
+            "Volume",
+            str(get_current_volume()),
         )
         play_effect("volume_dial")
 
@@ -304,17 +298,9 @@ def volume_mute(qtile):
     with pulsectl.Pulse("volume-adjustment") as pulse:
         for sink in pulse.sink_list():
             pulse.mute(sink, not sink.mute)
-    check_output(
-        [
-            "dunstify",
-            "-a",
-            "qtile",
-            "-t",
-            "1000",
-            "-r",
-            "1999990",
-            "Volume: %s" % ("Muted" if sink.mute else get_current_volume()),
-        ]
+    send_notification(
+        "Volume",
+        ("Muted" if sink.mute else str(get_current_volume())),
     )
     play_effect("thud")
 

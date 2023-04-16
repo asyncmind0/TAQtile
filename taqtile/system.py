@@ -12,9 +12,9 @@ from os.path import expanduser
 from plumbum import local
 import os
 import psutil
-import notify2
 
 from taqtile.log import logger
+from taqtile.utils import send_notification
 from guppy import hpy
 
 
@@ -293,10 +293,4 @@ def show_process_stats(qtile):
     {h.heap()}
     """
     logger.info(message)
-    send_notification(message)
-
-
-def send_notification(message):
-    notify2.init("qtile")
-    n = notify2.Notification("qtile stats", message)
-    n.show()
+    send_notification("stats", message)

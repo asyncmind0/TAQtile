@@ -49,6 +49,7 @@ from taqtile.system import get_hostconfig, show_process_stats
 from taqtile.themes import current_theme, dmenu_cmd_args
 from taqtile.sounds import play_effect, change_sink_volume, volume_mute
 from libqtile import hook
+from taqtile.utils import send_notification
 
 
 re_vol = re.compile(r"\[(\d?\d?\d?)%\]")
@@ -92,30 +93,17 @@ class Key(QKey):
 
 def brightness_cmd(qtile, cmd):
     check_output(shlex.split(cmd))
-    check_output(
-        [
-            "dunstify",
-            "-t",
-            "1000",
-            "-r",
-            "1999990",
-            "Brightness: %s"
-            % check_output(["xbacklight", "-get"]).decode().strip(),
-        ]
+    send_notification(
+        "Brighness",
+        check_output(["xbacklight", "-get"]).decode().strip(),
     )
 
 
 def switch_window(qtile, cmd):
     getattr(qtile.current_layout, cmd)()
-    check_output(
-        [
-            "dunstify",
-            "-t",
-            "1000",
-            "-r",
-            "1999990",
-            "Window: %s" % qtile.current_window.name,
-        ]
+    send_notification(
+        "Window",
+        qtile.current_window.name,
     )
 
 
@@ -126,20 +114,13 @@ def touchpad_toggle(qtile):
         check_output(["synclient", "TouchpadOff=0"])
     else:
         check_output(["synclient", "TouchpadOff=1"])
-    check_output(
-        [
-            "dunstify",
-            "-t",
-            "1000",
-            "-r",
-            "1999990",
-            "Touch Pad %s" % ("On" if touchpad_state else "Off"),
-        ]
+    send_notification(
+        "Touch Pad",
+        ("On" if touchpad_state else "Off"),
     )
 
 
 def list_keys(qtile, *args):
-
     from config import keys
 
     selected = dmenu_show(

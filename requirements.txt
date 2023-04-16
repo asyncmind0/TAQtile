@@ -4,7 +4,6 @@ pulsectl
 pyalsaaudio
 pydub
 simpleaudio
-notify2
 guppy3
 multitimer
 demnu
