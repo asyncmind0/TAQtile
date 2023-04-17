@@ -37,10 +37,14 @@ except:
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
 # _terminal = "alacritty -t {0} "
-_terminal = (
-    'st -f "%(terminal_font)s:pixelsize=%(terminal_fontsize)s" -t "{0}" -c st '
-    % current_theme
-)
+def get_terminal_command(
+    title="st",
+    window_class="st",
+    terminal_font=current_theme.get("terminal_font", None),
+    terminal_fontsize=current_theme.get("terminal_fontsize", None),
+):
+    return f'st -f "{terminal_font}:pixelsize={terminal_fontsize}" -t "{title}" -c {window_class} '
+
 
 # _terminal = "alacritty -t {0} "
 # _terminal = "kitty --name {0} --title {0} "
@@ -48,7 +52,7 @@ _terminal = (
 
 def terminal_tmux(level, session):
     return "{0} -e {1} -w {2} {3} {4}".format(
-        _terminal.format(session),
+        get_terminal_command(title=session),
         expanduser("~/.local/bin/tmux.py"),
         expanduser("~/.tmux/configs/default.yml"),
         level,
@@ -56,8 +60,8 @@ def terminal_tmux(level, session):
     )
 
 
-def terminal(title, cmd=None):
-    term = _terminal.format(title)
+def terminal(title, window_class="st", cmd=None):
+    term = get_terminal_command(title=title, window_class=window_class)
     if cmd:
         term += "-e %s" % cmd
     return term

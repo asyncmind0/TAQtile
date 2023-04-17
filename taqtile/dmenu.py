@@ -5,7 +5,7 @@ import re
 import shlex
 from os.path import isdir, join, pathsep, dirname
 
-from plumbum.cmd import dmenu, pactl
+from plumbum.cmd import dmenu, pactl, recordmydesktop
 
 from taqtile.log import logger
 from taqtile.recent_runner import RecentRunner
@@ -266,3 +266,8 @@ def switch_pulse_outputs(qtile):
         clients[client]["index"],
         sinks[sink],
     )
+
+
+def record_window(qtile):
+    qtile.current_window.id
+    record_window()

@@ -307,4 +307,4 @@ def volume_mute(qtile):
 
 @subscribe.startup
 def startup():
-    threading.Thread(target=set_all_volume, args=(0.3)).start()
+    threading.Thread(target=set_all_volume, args=(0.3,)).start()

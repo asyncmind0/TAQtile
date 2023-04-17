@@ -76,8 +76,11 @@ def move_win():
     from libqtile import qtile
 
     for w in win_list:
-        w.togroup(qtile.current_group.name)
-        w.focus()
+        try:
+            w.togroup(qtile.current_group.name)
+            w.focus()
+        except ValueError:
+            pass
 
 
 class Key(QKey):
@@ -259,7 +262,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "o", lazy.function(dmenu_org)),
         # ([mod], "f5", lazy.spawn('st -t {0} -e {0}'.format('ncmpcpp'))),
         ([mod], "r", lazy.spawncmd()),
-        ([mod], "Return", lazy.spawn(terminal("st"))),
+        ([mod], "Return", lazy.spawn(terminal("st", window_class="shrapnel"))),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         # ([mod, "shift"], "b", lazy.spawn("google-chrome-stable")),
         (

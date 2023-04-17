@@ -36,6 +36,9 @@ from taqtile.widgets.gpu import GPU
 from taqtile.widgets.exchange import ExchangeRate
 
 from taqtile.widgets.togglebtn import ToggleButton
+from taqtile.sounds.wireplumber import AppMonitorButton
+from taqtile.widgets.discordstatus import DiscordStatusWidget
+from taqtile.widgets.screenrec import ScreenRecord
 
 
 # from widgets.bankbalance import BankBalance
@@ -54,7 +57,7 @@ QUATERNARY_SCREEN = system.get_screen(3)
 try:
     localtimezone = check_output(["tzupdate", "-p", "-s", "5"]).decode().strip()
 except:
-    log.exception("Failed to automatically set timezone")
+    logger.exception("Failed to automatically set timezone")
     localtimezone = "Australia/Sydney"
 
 
@@ -83,7 +86,8 @@ def get_screens(num_monitors, groups):
     windowname_params = default_params(padding=4)
     systray_params = default_params(icon_size=16)
     clock_params = default_params(
-        padding=2, format="%Y-%m-%d %a %H:%M", fontsize=12
+        padding=2,
+        format="%Y-%m-%d %a %H:%M",
     )
     pacman_params = default_params()
     notify_params = default_params()
@@ -234,6 +238,16 @@ def get_screens(num_monitors, groups):
         # TaskList2(**tasklist_params),
         WindowName(**windowname_params),
         Sep(**sep_params),
+        ScreenRecord("REC", **default_params()),
+        Sep(**sep_params),
+        DiscordStatusWidget(
+            update_interval=60,
+            bot_token="MTA5NTcwNDc0OTc5OTY0MTA4OA.G01ADH.aCnPOok02YlRENCgqhZmlZaLkFgIiC5hK_oFeY",
+            user_id="asyncmind#4110",
+        ),
+        Sep(**sep_params),
+        AppMonitorButton(format="[{state}]"),
+        Sep(**sep_params),
         ToggleButton(
             "dunst",
             active_text="<span color='green'>\uf0f3</span>",
@@ -371,5 +385,5 @@ def get_screens(num_monitors, groups):
             bottom=Bar(make_clock_bar(), **default_params()),
         )
     screens = [screens[y] for y in sorted(screens.keys())]
-    log.error("Screens: %s ", screens)
+    logger.error("Screens: %s ", screens)
     return screens

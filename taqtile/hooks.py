@@ -1,5 +1,5 @@
 from __future__ import print_function
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import os
 from os.path import splitext, basename
@@ -9,7 +9,6 @@ from subprocess import check_output
 from libqtile import hook
 from plumbum import local
 
-from taqtile.log import logger
 from taqtile.extra import float_to_front
 from taqtile.system import (
     get_hostconfig,
@@ -18,6 +17,12 @@ from taqtile.system import (
     hdmi_connected,
     get_windows_map,
 )
+import psutil, os, time
+import multitimer
+import logging
+
+
+logger = logging.getLogger("taqtile")
 
 
 notify_send = local["notify-send"]
@@ -26,6 +31,37 @@ notify_send = local["notify-send"]
 num_monitors = get_num_monitors()
 prev_timestamp = 0
 prev_state = hdmi_connected()
+
+
+NOAUTOCLOSE = []
+REAP_INCLUDE_PATTERNS = []
+
+
+def close_old_windows():
+    from libqtile import qtile
+
+    logger.debug("checking for windows to reap")
+
+    for key, win in qtile.windows_map.items():
+        proc = psutil.Process(win.get_pid())
+        created = datetime.fromtimestamp(proc.create_time())
+        logger.debug(
+            f"window {win.name} created on {created}, diff {(datetime.utcnow() - created)}"
+        )
+        try:
+            if abs(datetime.now() - created) > timedelta(days=1):
+                logger.error(f"Old window found: {key}:{win.name}")
+                for pattern in REAP_INCLUDE_PATTERNS:
+                    if not re.match(pattern, win.name):
+                        continue
+
+                if key not in NOAUTOCLOSE:
+                    logger.error(f"Old window marked for kill: {key}")
+        except:
+            logger.exception("Error reaping windows")
+
+
+WINDOW_REAPER_THREAD = multitimer.MultiTimer(5, close_old_windows)
 
 
 # @hook.subscribe.screen_change
@@ -52,6 +88,8 @@ def dialogs(window):
 
 @hook.subscribe.startup
 def startup():
+    global WINDOW_REAPER_THREAD
+    WINDOW_REAPER_THREAD.start()
     errored = False
     try:
         # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
@@ -97,7 +135,7 @@ def dbus_register():
         logger.exception("error in dbus_register")
 
 
-# @hook.subscribe.client_managed
+@hook.subscribe.client_managed
 def rules_shrapnel(client):
     client_name = client.window.get_name()
     if client_name == "shrapnel":
