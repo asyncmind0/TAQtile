@@ -18,8 +18,13 @@ from taqtile.utils import send_notification
 from guppy import hpy
 
 
-def passstore(path):
-    return subprocess.check_output(["pass", path]).strip().decode("utf8")
+def passstore(path, raise_exception=True):
+    try:
+        return subprocess.check_output(["pass", path]).strip().decode("utf8")
+    except:
+        if raise_exception:
+            raise
+        logger.exception(f"error fetching from pass {path}")
 
 
 # TODO https://confuse.readthedocs.io/en/latest/
@@ -218,11 +223,8 @@ def execute_once(
     process_filter = process_filter or cmd[0]
     pid = None
     try:
-        pid = local["pgrep"]("-f", process_filter)
-        pid.wait()
+        pid = local["pgrep"]("-f", process_filter).strip()
     except Exception as e:
-        logger.error("Not running: %s:%s", process_filter, e)
-    if not pid:
         logger.info("process not running: %s", process_filter)
         if window_regex and window_exists(qtile, window_regex):
             assert not toggle, "cannot toggle no pid"
@@ -234,9 +236,6 @@ def execute_once(
             logger.info("Started: %s: %s", cmd, pid)
         except Exception as e:
             logger.exception("Error running %s", cmd)
-    elif toggle:
-        logger.debug("Kill process: %s", process_filter)
-        os.kill(int(pid), signal.SIGKILL)
     else:
         logger.debug("Not Starting: %s", cmd)
 
