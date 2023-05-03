@@ -23,7 +23,7 @@ from taqtile.layouts import Max
 log_file_path = expanduser("~/.local/share/qtile/qtile.taqtile.log")
 handler = logging.FileHandler(log_file_path)
 formatter = logging.Formatter(
-    "%(asctime)s %(levelname)s [%(name)s] %(message)s"
+    "%(asctime)s %(levelname)s [%(name)s] [%(module)s] %(message)s"
 )
 handler.setFormatter(formatter)
 
