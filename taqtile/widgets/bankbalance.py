@@ -10,6 +10,7 @@ from libqtile.widget import base
 from taqtile.log import logger
 
 from .bank import CommBank
+from libqtile.utils import send_notification
 
 
 class BankBalance(base.ThreadedPollText):
@@ -104,9 +105,8 @@ class BankBalance(base.ThreadedPollText):
         return str(text)
 
     def button_press(self, x, y, button):
-        subprocess.check_output(
-            "notify-send %s"
-            % str(
+        send_notification(
+            str(
                 subprocess.check_output(
                     [
                         "python",

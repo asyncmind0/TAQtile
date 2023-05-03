@@ -26,13 +26,9 @@ from taqtile.system import (
 from time import sleep
 from threading import Thread
 from libqtile.command import lazy
+from libqtile.utils import send_notification
 
 from taqtile.log import logger
-
-try:
-    import notify2
-except:
-    pass
 
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
@@ -337,12 +333,11 @@ def show_mail(qtile):
         for mbox, query in queries.items():
             query = db.create_query(query)
             message.append("%s: %s" % (mbox, query.count_messages()))
-        notification = notify2.Notification(
+        send_notification(
             "Mail",
             "<br>".join(message),
             # icon=user_icon
         )
-        notification.show()
     except Exception:
         logger.exception("Error querying notmuch")
 
