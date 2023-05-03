@@ -17,6 +17,8 @@ logger = logging.getLogger("taqtile")
 @subscribe.client_name_updated
 def trigger_dgroups(client):
     accounts = get_hostconfig("browser_accounts", {})
+    if not client.name:
+        return
     if "WhatsApp - web.whatsapp.com" in client.name:
         client.togroup("webcon")
         return

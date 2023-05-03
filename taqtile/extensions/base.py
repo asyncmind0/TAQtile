@@ -104,8 +104,10 @@ class WindowList(QWindowList):
                         win = self.item_to_win[win]
                         win.kill()
                 return
-            else:
+            elif sout and len(sout) == 1:
                 sout = sout[0]
+            else:
+                return
 
         except AttributeError:
             # out is not a string (for example it's a Popen object returned
