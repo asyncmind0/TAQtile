@@ -169,9 +169,9 @@ def get_keys(mod, num_groups, num_monitors):
         # ([mod], "j", lazy.layout.down()),
         # Move windows up or down in current stack
         ([mod, "shift"], "k", lazy.layout.shuffle_up(), "Shuffle Up"),
-        ([mod], "Up", lazy.layout.up()),
+        ([mod], "Up", lazy.layout.previous()),
         ([mod, "shift"], "j", lazy.layout.shuffle_down()),
-        ([mod], "Down", lazy.layout.down()),
+        ([mod], "Down", lazy.layout.next()),
         ([mod, "shift"], "h", lazy.layout.client_to_previous().when("stack")),
         ([mod, "shift"], "l", lazy.layout.client_to_next().when("stack")),
         ([mod], "h", lazy.group.prev_window()),
@@ -262,7 +262,11 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "o", lazy.function(dmenu_org)),
         # ([mod], "f5", lazy.spawn('st -t {0} -e {0}'.format('ncmpcpp'))),
         ([mod], "r", lazy.spawncmd()),
-        ([mod], "Return", lazy.spawn(terminal("st", window_class="shrapnel"))),
+        (
+            [mod],
+            "Return",
+            lazy.spawn(terminal("shrapnel", window_class="shrapnel")),
+        ),
         ([mod, "shift"], "b", lazy.spawn("conkeror")),
         # ([mod, "shift"], "b", lazy.spawn("google-chrome-stable")),
         (
@@ -314,6 +318,7 @@ def get_keys(mod, num_groups, num_monitors):
         ([], "F1", lazy.function(SwitchToScreenGroup("work"))),
         ([], "F2", lazy.function(SwitchToScreenGroup("home"))),
         ([], "F3", lazy.function(SwitchToScreenGroup("audio"))),
+        ([], "F4", lazy.function(SwitchToScreenGroup("crypto"))),
         ([], "F6", lazy.function(SwitchToScreenGroup("slack"))),
         ([mod], "F6", lazy.function(list_bluetooth)),
         (

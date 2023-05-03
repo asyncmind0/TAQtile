@@ -37,8 +37,11 @@ from taqtile.widgets.exchange import ExchangeRate
 
 from taqtile.widgets.togglebtn import ToggleButton
 from taqtile.sounds.wireplumber import AppMonitorButton
-from taqtile.widgets.discordstatus import DiscordStatusWidget
+
+# from taqtile.widgets.discordstatus import DiscordStatusWidget
 from taqtile.widgets.screenrec import ScreenRecord
+
+from taqtile.widgets.live import VoiceInputStatusWidget
 
 
 # from widgets.bankbalance import BankBalance
@@ -213,9 +216,9 @@ def get_screens(num_monitors, groups):
         Spotify(**default_params()),
         # Sep(**sep_params),
         # Visualiser(**default_params()),
-        # Sep(**sep_params),
+        Sep(**sep_params),
         # Syncthing(
-        #    api_key=system.passstore("/syncthing/threadripper0/apikey"),
+        #    api_key=system.passstore("/syncthing/threadripper0/apikey", False),
         #    **default_params()
         # ),
         CalClock(timezone=localtimezone, **clock_params),
@@ -238,13 +241,21 @@ def get_screens(num_monitors, groups):
         # TaskList2(**tasklist_params),
         WindowName(**windowname_params),
         Sep(**sep_params),
+        VoiceInputStatusWidget(
+            "live",
+            active_text="Live \uf130",
+            active_background="#aa0000",
+            inactive_text="\uf130",
+            **default_params()
+        ),
+        Sep(**sep_params),
         ScreenRecord("REC", **default_params()),
         Sep(**sep_params),
-        DiscordStatusWidget(
-            update_interval=60,
-            bot_token="MTA5NTcwNDc0OTc5OTY0MTA4OA.G01ADH.aCnPOok02YlRENCgqhZmlZaLkFgIiC5hK_oFeY",
-            user_id="asyncmind#4110",
-        ),
+        # DiscordStatusWidget(
+        #    update_interval=60,
+        #    bot_token=system.passstore("internet/discord/bot_token", False),
+        #    user_id="asyncmind#4110",
+        # ),
         Sep(**sep_params),
         AppMonitorButton(format="[{state}]"),
         Sep(**sep_params),
@@ -274,7 +285,7 @@ def get_screens(num_monitors, groups):
         ),
         Sep(**sep_params),
         TextBox("\U0001F50A", **default_params()),
-        Volume(update_interval=1, **default_params()),
+        # Volume(update_interval=1, **default_params()),
         Sep(**sep_params),
         ExchangeRate(
             from_currency="AUD", to_currency="XMR", update_interval=60
