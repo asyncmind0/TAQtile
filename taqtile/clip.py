@@ -1,13 +1,16 @@
 from __future__ import print_function
-import shlex
-from taqtile.themes import dmenu_cmd_args
-import logging
-import os
-from os.path import join
+
 import json
-from plumbum import local
-from taqtile.log import logger
+import os
+import shlex
 import subprocess
+from os.path import join
+
+from plumbum import local
+
+from taqtile.log import logger
+from taqtile.themes import dmenu_cmd_args
+
 
 use_selection = "CLIPBOARD"
 blacklist = []
@@ -107,22 +110,4 @@ def dmenu_xclip(qtile, args):
     clips = [y.strip() for y in [x[1] for x in history] if y]
     logger.info("Clips %s", clips)
     clipmenu = local["clipmenu"]
-    dmenu_args = shlex.split(dmenu_cmd_args())
-    selected = clipmenu(*dmenu_args)
-    # selected = dmenu_show("Clips:", clips)
-    if not selected:
-        return
-    logger.info(selected)
-
-    copy_xclip(selected, True)
-    copy_xclip(selected, False)
-
-    # command = (echo['\n'.join(reversed(history))] | dmenu[args])(retcode=None)
-    outf = os.popen("xclip -selection secondary\n\n", "w")
-    outf.write(selected)
-    outf.close()
-    outf = os.popen("xclip -selection primary\n\n", "w")
-    outf.write(selected)
-    outf.close()
-    # (echo[selected] | xclip['-i', '-selection', 'primary'])()
-    # (echo[command] | xclip['-i', '-selection', 'secondary'])()
+    clipmenu("-c", "-i", "-p", "Clipmenu")
