@@ -88,6 +88,13 @@ def get_dgroups():
         ),
         Rule(
             Match(
+                title="shrapnel",
+            ),
+            float=True,
+            break_on_match=False,
+        ),
+        Rule(
+            Match(
                 wm_class=[re.compile("^crx_.*")],
                 wm_instance_class=[re.compile("^crx_.*")],
             ),
@@ -171,10 +178,11 @@ def generate_groups(num_groups, layouts):
                 persist=True,
                 matches=[
                     Match(
+                        title=[re.compile(r".*\[work\].*", re.I)],
                         wm_instance_class=[
                             "chromium (~/.config/chromium.work)",
                             "chromium (/home/steven/.config/chromium.work)",
-                        ]
+                        ],
                     ),
                 ],
             ),
