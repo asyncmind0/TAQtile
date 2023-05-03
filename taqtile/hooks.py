@@ -1,15 +1,16 @@
 from __future__ import print_function
-from datetime import datetime, timedelta
 
+import logging
 import os
-from os.path import splitext, basename
+from datetime import datetime, timedelta
 from random import randint
 from subprocess import check_output
 
+import multitimer
+import psutil
 from libqtile import hook
-from plumbum import local
+from libqtile.utils import send_notification
 
-from taqtile.extra import float_to_front
 from taqtile.system import (
     get_hostconfig,
     get_num_monitors,
@@ -17,15 +18,9 @@ from taqtile.system import (
     hdmi_connected,
     get_windows_map,
 )
-import psutil, os, time
-import multitimer
-import logging
 
 
-logger = logging.getLogger("taqtile")
-
-
-notify_send = local["notify-send"]
+logger = logging.getLogger(__name__)
 
 
 num_monitors = get_num_monitors()
@@ -90,25 +85,18 @@ def dialogs(window):
 def startup():
     global WINDOW_REAPER_THREAD
     WINDOW_REAPER_THREAD.start()
-    errored = False
-    try:
-        # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
-        # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
-        commands = get_hostconfig("autostart-once") or {}
-        num_mons = get_num_monitors()
-        logger.debug("Num MONS:%s", num_mons)
-        for command, kwargs in commands.items():
-            logger.debug("executing command %s", kwargs)
+    # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
+    # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+    commands = get_hostconfig("autostart-once") or {}
+    num_mons = get_num_monitors()
+    logger.debug("Num MONS:%s", num_mons)
+    for command, kwargs in commands.items():
+        logger.debug("executing command %s", kwargs)
+        try:
             execute_once(command, **(kwargs if kwargs else {}))
-    except:
-        logger.exception("error in startup hook")
-        errored = True
-    finally:
-        if errored:
-            try:
-                notify_send("Qtile startup apps errored.")
-            except:
-                pass
+        except Exception as e:
+            logger.exception("error in startup hook")
+            send_notification("Qtile startup apps errored.", "")
 
 
 @hook.subscribe.startup
@@ -148,8 +136,7 @@ def rules_shrapnel(client):
             1,
             None,
             above=True,
-            force=True,
-        )  # , '00C000')
+        )
         client.set_opacity(0.85)
 
 
@@ -204,7 +191,7 @@ def set_group(client):
             ]:
                 continue
             if rule and rule.matches(client):
-                logger.info("Matched %s %s", rule, client)
+                logger.info(f"Matched {rule} {client}", rule, client)
                 if rule.group:
                     logger.error("to group %s", rule.group)
                     client.togroup(rule.group)
@@ -243,7 +230,7 @@ def set_group(client):
                         1,
                         None,
                         above=True,
-                        force=True,
+                        # force=True,
                     )  # , '00C000')
 
                 if rule.break_on_match:
@@ -256,12 +243,8 @@ def set_groups(qtile):
     from libqtile import qtile
 
     for client in list(get_windows_map(qtile).values()):
-        logger.debug("set_groups")
+        logger.debug(f"set_groups {client}")
         set_group(client)
-        # try:
-        #    qtile.dgroups._add(client)
-        # except:
-        #    logger.exception("error setting rules %s", client)
 
 
 # @hook.subscribe.client_urgent_hint_changed
