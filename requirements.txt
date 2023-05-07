@@ -4,8 +4,7 @@ pulsectl
 pyalsaaudio
 pydub
 simpleaudio
-guppy3
+#guppy3
 multitimer
 git+https://github.com/elParaguayo/qtile-extras.git
-demnu
 tzupdate

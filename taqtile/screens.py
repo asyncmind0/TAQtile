@@ -36,7 +36,6 @@ from taqtile.widgets.gpu import GPU
 from taqtile.widgets.exchange import ExchangeRate
 
 from taqtile.widgets.togglebtn import ToggleButton
-from taqtile.sounds.wireplumber import AppMonitorButton
 
 # from taqtile.widgets.discordstatus import DiscordStatusWidget
 from taqtile.widgets.screenrec import ScreenRecord
@@ -257,8 +256,6 @@ def get_screens(num_monitors, groups):
         #    user_id="asyncmind#4110",
         # ),
         Sep(**sep_params),
-        AppMonitorButton(format="[{state}]"),
-        Sep(**sep_params),
         ToggleButton(
             "dunst",
             active_text="<span color='green'>\uf0f3</span>",
@@ -273,9 +270,9 @@ def get_screens(num_monitors, groups):
             "aeternity_miner",
             active_text="ae ",
             inactive_text="ae ",
-            on_command="systemctl --user start aeternity-miner.service",
-            off_command="systemctl --user stop aeternity-miner.service",
-            check_state_command="systemctl --user status aeternity-miner.service",
+            on_command="systemctl --user --no-pager start aeternity-miner.service > /dev/null",
+            off_command="systemctl --user --no-pager stop aeternity-miner.service >/dev/null",
+            check_state_command="systemctl --user --no-pager status aeternity-miner.service >/dev/null",
         ),
         Sep(**sep_params),
         ToggleButton(

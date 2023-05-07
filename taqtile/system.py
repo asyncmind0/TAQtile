@@ -15,7 +15,6 @@ import psutil
 
 from taqtile.log import logger
 from taqtile.utils import send_notification
-from guppy import hpy
 
 
 def passstore(path, raise_exception=True):
@@ -283,6 +282,7 @@ def show_process_stats(qtile):
     mem_info = p.memory_info()
     rss = mem_info.rss / 1024 / 1024  # convert to MB
     vms = mem_info.vms / 1024 / 1024  # convert to MB
+    from guppy import hpy
     h = hpy()
     message = f"""
     Process ID: {pid}
