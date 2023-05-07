@@ -47,7 +47,10 @@ class GPU(base.ThreadPoolText):
         self.add_defaults(GPU.defaults)
 
     def poll(self):
-        return self.format.format(**self.get_stats())
+        try:
+            return self.format.format(**self.get_stats())
+        except KeyError:
+            return 'err'
 
     def get_stats(self):
         # based on https://github.com/alwynmathew/nvidia-smi-python/blob/master/gpu_stat.py
@@ -65,6 +68,9 @@ class GPU(base.ThreadPoolText):
 
         d = OrderedDict()
         d["time"] = time.time()
+        d["gpu_util"] = "na"
+        d["msg"] = "GPU status: Unavail \n"
+        d['mem_used_per'] = '0'
 
         cmd = ["nvidia-smi", "-q", "-x"]
         try:
