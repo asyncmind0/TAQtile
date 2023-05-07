@@ -25,6 +25,9 @@ import subprocess
 import sys
 import time
 import xml.etree.ElementTree
+import logging
+
+logger = logging.getLogger("widgets.gpu")
 
 
 class GPU(base.ThreadPoolText):
@@ -49,7 +52,7 @@ class GPU(base.ThreadPoolText):
     def poll(self):
         try:
             return self.format.format(**self.get_stats())
-        except KeyError:
+        except Exception:
             return 'err'
 
     def get_stats(self):
@@ -62,6 +65,7 @@ class GPU(base.ThreadPoolText):
             try:
                 return int(text)
             except ValueError:
+                logger.exception("Poll format error")
                 return round(float(text), 2)
 
         i = 0
@@ -70,7 +74,7 @@ class GPU(base.ThreadPoolText):
         d["time"] = time.time()
         d["gpu_util"] = "na"
         d["msg"] = "GPU status: Unavail \n"
-        d['mem_used_per'] = '0'
+        d['mem_used_per'] = 0
 
         cmd = ["nvidia-smi", "-q", "-x"]
         try:
