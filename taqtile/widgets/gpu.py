@@ -67,7 +67,11 @@ class GPU(base.ThreadPoolText):
         d["time"] = time.time()
 
         cmd = ["nvidia-smi", "-q", "-x"]
-        cmd_out = subprocess.check_output(cmd)
+        try:
+            cmd_out = subprocess.check_output(cmd)
+        except:
+            return d
+            
         gpu = xml.etree.ElementTree.fromstring(cmd_out).find("gpu")
 
         util = gpu.find("utilization")
