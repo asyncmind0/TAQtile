@@ -38,7 +38,7 @@ num_monitors = get_num_monitors()
 
 layouts = [
     Max(**current_theme),
-    layout.Stack(**current_theme),
+    # layout.Stack(**current_theme),
     # layout.xmonad.MonadTall(ratio=0.50, **current_theme),
     # layout.Tile(**current_theme),
     # layout.Zoomy(**current_theme),

@@ -1,4 +1,5 @@
 from __future__ import print_function
+import re
 
 import logging
 import os
@@ -45,7 +46,12 @@ def close_old_windows():
         )
         try:
             if abs(datetime.now() - created) > timedelta(days=1):
-                logger.error(f"Old window found: {key}:{win.name}")
+                logger.error(
+                    f"Old window found: {key}:{win.name} {win.get_wm_class()}"
+                )
+                if win.get_wm_class() != "qutebrowser":
+                    continue
+
                 for pattern in REAP_INCLUDE_PATTERNS:
                     if not re.match(pattern, win.name):
                         continue

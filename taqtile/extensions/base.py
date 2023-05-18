@@ -42,6 +42,15 @@ def set_timestamp(window):
     )
 
 
+def bring_to_top(qtile, current_window):
+    if current_window is not None:
+        current_group = qtile.current_group
+        current_group.windows.remove(current_window)
+        current_group.windows.append(current_window)
+        current_group.focus(current_window)
+        qtile.current_screen.group.layout_all()
+
+
 class WindowList(QWindowList):
     show_icons = True
 
@@ -128,7 +137,9 @@ class WindowList(QWindowList):
         if self.qtile.current_group.name != win.group.name:
             screen = self.qtile.current_screen
             screen.set_group(win.group)
-        win.group.focus(win, force=True)
+        bring_to_top(self.qtile, win)
+        # win.bring_to_front()
+        # win.group.focus(win, force=True)
         # win.cmd_focus()
 
 

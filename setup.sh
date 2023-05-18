@@ -1,4 +1,3 @@
-yay -S locale-en_xx
 yay -S python-plumbum
 yay -S python-pytz
 yay -S python-pip
@@ -39,9 +38,7 @@ yay -S tor
 yay -S tor-browser
 yay -S most
 yay -S electrum
-yay -S -y electrum
 yay -S spectacle
-yay -S -y spectacle
 yay -S autossh
 yay -S android-tools
 yay -S dot
@@ -56,7 +53,6 @@ yay -S kerl
 yay -S ebtables
 yay -S ovmf
 yay -S qemu
-yay -S -y qemu
 yay -S virt-manager-git
 yay -S looking-glass
 yay -S pulseaudio-bluetooth
@@ -102,22 +98,12 @@ yay -S netcat
 yay -S nvidiux
 yay -S xpra
 yay -S nginx
-yay -S -y ngin
-yay -S -y nginx
 yay -S rebar3
-yay -S -y
-yay -S pdftoppm
-yay -S poppler
 yay -S feh
-yay -S -y feh
 yay -S filelight
 yay -S monero-gui
 yay -S google-chrome
-yay -S -y google-chrome
-yay -S teams
 yay -S pwgen
-yay -S transmission
-yay -S transmission-cli
 yay -S fbset
 yay -S packagekit
 yay -S cockpit-docker

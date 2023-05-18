@@ -1,4 +1,8 @@
 # The default ``config.py``
+import logging
+from os.path import dirname, join
+import os
+from subprocess import check_output
 
 
 def set_prefs(prefs):
@@ -40,8 +44,27 @@ def set_prefs(prefs):
     # prefs.add('source_folders', 'src')
 
     # You can extend python path for looking up modules
-    prefs.add("python_path", "~/.local/lib/python3.10/site-packages/")
-    prefs.add("python_path", "/usr/lib/python3.10/site-packages/")
+    try:
+        cwd = dirname(dirname(globals()["__file__"]))
+        os.chdir(cwd)
+        python_path = join(
+            check_output(
+                ["poetry", "env", "info", "-p", "-C", cwd], cwd=cwd, env={}
+            )
+            .decode()
+            .strip(),
+            "lib",
+            "python3.11",
+            "site-packages",
+        )
+        prefs.add(
+            "python_path",
+            python_path,
+        )
+        print(f"Rope python_path:{python_path} cwd:{cwd}, prefs:{prefs}")
+    except:
+        logging.exception("failed to set `python_path`")
+    # prefs.add("python_path", "/usr/lib/python3.10/site-packages/")
     prefs.add("python_path", "~/devel/qtile/")
 
     # Should rope save object information or not.

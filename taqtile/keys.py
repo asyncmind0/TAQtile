@@ -50,6 +50,8 @@ from taqtile.themes import current_theme, dmenu_cmd_args
 from taqtile.sounds import play_effect, change_sink_volume, volume_mute
 from libqtile import hook
 from taqtile.utils import send_notification
+from taqtile.popups.powermenu import show_power_menu
+from taqtile.popups.keyboard import show_keyboard
 
 
 re_vol = re.compile(r"\[(\d?\d?\d?)%\]")
@@ -229,7 +231,7 @@ def get_keys(mod, num_groups, num_monitors):
         # Unsplit = 1 window displayed, like Max layout, but still with
         # multiple stack panes
         ([mod, "shift"], "Return", lazy.layout.toggle_split()),
-        (["shift", mod], "q", lazy.shutdown()),
+        #(["shift", mod], "q", lazy.shutdown()),
         (
             [mod, "control"],
             "q",
@@ -398,6 +400,8 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "o", lazy.function(stick_win), "stick win"),
         ([mod, "shift"], "o", lazy.function(unstick_win), "unstick win"),
         ([mod, "shift"], "e", lazy.spawn("dmenumoji")),
+        ([mod, "shift"], "q", lazy.function(show_power_menu)),
+        ([mod, "shift"], "k", lazy.function(show_keyboard))
     ]
 
     laptop_keys = [
