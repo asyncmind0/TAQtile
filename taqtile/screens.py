@@ -33,7 +33,7 @@ from taqtile.widgets.bar import Bar
 from taqtile.widgets.windowname import WindowName
 from taqtile.widgets.multiscreengroupbox import MultiScreenGroupBox
 from taqtile.widgets.gpu import GPU
-from taqtile.widgets.exchange import ExchangeRate
+from taqtile.widgets.exchange import ExchangeRate, BitcoinFees
 
 from taqtile.widgets.togglebtn import ToggleButton
 
@@ -283,6 +283,8 @@ def get_screens(num_monitors, groups):
         Sep(**sep_params),
         TextBox("\U0001F50A", **default_params()),
         # Volume(update_interval=1, **default_params()),
+        Sep(**sep_params),
+        BitcoinFees(),
         Sep(**sep_params),
         ExchangeRate(
             from_currency="AUD", to_currency="XMR", update_interval=60
