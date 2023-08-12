@@ -70,10 +70,11 @@ class WindowList(QWindowList):
 
     def format_item(self, win, key):
         icon = ""
-        if win.window.get_wm_class()[0] == "st":
+        wmclass = win.window.get_wm_class()
+        if wmclass and wmclass[0] == "st":
             icon = "utilities-terminal"
-        else:
-            icon = win.window.get_wm_class()[0].lower()
+        elif wmclass:
+            icon = wmclass[0].lower()
         return f" {key}\0icon\x1f{icon}"
 
     def run(self):
