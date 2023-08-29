@@ -303,8 +303,3 @@ def volume_mute(qtile):
         ("Muted" if sink.mute else str(get_current_volume())),
     )
     play_effect("thud")
-
-
-@subscribe.startup
-def startup():
-    threading.Thread(target=set_all_volume, args=(0.3,)).start()

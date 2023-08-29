@@ -32,7 +32,7 @@ from taqtile.system import (
 from taqtile.groups import Rule, Match
 from taqtile import sounds
 
-logger = logging.getLogger("taqtile")
+logger = logging.getLogger(__name__)
 
 
 @hook.subscribe.client_new

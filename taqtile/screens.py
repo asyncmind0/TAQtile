@@ -14,15 +14,15 @@ from libqtile.widget import (
     Systray,
     DF,
     CryptoTicker,
-    PulseVolume as Volume,
+    #PulseVolume as Volume,
     WindowCount,
     CPU,
     Spacer,
 )
-from qtile_extras.widget import (
-    Visualiser,
-    Syncthing,
-)
+#from qtile_extras.widget import (
+#    Visualiser,
+#    Syncthing,
+#)
 
 from taqtile import system
 from taqtile.themes import current_theme, default_params

@@ -62,6 +62,10 @@ def terminal(title, window_class="st", cmd=None):
         term += "-e %s" % cmd
     return term
 
+def group_by_name(groups, name):
+    for group in groups:
+        if group.name == name:
+            return group
 
 class SwitchToScreen(object):
     def __init__(self, group, preferred_screen=None):
@@ -97,7 +101,7 @@ class SwitchToScreenGroup(SwitchToScreen):
     def __call__(self, qtile):
         screen, index = super().__call__(qtile)
         if index and screen:
-            screen.toggle_group(index)
+            screen.toggle_group(group_by_name(qtile.groups, index))
 
 
 class SwitchToScreenGroupUrgent(SwitchToScreenGroup):
@@ -170,6 +174,7 @@ class SwitchToWindowGroup(object):
         else:
             self.cmd = []
 
+
     def raise_window(self, qtile):
         for window in get_windows_map(qtile).values():
             if window.group and window.match(Match(title=self.title)):
@@ -189,7 +194,7 @@ class SwitchToWindowGroup(object):
                         cmds.append(cmd)
             for cmd in cmds:
                 logger.info("Spawn %s", cmd)
-                qtile.spawn(f"systemd-run --user {cmd}")
+                qtile.cmd_spawn(f"systemd-run --user {cmd}")
         except Exception as e:
             logger.exception("wierd")
         return False
@@ -210,7 +215,8 @@ class SwitchToWindowGroup(object):
         # elif qtile.currentWindow.title :
         else:
             try:
-                get_current_screen(qtile).toggle_group(self.name)
+                group = group_by_name(qtile.groups, self.name)
+                get_current_screen(qtile).toggle_group(group)
             except Exception as e:
                 logger.exception("wierd")
         self.raise_window(qtile)

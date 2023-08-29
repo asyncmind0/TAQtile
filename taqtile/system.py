@@ -231,7 +231,7 @@ def execute_once(
         # spawn the process using a shell command with subprocess.Popen
         logger.debug("Starting: %s", cmd)
         try:
-            qtile.spawn(f"systemd-run --user {process}")
+            qtile.cmd_spawn(f"systemd-run --user {process}")
             logger.info("Started: %s: %s", cmd, pid)
         except Exception as e:
             logger.exception("Error running %s", cmd)
@@ -276,6 +276,7 @@ def get_redis():
 
 
 def show_process_stats(qtile):
+    from guppy import hpy
     pid = os.getpid()
     p = psutil.Process(pid)
     threads = p.num_threads()
