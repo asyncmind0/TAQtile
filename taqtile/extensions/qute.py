@@ -11,11 +11,13 @@ import threading
 import logging
 
 
-logger = logging.getLogger("taqtile")
+logger = logging.getLogger(__name__)
 
 
 @subscribe.client_name_updated
 def trigger_dgroups(client):
+    if client.get_wm_class()[0] != "qutebrowser":
+        return
     accounts = get_hostconfig("browser_accounts", {})
     if not client.name:
         return
