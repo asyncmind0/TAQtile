@@ -4,13 +4,14 @@ import json
 import os
 import shlex
 import subprocess
+import logging
 from os.path import join
 
 from plumbum import local
 
-from taqtile.log import logger
 from taqtile.themes import dmenu_cmd_args
 
+logger = logging.getLogger(__name__)
 
 use_selection = "CLIPBOARD"
 blacklist = []
@@ -64,7 +65,6 @@ def hook_change(name, selection):
 
         count_call += 1
         previous_clip = text
-        logger.error("CLIPBOARD %s" % text)
         logger.error("count_call %s" % count_call)
         history = []
         if os.path.isfile(history_file):
@@ -108,6 +108,5 @@ def dmenu_xclip(qtile, args):
 
     history = reversed([x.split(" ", 1) for x in history if x and x.strip()])
     clips = [y.strip() for y in [x[1] for x in history] if y]
-    logger.info("Clips %s", clips)
     clipmenu = local["clipmenu"]
     clipmenu("-c", "-i", "-p", "Clipmenu")

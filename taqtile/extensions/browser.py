@@ -20,6 +20,7 @@ from taqtile.system import (
     get_current_screen,
     get_current_group,
     get_redis,
+    group_by_name
 )
 import logging
 
@@ -42,6 +43,7 @@ class BrowserAppLauncher(DmenuRun):
             return
         self.recent.insert(selected)
         if get_current_group(qtile).name != group:
+            group = group_by_name(qtile.groups, group)
             get_current_screen(qtile).toggle_group(group)
         logger.debug("Does Window exists with regex %s", regex)
         window = window_exists(self.qtile, re.compile(regex, re.I))

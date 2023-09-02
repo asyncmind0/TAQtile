@@ -32,9 +32,9 @@ mod = "mod4"
 
 default_config = {
     "screens": {
-        0: 2,
+        0: 1,
         1: 0,
-        2: 1,
+        2: 2,
         3: 3,
     },
     "term0_key": "F11",
@@ -277,6 +277,7 @@ def get_redis():
 
 def show_process_stats(qtile):
     from guppy import hpy
+
     pid = os.getpid()
     p = psutil.Process(pid)
     threads = p.num_threads()
@@ -284,6 +285,7 @@ def show_process_stats(qtile):
     rss = mem_info.rss / 1024 / 1024  # convert to MB
     vms = mem_info.vms / 1024 / 1024  # convert to MB
     from guppy import hpy
+
     h = hpy()
     message = f"""
     Process ID: {pid}
@@ -294,3 +296,8 @@ def show_process_stats(qtile):
     """
     logger.info(message)
     send_notification("stats", message)
+
+def group_by_name(groups, name):
+    for group in groups:
+        if group.name == name:
+            return group

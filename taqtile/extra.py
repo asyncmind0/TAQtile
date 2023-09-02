@@ -22,13 +22,16 @@ from taqtile.system import (
     get_current_window,
     get_current_group,
     get_windows_map,
+    group_by_name
 )
 from time import sleep
 from threading import Thread
 from libqtile.command import lazy
 from libqtile.utils import send_notification
 
-from taqtile.log import logger
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
@@ -62,10 +65,8 @@ def terminal(title, window_class="st", cmd=None):
         term += "-e %s" % cmd
     return term
 
-def group_by_name(groups, name):
-    for group in groups:
-        if group.name == name:
-            return group
+
+
 
 class SwitchToScreen(object):
     def __init__(self, group, preferred_screen=None):
@@ -80,7 +81,7 @@ class SwitchToScreen(object):
         ):
             screen = qtile.screens[self.preferred_screen]
             if self.preferred_screen != get_current_screen(qtile).index:
-                qtile.to_screen(self.preferred_screen)
+                qtile.cmd_to_screen(self.preferred_screen)
                 if get_current_group(qtile).name == self.name:
                     return
         else:
@@ -174,7 +175,6 @@ class SwitchToWindowGroup(object):
         else:
             self.cmd = []
 
-
     def raise_window(self, qtile):
         for window in get_windows_map(qtile).values():
             if window.group and window.match(Match(title=self.title)):
@@ -207,8 +207,8 @@ class SwitchToWindowGroup(object):
             get_current_screen(qtile).index != self.screen
         ):  # and qtile.currentWindow.title != self.title:
             try:
-                logger.info("cmd_to_screen: %s" % self.screen)
-                qtile.to_screen(self.screen)
+                # logger.info("cmd_to_screen: %s" % self.screen)
+                qtile.cmd_to_screen(self.screen)
             except:
                 logger.exception("wierd")
         # TODO if target window exists in current group raise it and exit

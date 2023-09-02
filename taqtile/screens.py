@@ -14,15 +14,16 @@ from libqtile.widget import (
     Systray,
     DF,
     CryptoTicker,
-    #PulseVolume as Volume,
+    # PulseVolume as Volume,
     WindowCount,
     CPU,
     Spacer,
 )
-#from qtile_extras.widget import (
+
+# from qtile_extras.widget import (
 #    Visualiser,
 #    Syncthing,
-#)
+# )
 
 from taqtile import system
 from taqtile.themes import current_theme, default_params
@@ -142,6 +143,11 @@ def get_screens(num_monitors, groups):
         Spacer(**default_params()),
         # ThreadedPacman(**pacman_params),
         Sep(**sep_params),
+        Net(
+            font="Fontawesome",
+            # format="\uf093 {down:06.1f}kB / \uf019 {up:06.1f}kB",
+        ),
+        Sep(**sep_params),
         DF(
             format="\uf0a0 {uf}{m} {r:.0f}%",
             visible_on_warn=False,
@@ -169,11 +175,6 @@ def get_screens(num_monitors, groups):
                 font="Fontawesome",
                 format="\uf108 {gpu_util:05.1f}GHz {mem_used_per:05.1f}%",
             )
-        ),
-        Sep(**sep_params),
-        Net(
-            font="Fontawesome",
-            format="\uf093 {down:06.1f}kB / \uf019 {up:06.1f}kB",
         ),
         Sep(**sep_params),
         TextBox(

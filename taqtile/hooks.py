@@ -41,28 +41,24 @@ def close_old_windows():
     for key, win in qtile.windows_map.items():
         proc = psutil.Process(win.get_pid())
         created = datetime.fromtimestamp(proc.create_time())
-        logger.debug(
-            f"window {win.name} created on {created}, diff {(datetime.utcnow() - created)}"
-        )
         try:
-            if abs(datetime.now() - created) > timedelta(days=1):
-                logger.error(
-                    f"Old window found: {key}:{win.name} {win.get_wm_class()}"
-                )
-                if win.get_wm_class() != "qutebrowser":
-                    continue
-
+            if win.get_wm_class() != "qutebrowser":
+                continue
+            if (datetime.now() - created) > timedelta(days=1):
                 for pattern in REAP_INCLUDE_PATTERNS:
                     if not re.match(pattern, win.name):
                         continue
-
                 if key not in NOAUTOCLOSE:
-                    logger.error(f"Old window marked for kill: {key}")
+                    logger.error(
+                        f"Old window found marked for kill: {key}:{win.name} {win.get_wm_class()}{(datetime.now() - created) > timedelta(days=1)}"
+                    )
+        except AttributeError:
+            pass
         except:
             logger.exception("Error reaping windows")
 
 
-WINDOW_REAPER_THREAD = multitimer.MultiTimer(5, close_old_windows)
+WINDOW_REAPER_THREAD = multitimer.MultiTimer(60, close_old_windows)
 
 
 # @hook.subscribe.screen_change
