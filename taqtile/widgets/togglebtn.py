@@ -1,13 +1,9 @@
 import logging
 import subprocess
-from libqtile.widget import base
-from libqtile.widget.generic_poll_text import GenPollText
-from libqtile.command import lazy
 from functools import wraps
-import shlex
-import threading
-import time
-import logging
+
+from libqtile.widget.generic_poll_text import GenPollText
+
 
 logger = logging.getLogger("taqtile")
 
@@ -58,7 +54,10 @@ class ToggleButton(GenPollText):
         if self.check_state_command:
             # Execute the command
             with subprocess.Popen(
-                self.check_state_command, shell=True
+                self.check_state_command,
+                shell=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
             ) as process:
                 # Wait for the command to complete and get the return code
                 return_code = process.wait()

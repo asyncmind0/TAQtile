@@ -3,9 +3,10 @@ import requests
 
 
 class ExchangeRate(widget.GenPollUrl):
-    def __init__(self, from_currency, to_currency, **config):
+    def __init__(self, amount, from_currency, to_currency, **config):
         self.from_currency = from_currency
         self.to_currency = to_currency
+        self.amount = amount
         super().__init__(
             json=True,
             url=f"https://min-api.cryptocompare.com/data/price?fsym={from_currency}&tsyms={to_currency}",
@@ -13,8 +14,7 @@ class ExchangeRate(widget.GenPollUrl):
         )
 
     def parse(self, body):
-        amount = 1
-        return f"{amount} {self.from_currency} = {amount * body[self.to_currency]} {self.to_currency}"
+        return f"{self.amount} {self.from_currency} = {self.amount * body[self.to_currency]} {self.to_currency}"
 
 
 class BitcoinFees(widget.GenPollUrl):
