@@ -8,32 +8,6 @@ from pprint import pformat
 from libqtile import qtile
 
 logger = logging.getLogger(__name__)
-OBS_CLIENT = None
-
-
-def obs_switch_scene(scenename):
-    global OBS_CLIENT
-    try:
-        import obsws_python as obs
-
-        if not OBS_CLIENT:
-            OBS_CLIENT = obs.ReqClient(host="localhost", port=4444, timeout=3)
-        try:
-            resp = OBS_CLIENT.set_current_program_scene(scenename)
-            logger.info(f"switch to {scenename} got response {resp}")
-        except BrokenPipeError:
-            OBS_CLIENT = None
-        return OBS_CLIENT
-    except Exception:
-        logger.exception("obs integration failed")
-        return
-
-
-@hook.subscribe.setgroup
-def change_group_obs_hook():
-    obs_switch_scene(
-        {1: "output", 0: "main", 2: "log"}[qtile.current_screen.index]
-    )
 
 
 class VoiceInputStatusWidget(ToggleButton):
