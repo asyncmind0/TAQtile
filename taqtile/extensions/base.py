@@ -30,6 +30,7 @@ from taqtile.system import (
     get_redis,
 )
 from taqtile.groups import Rule, Match
+from taqtile.widgets.obscontrol import obs_pause_recording, obs_resume_recording
 from taqtile import sounds
 
 logger = logging.getLogger(__name__)
@@ -388,30 +389,34 @@ class PassMenu(DmenuRun):
     dmenu_command = "dmenu"
 
     def run(self):
-        logger.error("running")
-        recent = RecentRunner("pass_menu")
-        with local.cwd(expanduser("~/.password-store/")):
-            passfiles = [
-                splitext(join(base, f))[0][2:]
-                for base, _, files in os.walk(".")
-                for f in files
-                if f.endswith(".gpg")
-            ]
-        selection = super().run(items=recent.list(passfiles)).strip()
-        logger.info("Selected: %s", selection)
-        if not selection:
-            return
-        recent.insert(selection)
-        return Popen(
-            [
-                join(dirname(__file__), "..", "..", "bin", "passinsert"),
-                selection,
-                str(get_current_window(self.qtile).window.wid),
-            ],
-            stdout=None,
-            stdin=None,
-            preexec_fn=os.setpgrp,
-        )
+        try:
+            obs_pause_recording()
+            logger.error("running")
+            recent = RecentRunner("pass_menu")
+            with local.cwd(expanduser("~/.password-store/")):
+                passfiles = [
+                    splitext(join(base, f))[0][2:]
+                    for base, _, files in os.walk(".")
+                    for f in files
+                    if f.endswith(".gpg")
+                ]
+            selection = super().run(items=recent.list(passfiles)).strip()
+            logger.info("Selected: %s", selection)
+            if not selection:
+                return
+            recent.insert(selection)
+            return Popen(
+                [
+                    join(dirname(__file__), "..", "..", "bin", "passinsert"),
+                    selection,
+                    str(get_current_window(self.qtile).window.wid),
+                ],
+                stdout=None,
+                stdin=None,
+                preexec_fn=os.setpgrp,
+            )
+        finally:
+            obs_resume_recording()
 
 
 def persist(key, value):
