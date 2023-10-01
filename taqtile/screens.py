@@ -42,6 +42,7 @@ from taqtile.widgets.togglebtn import ToggleButton
 from taqtile.widgets.screenrec import ScreenRecord
 
 from taqtile.widgets.live import VoiceInputStatusWidget
+from taqtile.widgets.obscontrol import OBSStatusWidget
 
 
 # from widgets.bankbalance import BankBalance
@@ -241,15 +242,30 @@ def get_screens(num_monitors, groups):
         # TaskList2(**tasklist_params),
         WindowName(**windowname_params),
         Sep(**sep_params),
-        VoiceInputStatusWidget(
-            "live",
-            active_text="Live \uf130",
+        OBSStatusWidget(
+            "OBS",
+            active_text="OBS \uf130",
             active_background="#aa0000",
-            inactive_text="\uf130",
+            inactive_text="OBS \uf130",
+            update_interval=5,
             **default_params()
         ),
         Sep(**sep_params),
-        ScreenRecord("REC", **default_params()),
+        VoiceInputStatusWidget(
+            "mic",
+            active_text="mic \uf130",
+            active_background="#aa0000",
+            inactive_text="mic \uf130",
+            update_interval=5,
+            **default_params()
+        ),
+        Sep(**sep_params),
+        ScreenRecord(
+            "REC",
+            active_text="rec ",
+            inactive_text="rec ",
+            **default_params()
+        ),
         Sep(**sep_params),
         # DiscordStatusWidget(
         #    update_interval=60,
