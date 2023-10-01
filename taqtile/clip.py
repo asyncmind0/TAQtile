@@ -10,6 +10,7 @@ from os.path import join
 from plumbum import local
 
 from taqtile.themes import dmenu_cmd_args
+from taqtile.widgets.obscontrol import obs_pause_recording, obs_resume_recording
 
 logger = logging.getLogger(__name__)
 
@@ -95,18 +96,24 @@ def copy_xclip(text, primary=False):
 
 
 def dmenu_xclip(qtile, args):
-    dmenu = local["dmenu"]
-    echo = local["echo"]
-    xclip = local["xclip"]
+    try:
+        obs_pause_recording()
+        dmenu = local["dmenu"]
+        echo = local["echo"]
+        xclip = local["xclip"]
 
-    history = []
-    logger.info(history_file)
+        history = []
+        logger.info(history_file)
 
-    if os.path.isfile(history_file):
-        with open(history_file, "r") as qfile:
-            history = qfile.readlines()
+        if os.path.isfile(history_file):
+            with open(history_file, "r") as qfile:
+                history = qfile.readlines()
 
-    history = reversed([x.split(" ", 1) for x in history if x and x.strip()])
-    clips = [y.strip() for y in [x[1] for x in history] if y]
-    clipmenu = local["clipmenu"]
-    clipmenu("-c", "-i", "-p", "Clipmenu")
+        history = reversed(
+            [x.split(" ", 1) for x in history if x and x.strip()]
+        )
+        clips = [y.strip() for y in [x[1] for x in history] if y]
+        clipmenu = local["clipmenu"]
+        clipmenu("-c", "-i", "-p", "Clipmenu")
+    finally:
+        obs_resume_recording()
