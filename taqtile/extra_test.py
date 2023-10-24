@@ -40,10 +40,6 @@ class TestSwitchToWindowGroup(TestCase):
                     ),
                 },
                 {
-                    "cmd": 'google-chrome-stable --app="https://inbox.google.com/u/1/"',
-                    "match": re.compile("^Inbox .* steven@streethawk.co$"),
-                },
-                {
                     "cmd": 'google-chrome-stable --app="https://inbox.google.com/u/2/"',
                     "match": re.compile("^Inbox .* stevenjose@gmail.com$"),
                 },

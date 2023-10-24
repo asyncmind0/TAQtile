@@ -250,6 +250,7 @@ def generate_groups(num_groups, layouts):
                     Match(wm_class=["pavucontrol-qt"]),
                     Match(wm_class=["qpwgraph"]),
                     Match(wm_class=["spotify"]),
+                    Match(title=[re.compile(r".*open\.spotify\.com.*", re.I)]),
                 ],
             ),
             "crypto": dict(

@@ -20,6 +20,8 @@ class ScreenRecord(ToggleButton):
                         f"--windowid={self.qtile.current_window.window.wid}",
                         "--on-the-fly-encoding",
                         "--overwrite",
+                        "--device",
+                        "pulse",
                         "-o",
                         expanduser(
                             f"~/screenrecordings/qtilerec_{datetime.utcnow().strftime('%Y%m%d%H%M')}.ogv"

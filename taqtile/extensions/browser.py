@@ -20,9 +20,10 @@ from taqtile.system import (
     get_current_screen,
     get_current_group,
     get_redis,
-    group_by_name
+    group_by_name,
 )
 import logging
+from taqtile.widgets.obscontrol import obs_pause_recording, obs_resume_recording
 
 logger = logging.getLogger("taqtile")
 
@@ -43,7 +44,6 @@ class BrowserAppLauncher(DmenuRun):
             return
         self.recent.insert(selected)
         if get_current_group(qtile).name != group:
-            group = group_by_name(qtile.groups, group)
             get_current_screen(qtile).toggle_group(group)
         logger.debug("Does Window exists with regex %s", regex)
         window = window_exists(self.qtile, re.compile(regex, re.I))
@@ -63,22 +63,28 @@ class BrowserAppLauncher(DmenuRun):
             )
 
             logger.info("Command: %s", cmd)
-            return qtile.cmd_spawn(cmd)
+            return qtile.spawn(cmd)
 
     def run(self):
-        self.recent = RecentRunner(self.dbname)
-        logger.info(f"Accounts: {self.accounts}")
-        selected = super().run(items=self.recent.list(self.accounts)).strip()
-        logger.info(f"Selected: {selected}")
-        self.handle_selected_item(
-            selected,
-            (
-                self.accounts[selected]
-                .get(self.config_key, {"regex": ".*%s.*" % selected})
-                .get("regex")
-            ),
-            logger,
-        )
+        try:
+            obs_pause_recording()
+            self.recent = RecentRunner(self.dbname)
+            logger.info(f"Accounts: {self.accounts}")
+            selected = (
+                super().run(items=self.recent.list(self.accounts)).strip()
+            )
+            logger.info(f"Selected: {selected}")
+            self.handle_selected_item(
+                selected,
+                (
+                    self.accounts[selected]
+                    .get(self.config_key, {"regex": ".*%s.*" % selected})
+                    .get("regex")
+                ),
+                logger,
+            )
+        finally:
+            obs_resume_recording()
 
 
 class Inboxes(BrowserAppLauncher):

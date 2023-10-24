@@ -22,7 +22,7 @@ from taqtile.system import (
     get_current_window,
     get_current_group,
     get_windows_map,
-    group_by_name
+    group_by_name,
 )
 from time import sleep
 from threading import Thread
@@ -50,10 +50,11 @@ def get_terminal_command(
 
 
 def terminal_tmux(level, session):
-    return "{0} -e {1} -w {2} {3} {4}".format(
+    return "{0} -e {1} -w {2} -c {3} {4} {5}".format(
         get_terminal_command(title=session),
         expanduser("~/.local/bin/tmux.py"),
         expanduser("~/.tmux/configs/default.yml"),
+        expanduser("~/.tmux/outer.conf"),
         level,
         session,
     )
@@ -63,9 +64,8 @@ def terminal(title, window_class="st", cmd=None):
     term = get_terminal_command(title=title, window_class=window_class)
     if cmd:
         term += "-e %s" % cmd
+    logger.info(f"starting terminal: {term}")
     return term
-
-
 
 
 class SwitchToScreen(object):
@@ -81,7 +81,7 @@ class SwitchToScreen(object):
         ):
             screen = qtile.screens[self.preferred_screen]
             if self.preferred_screen != get_current_screen(qtile).index:
-                qtile.cmd_to_screen(self.preferred_screen)
+                qtile.to_screen(self.preferred_screen)
                 if get_current_group(qtile).name == self.name:
                     return
         else:
@@ -102,7 +102,7 @@ class SwitchToScreenGroup(SwitchToScreen):
     def __call__(self, qtile):
         screen, index = super().__call__(qtile)
         if index and screen:
-            screen.toggle_group(group_by_name(qtile.groups, index))
+            screen.toggle_group(index)
 
 
 class SwitchToScreenGroupUrgent(SwitchToScreenGroup):
@@ -185,7 +185,6 @@ class SwitchToWindowGroup(object):
         cmds = []
         try:
             for cmd in self.cmd:
-                logger.debug("Check %s", cmd)
                 if isinstance(cmd, dict):
                     if not window_exists(qtile, re.compile(cmd["match"])):
                         cmds.append(cmd["cmd"])
@@ -194,31 +193,20 @@ class SwitchToWindowGroup(object):
                         cmds.append(cmd)
             for cmd in cmds:
                 logger.info("Spawn %s", cmd)
-                qtile.cmd_spawn(f"systemd-run --user {cmd}")
+                qtile.spawn(f"systemd-run --user {cmd}")
         except Exception as e:
             logger.exception("wierd")
         return False
 
     def __call__(self, qtile):
+        logger.debug(f"spawn cmd: {self.cmd}")
         self.spawn_ifnot(qtile)
         if self.screen > len(qtile.screens) - 1:
             self.screen = len(qtile.screens) - 1
-        if (
-            get_current_screen(qtile).index != self.screen
-        ):  # and qtile.currentWindow.title != self.title:
-            try:
-                # logger.info("cmd_to_screen: %s" % self.screen)
-                qtile.cmd_to_screen(self.screen)
-            except:
-                logger.exception("wierd")
-        # TODO if target window exists in current group raise it and exit
-        # elif qtile.currentWindow.title :
+        if get_current_screen(qtile).index != self.screen:
+            qtile.to_screen(self.screen)
         else:
-            try:
-                group = group_by_name(qtile.groups, self.name)
-                get_current_screen(qtile).toggle_group(group)
-            except Exception as e:
-                logger.exception("wierd")
+            get_current_screen(qtile).toggle_group(self.name)
         self.raise_window(qtile)
 
 
@@ -426,7 +414,6 @@ def float_to_front(qtile):
     """
     Bring all floating windows of the group to front
     """
-    logger.info("float_to_front called")
     global floating_windows
     floating_windows = []
     for window in qtile.windows_map.values():
