@@ -18,12 +18,14 @@ from libqtile.widget import (
     WindowCount,
     CPU,
     Spacer,
+    Mpd2 as Mpd,
 )
 
-# from qtile_extras.widget import (
-#    Visualiser,
-#    Syncthing,
-# )
+from qtile_extras.widget import (
+    UnitStatus,
+    #    Visualiser,
+    #    Syncthing,
+)
 
 from taqtile import system
 from taqtile.themes import current_theme, default_params
@@ -214,8 +216,11 @@ def get_screens(num_monitors, groups):
         Sep(**sep_params),
         WindowName(**windowname_params),
         Sep(**sep_params),
+        Mpd(**default_params()),
+        Sep(**sep_params),
         Spotify(**default_params()),
-        # Sep(**sep_params),
+        Sep(**sep_params),
+        UnitStatus(**default_params()),
         # Visualiser(**default_params()),
         Sep(**sep_params),
         # Syncthing(
@@ -289,7 +294,7 @@ def get_screens(num_monitors, groups):
             inactive_text="ae ",
             on_command="systemctl --user --no-pager start aeternity-miner.service > /dev/null",
             off_command="systemctl --user --no-pager stop aeternity-miner.service >/dev/null",
-            check_state_command="systemctl --user --no-pager status aeternity-miner.service >/dev/null",
+            check_state_command="systemctl --user --quiet is-active aeternity-miner.service",
         ),
         Sep(**sep_params),
         ToggleButton(
@@ -300,12 +305,15 @@ def get_screens(num_monitors, groups):
         Sep(**sep_params),
         TextBox("\U0001F50A", **default_params()),
         # Volume(update_interval=1, **default_params()),
+        # Sep(**sep_params),
+        # ExchangeRate(
+        #    amount=170,
+        #    from_currency="AUD",
+        #    to_currency="XMR",
+        #    update_interval=60,
+        # ),
         Sep(**sep_params),
         BitcoinFees(),
-        Sep(**sep_params),
-        ExchangeRate(
-            from_currency="AUD", to_currency="XMR", update_interval=60
-        ),
         Sep(**sep_params),
         CryptoTicker(currency="AUD"),
         Sep(**sep_params),
