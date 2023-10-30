@@ -5,13 +5,13 @@ from libqtile import hook, qtile
 from taqtile.widgets.togglebtn import ToggleButton
 import websocket
 
+logger = logging.getLogger(__name__)
 
 try:
     import obsws_python as obs
 except ImportError:
     logger.error("OBS python sdk not installed")
 
-logger = logging.getLogger(__name__)
 PRIVATE_GROUPS = ["webcon", "home", "slack", "mail", "crypto", "calendar"]
 
 
@@ -24,7 +24,7 @@ def initialize_obs_client(func):
                 )
             qtile.OBS_CLIENT.get_version()
             return func(qtile.OBS_CLIENT, *args, **kwargs)
-        except ImportError:
+        except NameError:
             logger.error("obs integration failed")
         except (
             websocket._exceptions.WebSocketConnectionClosedException,
