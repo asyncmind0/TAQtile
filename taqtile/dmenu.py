@@ -271,3 +271,7 @@ def switch_pulse_outputs(qtile):
 def record_window(qtile):
     qtile.current_window.id
     record_window()
+
+
+def powermenu(qtile):
+    option = dmenu_show("Powemenu:", ["quit", "restart", "shutdown"])
