@@ -70,12 +70,10 @@ yay -S nvidia-settings
 yay -S kdesu
 yay -S -y kdesu
 yay -S snapd
-yay -S kustomize-bin
 yay -S vbetool
 yay -S postgresql
 yay -S -y postgresql
 yay -S helm-bin
-yay -S kubernetes-helmfile-bin
 yay -Si privoxy
 yay -S pgbouncer
 yay -S erlang
@@ -195,7 +193,6 @@ yay -S bitwarden-cli
 yay -S bitwarden-cli-bin
 yay -S tensorflow
 yay -S gitlab-runner
-yay -S kubernetes-bin
 yay -S -y chromium
 yay -S git-lfs
 yay -S python-boto
@@ -290,7 +287,6 @@ yay -S dig
 yay -S whatsapp-nativefier
 yay -S chromium
 yay -S spotify
-yay -S kubectl-bin
 yay -S obs-studio
 yay -S xdg-user-dirs
 yay -S xdg-utils
