@@ -8,4 +8,4 @@ simpleaudio
 multitimer
 git+https://github.com/elParaguayo/qtile-extras.git
 tzupdate
-websocket
+websocket-client==1.6.2
