@@ -72,7 +72,13 @@ def unstick_win(qtile):
         except ValueError:
             pass
 
-
+@hook.subscribe.client_focus
+def client_focus(client):
+    for w in win_list:
+        try:
+            w.bring_to_front()
+        except ValueError:
+            pass
 @hook.subscribe.setgroup
 def move_win():
     from libqtile import qtile

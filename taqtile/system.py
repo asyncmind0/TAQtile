@@ -141,6 +141,12 @@ platform_specific = {
         "laptop": True,
     },
     "threadripper0": {"battery": False},
+    "doombox": {
+        "battery": False,
+    "autostart-once": {
+        "/usr/sbin/brave --profile-directory=home": None
+        }}
+        
 }
 
 
