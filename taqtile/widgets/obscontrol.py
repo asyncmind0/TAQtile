@@ -24,7 +24,7 @@ def initialize_obs_client(func):
                 )
             qtile.OBS_CLIENT.get_version()
             return func(qtile.OBS_CLIENT, *args, **kwargs)
-        except ImportError:
+        except NameError:
             logger.error("obs integration failed")
         except (
             websocket._exceptions.WebSocketConnectionClosedException,
