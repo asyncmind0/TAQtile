@@ -204,6 +204,7 @@ def context_switch_sound(duration=15, volume=-30):
     play(context_switch_wave)
 
 
+@requires_toggle_button_active("sound_effects")
 def play_effect(effect):
     threading.Thread(target=thud, args=()).start()
 
@@ -240,8 +241,7 @@ def change_sink_volume(qtile, increment):
         # new_volume = max(min(current_volume + int(increment * 100), 100), 0)
         # mixer.setvolume(new_volume)  # set the volume
         send_notification(
-            "Volume",
-            str(get_current_volume()),
+            "Volume", str(get_current_volume()), value=get_current_volume()
         )
         play_effect("volume_dial")
 
