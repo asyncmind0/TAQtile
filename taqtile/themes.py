@@ -1,5 +1,19 @@
+from os.path import expanduser
+import json
 from taqtile.log import logger
 
+colors = expanduser("~/.cache/wal/colors.json")
+colordict = json.load(open(colors))
+ColorZ = colordict["colors"]["color0"]
+ColorA = colordict["colors"]["color1"]
+ColorB = colordict["colors"]["color2"]
+ColorC = colordict["colors"]["color3"]
+ColorD = colordict["colors"]["color4"]
+ColorE = colordict["colors"]["color5"]
+ColorF = colordict["colors"]["color6"]
+ColorG = colordict["colors"]["color7"]
+ColorH = colordict["colors"]["color8"]
+ColorI = colordict["colors"]["color9"]
 
 default_theme = dict(
     padding=1,
@@ -7,13 +21,13 @@ default_theme = dict(
     linewidth=4,
     fontsize=14,
     terminal_font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
-    terminal_fontsize=16,  #
+    terminal_fontsize=14,  #
     font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
     # font="Inconsolata", font="Hack", # font="ProggySquareTTSZ", #
     # font="pango:monospace",
     # font="Terminus",
     borderwidth=1,
-    bar_height=24,
+    bar_height=18,
     dmenu_lines=30,  #
     dmenu_command="dmenu -z 1500 -c",
     foreground_urgent="#ffffff",
@@ -56,8 +70,22 @@ matrix_green = dict(
     bar_height=18,
 )
 
+pywal_theme = dict(
+    background=ColorZ,
+    border_focus=ColorC,
+    border_normal=ColorZ,
+    foreground=ColorA,
+    background_alt=ColorC,
+    hl_background=ColorC,
+    hl_foreground=ColorG,
+    focused_background=ColorI,
+    highlight_color=ColorI,
+    this_current_screen_border=ColorI,
+    highlight_method="block",
+)
 current_theme = dict(default_theme)
-current_theme.update(star_trek_blue)
+current_theme.update(pywal_theme)
+# current_theme.update(star_trek_blue)
 # current_theme.update(matrix_green)
 logger.debug("Current theme:%s", current_theme)
 dmenu_options = (
@@ -70,23 +98,21 @@ dmenu_options = (
 )
 
 
-rofi_options = (
-    "-i "
-    "-f -bw 1 "
-    "-l 10 "
-    "-separator-style solid "
+"""
     "-color-window '%(background)s,%(foreground)s' "
     "-color-normal '%(background)s,%(foreground)s,"
     "%(background_alt)s,%(hl_background)s,%(hl_foreground)s' "
     "-font '%(font)s %(fontsize)s' "
+    "-separator-style solid "
     # "-location 1 "
     "-hide-scrollbar "
     "-width 50 "
-    "-monitor -2 "
+    # "-monitor -2 "
     "-no-fixed-num-lines "
     "-padding 3 "
     "-line-margin 0 "
-) % current_theme
+"""
+rofi_options = ("-i " "-f -bw 1 " "-l 10 ") % current_theme
 
 
 def dmenu_cmd_args(**overrides):

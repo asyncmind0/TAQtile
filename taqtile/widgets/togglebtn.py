@@ -1,8 +1,10 @@
 import logging
 import subprocess
 from functools import wraps
+from libqtile import hook
 
 from libqtile.widget.generic_poll_text import GenPollText
+from qtile_extras.widget.mixins import TooltipMixin
 
 
 logger = logging.getLogger("taqtile")
@@ -11,9 +13,10 @@ logger = logging.getLogger("taqtile")
 TOGGLE_BUTTON_STATES = {}
 
 
-class ToggleButton(GenPollText):
+class ToggleButton(GenPollText, TooltipMixin):
     def __init__(self, name, **config):
-        super().__init__(**config)
+        GenPollText.__init__(self, **config)
+        TooltipMixin.__init__(self, **config)
         self.name = name
         self.font = "FontAwesome"
         self.add_defaults(
@@ -35,10 +38,33 @@ class ToggleButton(GenPollText):
                     "Update interval in seconds, if none, the widget updates only once.",
                 ),
                 ("func", self.check_state, "Poll Function"),
+                ("focused_background", "#ffffff", "Background colour."),
+                ("focused_foreground", "#000000", "Background colour."),
             ]
+            + TooltipMixin.defaults
         )
+        self.tooltip_text = self.name
         self.default_background = self.background
         self.check_state()
+        self.default_background = self.background
+        self.default_foreground = self.foreground
+        hook.subscribe.current_screen_change(self._hook_current_screen_change)
+
+    def _hook_current_screen_change(self, *args):
+        if not self.qtile:
+            return
+        logger.debug(
+            f"current_screen_change current_screen: {self.qtile.current_screen.index} self.bar.screen:{self.bar.screen.index}"
+        )
+
+        if self.bar.screen == self.qtile.current_screen:
+            self.background = self.focused_background
+            self.foreground = self.focused_foreground
+        else:
+            self.background = self.default_background
+            self.foreground = self.default_foreground
+        self._configure(self.qtile, self.bar)
+        self.draw()
 
     def _update_background(self):
         self.background = (
