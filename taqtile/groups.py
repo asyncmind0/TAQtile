@@ -48,12 +48,7 @@ def is_mailbox(client):
 def get_dgroups():
     return [
         Rule(
-            Match(
-                title=[
-                    re.compile("^Android Emulator.*"),
-                    re.compile("^Emulator.*"),
-                ]
-            ),
+            Match(title="^Android Emulator.*|^Emulator.*"),
             float=True,
             intrusive=True,
             group=get_group_affinity("emulator"),
@@ -65,29 +60,6 @@ def get_dgroups():
         ),
         Rule(
             Match(
-                title=[
-                    re.compile(r"^Developer.*", re.I),
-                    re.compile(r"^Devtools.*", re.I),
-                    re.compile(r"^Inspector.*", re.I),
-                    re.compile(r"^chrome-devtools.*", re.I),
-                ]
-            ),
-            group=get_group_affinity("devtools"),
-            break_on_match=True,
-        ),
-        Rule(
-            Match(
-                title=[
-                    re.compile(r"^Hangouts$"),
-                    re.compile(r"^yakyak$", re.I),
-                    re.compile(r"^Signal$", re.I),
-                ]
-            ),
-            group=get_group_affinity("hangouts"),
-            break_on_match=False,
-        ),
-        Rule(
-            Match(
                 title="shrapnel",
             ),
             float=True,
@@ -95,34 +67,41 @@ def get_dgroups():
         ),
         Rule(
             Match(
-                wm_class=[re.compile("^crx_.*")],
-                wm_instance_class=[re.compile("^crx_.*")],
+                wm_class="antimicrox",
+            ),
+            float=True,
+            break_on_match=False,
+        ),
+        Rule(
+            Match(
+                wm_class=re.compile("^crx_.*"),
+                wm_instance_class=re.compile("^crx_.*"),
             ),
             group=get_group_affinity("hangouts"),
             break_on_match=False,
         ),
         Rule(
             Match(
-                title=[re.compile(r"whatsapp.*", re.I)],
-                wm_class=[re.compile(".*whatsapp.*", re.I)],
+                title=re.compile(r"whatsapp.*", re.I),
+                wm_class=re.compile(".*whatsapp.*", re.I),
             ),
             group=get_group_affinity("whatsapp"),
             break_on_match=True,
         ),
         Rule(
-            Match(title=[re.compile(r"klipper", re.I)]),
+            Match(title=re.compile(r"klipper", re.I)),
             group="3",
             break_on_match=False,
         ),
         Rule(
-            Match(title=[re.compile(r".*discord.*", re.I)]),
+            Match(title=re.compile(r".*discord.*", re.I)),
             group="webcon",
             break_on_match=False,
         ),
         Rule(
             Match(
-                wm_class=[re.compile("insync.*", re.I)],
-                wm_instance_class=[re.compile("insync.*", re.I)],
+                wm_class=re.compile("insync.*", re.I),
+                wm_instance_class=re.compile("insync.*", re.I),
             ),
             # float=True,
             static=True,
@@ -136,13 +115,11 @@ def generate_groups(num_groups, layouts):
 
     # dgroup rules that not belongs to any group
 
-    def terminal_matches(regexes):
-        return [
-            Match(
-                title=[re.compile(regex) for regex in regexes],
-                # wm_class=["InputOutput", "xterm-256color"]
-            )
-        ]
+    def terminal_match(regex):
+        return Match(
+            title=re.compile(regex)
+            # wm_class= "xterm-256color"
+        )
 
     logger.debug("num_groups:%s", num_groups)
     groups = []
@@ -151,15 +128,17 @@ def generate_groups(num_groups, layouts):
         {
             "monitor": dict(
                 screen_affinity=PRIMARY_SCREEN,
-                matches=terminal_matches([r"^monitor$"])
-                + [Match(title=[re.compile(r"System Monitor", re.I)])],
+                matches=[
+                    terminal_match(r"^monitor$"),
+                    # Match(title=re.compile(r"System Monitor", re.I)),
+                ],
             ),
             "mail": dict(
                 screen_affinity=PRIMARY_SCREEN,
                 exclusive=False,
                 init=True,
                 matches=[
-                    Match(wm_instance_class=[re.compile("mail.google.com.*")]),
+                    Match(wm_instance_class=re.compile("mail.google.com.*")),
                 ],
             ),
             "calendar": dict(
@@ -167,9 +146,7 @@ def generate_groups(num_groups, layouts):
                 exclusive=False,
                 init=True,
                 matches=[
-                    Match(
-                        wm_instance_class=[re.compile("calendar.google.com.*")]
-                    )
+                    Match(wm_instance_class=re.compile("calendar.google.com.*"))
                 ],
             ),
             "work": dict(
@@ -178,11 +155,11 @@ def generate_groups(num_groups, layouts):
                 persist=True,
                 matches=[
                     Match(
-                        title=[re.compile(r".*\[work\].*", re.I)],
-                        wm_instance_class=[
-                            "chromium (~/.config/chromium.work)",
-                            "chromium (/home/steven/.config/chromium.work)",
-                        ],
+                        title=re.compile(r".*\[work\].*", re.I),
+                        wm_instance_class=re.compile(
+                            r"chromium \(~\/\.config\/chromium\.work\)|chromium \(\/home\/steven\/\.config\/chromium\.work\)",
+                            re.I,
+                        ),
                     ),
                 ],
             ),
@@ -192,10 +169,10 @@ def generate_groups(num_groups, layouts):
                 persist=True,
                 matches=[
                     Match(
-                        wm_instance_class=[
-                            "chromium (~/.config/chromium.home)",
-                            "chromium (/home/steven/.config/chromium.home)",
-                        ]
+                        wm_instance_class=re.compile(
+                            r"chromium \(~\/\.config\/chromium\.home\)|chromium \(\/home\/steven\/\.config\/chromium\.home\)",
+                            re.I,
+                        )
                     ),
                 ],
             ),
@@ -204,8 +181,8 @@ def generate_groups(num_groups, layouts):
                 init=True,
                 persist=True,
                 matches=[
-                    Match(title=[re.compile(r".*twitter\.com.*", re.I)]),
-                    Match(title=[re.compile(r".*diamondapp\.com.*", re.I)]),
+                    Match(title=re.compile(r".*twitter\.com.*", re.I)),
+                    Match(title=re.compile(r".*diamondapp\.com.*", re.I)),
                 ],
             ),
             "slack": dict(
@@ -213,9 +190,8 @@ def generate_groups(num_groups, layouts):
                 init=True,
                 persist=True,
                 matches=[
-                    Match(wm_class=["zoom"]),
-                    Match(wm_class=["slack"]),
-                    # Match(role=[re.compile("^slack$")], wm_class=["slack"]),
+                    Match(wm_class="zoom"),
+                    Match(wm_class="slack"),
                 ],
             ),
             "webcon": dict(
@@ -223,43 +199,44 @@ def generate_groups(num_groups, layouts):
                 init=True,
                 persist=True,
                 matches=[
-                    Match(wm_class=["discord"]),
-                    Match(title=[re.compile(r".*discord.*", re.I)]),
-                    Match(title=[re.compile(r".*whatsapp.*", re.I)]),
-                    Match(wm_class=["telegram-desktop"]),
-                    # Match(role=[re.compile("^slack$")], wm_class=["slack"]),
+                    Match(wm_class="discord"),
+                    Match(title=re.compile(r".*discord.*", re.I)),
+                    Match(title=re.compile(r".*whatsapp.*", re.I)),
+                    Match(wm_class="telegram-desktop"),
                 ],
             ),
             "krusader": dict(
                 screen_affinity=PRIMARY_SCREEN,
                 persist=False,
-                matches=[Match(title=[".*krusader.*"], wm_class=["Krusader"])],
+                matches=Match(
+                    title=re.compile(r".*krusader.*"), wm_class="Krusader"
+                ),
             ),
-            "emacs": dict(
-                screen_affinity=PRIMARY_SCREEN,
-                persist=True,
-                matches=[
-                    Match(wm_class=["emacs"]),
-                    Match(wm_class=["jetbrains-studio"]),
-                ],
-            ),
+            # "emacs": dict(
+            #    screen_affinity=PRIMARY_SCREEN,
+            #    persist=True,
+            #    matches=[
+            #        Match(wm_class=["emacs"]),
+            #        Match(wm_class=["jetbrains-studio"]),
+            #    ],
+            # ),
             "audio": dict(
                 screen_affinity=PRIMARY_SCREEN,
                 persist=True,
                 matches=[
-                    Match(wm_class=["pavucontrol-qt"]),
-                    Match(wm_class=["qpwgraph"]),
-                    Match(wm_class=["spotify"]),
-                    Match(title=[re.compile(r".*open\.spotify\.com.*", re.I)]),
+                    Match(wm_class="pavucontrol-qt"),
+                    Match(wm_class="qpwgraph"),
+                    Match(wm_class="spotify"),
+                    Match(title=re.compile(r".*open\.spotify\.com.*", re.I)),
                 ],
             ),
             "crypto": dict(
                 screen_affinity=SECONDARY_SCREEN,
                 persist=True,
                 matches=[
-                    Match(wm_class=["electrum"]),
-                    Match(wm_class=["monero-wallet-gui"]),
-                    Match(wm_class=["bitcoin-qt"]),
+                    Match(wm_class="electrum"),
+                    Match(wm_class="monero-wallet-gui"),
+                    Match(wm_class="bitcoin-qt"),
                 ],
             ),
         }
@@ -268,17 +245,17 @@ def generate_groups(num_groups, layouts):
         group_args["htop"] = dict(
             screen_affinity=SECONDARY_SCREEN,
             persist=False,
-            matches=terminal_matches([r"^htop$"]),
+            matches=terminal_match(r"^htop$"),
         )
         group_args["log"] = dict(
             screen_affinity=SECONDARY_SCREEN,
             persist=False,
-            matches=terminal_matches([r"^log$"]),
+            matches=terminal_match(r"^log$"),
         )
         group_args["ulog"] = dict(
             screen_affinity=SECONDARY_SCREEN,
             persist=False,
-            matches=terminal_matches([r"^ulog$"]),
+            matches=terminal_match(r"^ulog$"),
         )
 
     for i in range(1, num_groups + 1):
