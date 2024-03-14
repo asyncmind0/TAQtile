@@ -393,7 +393,6 @@ def get_keys(mod, num_groups, num_monitors):
                     dmenu_prompt="windows:",
                     # all_groups=False,
                     dmenu_ignorecase=True,
-                    dmenu_font=current_theme["font"],
                     **current_theme,
                 )
             ),
@@ -407,7 +406,6 @@ def get_keys(mod, num_groups, num_monitors):
                     all_groups=False,
                     dmenu_prompt="windows:",
                     dmenu_ignorecase=True,
-                    dmenu_font=current_theme["font"],
                     **current_theme,
                 )
             ),
@@ -417,8 +415,8 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "o", lazy.function(toggle_stick_win), "stick win"),
         ([mod, "shift"], "o", lazy.function(unstick_win), "unstick win"),
         ([mod, "shift"], "e", lazy.spawn("dmenumoji")),
-        ([mod, "shift"], "q", lazy.function(show_power_menu)),
-        ([mod, "shift"], "k", lazy.function(show_keyboard))
+        #([mod, "shift"], "q", lazy.function(show_power_menu)),
+        #([mod, "shift"], "k", lazy.function(show_keyboard))
     ]
 
     laptop_keys = [

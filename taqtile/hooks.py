@@ -99,6 +99,8 @@ def startup():
         except Exception as e:
             logger.exception("error in startup hook")
             send_notification("Qtile startup apps errored.", "")
+    from libqtile import qtile
+    qtile.togroup("home")
 
 
 @hook.subscribe.startup
@@ -154,9 +156,9 @@ def trigger_dgroups(client):
                 type="UTF8_STRING",
                 format=8,
             )
-        from libqtile import qtile
+            from libqtile import qtile
 
-        # qtile.dgroups._add(client)
+            qtile.dgroups._add(client)
     except:
         logger.exception("Error in trigger_dgroups")
 

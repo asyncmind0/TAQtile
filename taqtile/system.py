@@ -144,7 +144,7 @@ platform_specific = {
     "doombox": {
         "battery": False,
     "autostart-once": {
-        "/usr/sbin/brave --profile-directory=home": None
+        #"/usr/sbin/brave --profile-directory=home": None
         }}
         
 }

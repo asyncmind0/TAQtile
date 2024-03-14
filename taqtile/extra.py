@@ -50,7 +50,7 @@ def get_terminal_command(
 
 
 def terminal_tmux(level, session):
-    return "{0} -e {1} -w {2} -c {3} {4} {5}".format(
+    return "systemd-run --user {0} -e {1} -w {2} -c {3} {4} {5}".format(
         get_terminal_command(title=session),
         expanduser("~/.local/bin/tmux.py"),
         expanduser("~/.tmux/configs/default.yml"),

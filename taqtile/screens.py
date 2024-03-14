@@ -400,7 +400,7 @@ def get_screens(num_monitors, groups):
     if num_monitors == 1:
         screens[PRIMARY_SCREEN] = Screen(
             Bar(secondary_bar, **default_params()),
-            bottom=Bar(make_clock_bar() + monitoring_bar, **default_params()),
+            bottom=Bar(make_clock_bar() + monitoring_bar, **default_params(fontsize=9)),
         )
     else:
         screens[PRIMARY_SCREEN] = Screen(

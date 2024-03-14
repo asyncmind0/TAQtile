@@ -32,6 +32,9 @@ from taqtile.system import (
 from taqtile.groups import Rule, Match
 from taqtile.widgets.obscontrol import obs_pause_recording, obs_resume_recording
 from taqtile import sounds
+from taqtile.extra import (
+    check_restart,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -265,6 +268,7 @@ class SessionActions(Dmenu):
         "lock": "gnome-screensaver-command --lock ;;",
         "logout": "loginctl terminate-user %s" % getuser(),
         "shutdown": 'gksu "shutdown -h now" & ;;',
+        "restart": check_restart,
         "reboot": 'gksu "shutdown -r now" & ;;',
         "suspend": "gksu pm-suspend && gnome-screensaver-command --lock ;;",
         "hibernate": "gksu pm-hibernate && gnome-screensaver-command --lock ;;",
@@ -272,8 +276,12 @@ class SessionActions(Dmenu):
 
     def run(self):
         out = super().run(items=self.actions.keys()).strip()
-        logger.debug("selected: %s:%s", out, self.actions[out])
-        self.qtile.spawn(out)
+        action  = self.actions[out]
+        logger.error("selected: %s:%s", out, action)
+        if callable(action):
+            action(self.qtile)
+        else:
+            self.qtile.spawn(action)
 
 
 class BroTab(Dmenu):
@@ -347,7 +355,8 @@ class DmenuRunRecent(DmenuRun):
         super()._configure(qtile)
 
     def run(self):
-        logger.error("running %s" % self.__class__.__name__)
+        logger.error("running %s " % self.__class__.__name__)
+        logger.info("running command %s " % self.configured_command)
         recent = RecentRunner(self.dbname)
         selected = (
             super()
