@@ -74,6 +74,7 @@ class ScreenNameTextBox(TextBox):
 
 
 def get_screens(num_monitors, groups):
+    logger.debug("get screens starts")
     multi_monitor = num_monitors > 1
 
     tasklist_params = default_params(
@@ -142,221 +143,236 @@ def get_screens(num_monitors, groups):
         padding_y=2,
     )
 
-    monitoring_bar = [
-        Spacer(**default_params()),
-        # ThreadedPacman(**pacman_params),
-        Sep(**sep_params),
-        Net(
-            font="Fontawesome",
-            # format="\uf093 {down:06.1f}kB / \uf019 {up:06.1f}kB",
-        ),
-        Sep(**sep_params),
-        DF(
-            format="\uf0a0 {uf}{m} {r:.0f}%",
-            visible_on_warn=False,
-            **default_params()
-        ),
-        # Sep(**sep_params),
-        # BankBalance(account='credit', **default_params()),
-        # Sep(**sep_params),
-        # BankBalance(account='debit', **default_params()),
-        # Sep(**sep_params),
-        # PriorityNotify(**default_params()),
-        # Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
-        # Sep(**sep_params),
-        # NotmuchCount(**default_params()),
-        Sep(**sep_params),
-        CPU(
-            **default_params(
+    def get_monitoring_bar():
+        logger.debug("get screens starts monitoring bar")
+        return [
+            Spacer(**default_params()),
+            # ThreadedPacman(**pacman_params),
+            Sep(**sep_params),
+            Net(
                 font="Fontawesome",
-                format="\uf2db {freq_current:03.1f}GHz {load_percent:05.1f}%",
-            )
-        ),
-        Sep(**sep_params),
-        GPU(
-            **default_params(
-                font="Fontawesome",
-                format="\uf108 {gpu_util:05.1f}GHz {mem_used_per:05.1f}%",
-            )
-        ),
-        Sep(**sep_params),
-        TextBox(
-            "c",
-            **default_params(
-                foreground=cpugraph_params["graph_color"],
-                **graph_label_defaults
-            )
-        ),
-        CPUGraph(**cpugraph_params),
-        # Image(filename="/usr/share/icons/oxygen/16x16/devices/media-flash-memory-stick.png"),
-        TextBox(
-            "m",
-            **default_params(
-                foreground=memgraph_params["graph_color"],
-                **graph_label_defaults
-            )
-        ),
-        MemoryGraph(**memgraph_params),
-        # Image(filename="/usr/share/icons/oxygen/16x16/devices/network-wired.png"),
-        TextBox(
-            "n",
-            **default_params(
-                foreground=netgraph_params["graph_color"],
-                **graph_label_defaults
-            )
-        ),
-        NetGraph(**netgraph_params),
-    ]
-    primary_bar = [
-        TextBox("first", padding=4),
-        Sep(**sep_params),
-        MultiScreenGroupBox(screen=PRIMARY_SCREEN),
-        # Prompt(**prompt_params),
-        # TaskList2(**tasklist_params),
-        Sep(**sep_params),
-        WindowName(**windowname_params),
-        Sep(**sep_params),
-        Mpd(**default_params()),
-        Sep(**sep_params),
-        Spotify(**default_params()),
-        Sep(**sep_params),
-        UnitStatus(**default_params()),
-        # Visualiser(**default_params()),
-        Sep(**sep_params),
-        # Syncthing(
-        #    api_key=system.passstore("/syncthing/threadripper0/apikey", False),
-        #    **default_params()
-        # ),
-        CalClock(timezone=localtimezone, **clock_params),
-        Sep(**sep_params),
-        WindowCount(
-            text_format="\uf2d2{num}", show_zero=True, **default_params()
-        ),
-        Sep(**sep_params),
-        CurrentLayout(**current_layout_params),
-    ]
-    if system.get_hostconfig("battery"):
-        primary_bar.append(Battery(**batteryicon_params))
-        primary_bar.append(Sep(**sep_params))
+                # format="\uf093 {down:06.1f}kB / \uf019 {up:06.1f}kB",
+            ),
+            Sep(**sep_params),
+            DF(
+                format="\uf0a0 {uf}{m} {r:.0f}%",
+                visible_on_warn=False,
+                **default_params()
+            ),
+            # Sep(**sep_params),
+            # BankBalance(account='credit', **default_params()),
+            # Sep(**sep_params),
+            # BankBalance(account='debit', **default_params()),
+            # Sep(**sep_params),
+            # PriorityNotify(**default_params()),
+            # Image(filename="/usr/share/icons/oxygen/16x16/devices/cpu.png"),
+            # Sep(**sep_params),
+            # NotmuchCount(**default_params()),
+            Sep(**sep_params),
+            CPU(
+                **default_params(
+                    font="Fontawesome",
+                    format="\uf2db {freq_current:03.1f}GHz {load_percent:05.1f}%",
+                )
+            ),
+            Sep(**sep_params),
+            GPU(
+                **default_params(
+                    font="Fontawesome",
+                    format="\uf108 {gpu_util:05.1f}GHz {mem_used_per:05.1f}%",
+                )
+            ),
+            Sep(**sep_params),
+            TextBox(
+                "c",
+                **default_params(
+                    foreground=cpugraph_params["graph_color"],
+                    **graph_label_defaults
+                )
+            ),
+            CPUGraph(**cpugraph_params),
+            # Image(filename="/usr/share/icons/oxygen/16x16/devices/media-flash-memory-stick.png"),
+            TextBox(
+                "m",
+                **default_params(
+                    foreground=memgraph_params["graph_color"],
+                    **graph_label_defaults
+                )
+            ),
+            MemoryGraph(**memgraph_params),
+            # Image(filename="/usr/share/icons/oxygen/16x16/devices/network-wired.png"),
+            TextBox(
+                "n",
+                **default_params(
+                    foreground=netgraph_params["graph_color"],
+                    **graph_label_defaults
+                )
+            ),
+            NetGraph(**netgraph_params),
+        ]
 
-    secondary_bar = [
-        ScreenNameTextBox("second"),
-        Sep(**sep_params),
-        MultiScreenGroupBox(screen=SECONDARY_SCREEN),
-        Sep(**sep_params),
-        # TaskList2(**tasklist_params),
-        WindowName(**windowname_params),
-        Sep(**sep_params),
-        OBSStatusWidget(
-            "OBS",
-            active_text="OBS \uf130",
-            active_background="#aa0000",
-            inactive_text="OBS \uf130",
-            update_interval=5,
-            **default_params()
-        ),
-        Sep(**sep_params),
-        VoiceInputStatusWidget(
-            "mic",
-            active_text="mic \uf130",
-            active_background="#aa0000",
-            inactive_text="mic \uf130",
-            update_interval=5,
-            **default_params()
-        ),
-        Sep(**sep_params),
-        ScreenRecord(
-            "REC",
-            active_text="rec ",
-            inactive_text="rec ",
-            **default_params()
-        ),
-        Sep(**sep_params),
-        # DiscordStatusWidget(
-        #    update_interval=60,
-        #    bot_token=system.passstore("internet/discord/bot_token", False),
-        #    user_id="asyncmind#4110",
-        # ),
-        Sep(**sep_params),
-        ToggleButton(
-            "dunst",
-            active_text="<span color='green'>\uf0f3</span>",
-            inactive_text="<span color='green'>\uf1f6</span>",
-            on_command="dunstctl set-paused false",
-            off_command="dunstctl set-paused true",
-            # the command 'dunstctl is-paused' prints string "false" in stdout how to set exit status 1, make it a oneliner
-            check_state_command="dunstctl is-paused | grep -q false",
-        ),
-        Sep(**sep_params),
-        ToggleButton(
-            "aeternity_miner",
-            active_text="ae ",
-            inactive_text="ae ",
-            on_command="systemctl --user --no-pager start aeternity-miner.service > /dev/null",
-            off_command="systemctl --user --no-pager stop aeternity-miner.service >/dev/null",
-            check_state_command="systemctl --user --quiet is-active aeternity-miner.service",
-        ),
-        Sep(**sep_params),
-        ToggleButton(
-            "sound_effects",
-            active_text="\uf0f3",
-            inactive_text="\uf1f6",
-        ),
-        Sep(**sep_params),
-        TextBox("\U0001F50A", **default_params()),
-        # Volume(update_interval=1, **default_params()),
-        # Sep(**sep_params),
-        # ExchangeRate(
-        #    amount=170,
-        #    from_currency="AUD",
-        #    to_currency="XMR",
-        #    update_interval=60,
-        # ),
-        Sep(**sep_params),
-        BitcoinFees(),
-        Sep(**sep_params),
-        CryptoTicker(currency="AUD"),
-        Sep(**sep_params),
-        WindowCount(
-            text_format="\uf2d2 {num}", show_zero=True, **default_params()
-        ),
-        Sep(**sep_params),
-        CurrentLayout(**current_layout_params),
-        Sep(**sep_params),
-        Systray(**systray_params),
-        Sep(**sep_params),
-        CalClock(timezone=localtimezone, **clock_params),
-    ]
-    tertiary_bar = [
-        ScreenNameTextBox("third"),
-        Sep(**sep_params),
-        MultiScreenGroupBox(screen=TERTIARY_SCREEN),
-        # Sep(**sep_params),
-        ##TaskList2(**tasklist_params),
-        WindowName(**windowname_params),
-        Sep(**sep_params),
-        WindowCount(
-            text_format="\uf2d2 {num}", show_zero=True, **default_params()
-        ),
-        Sep(**sep_params),
-        CurrentLayout(**current_layout_params),
-        CalClock(timezone=localtimezone, **clock_params),
-    ]
-    quaternary_bar = [
-        ScreenNameTextBox("fourth"),
-        Sep(**sep_params),
-        MultiScreenGroupBox(screen=TERTIARY_SCREEN),
-        # Sep(**sep_params),
-        ##TaskList2(**tasklist_params),
-        WindowName(**windowname_params),
-        Sep(**sep_params),
-        WindowCount(
-            text_format="\uf2d2 {num}", show_zero=True, **default_params()
-        ),
-        Sep(**sep_params),
-        CurrentLayout(**current_layout_params),
-        CalClock(timezone=localtimezone, **clock_params),
-    ]
+    def get_primary_bar():
+        logger.debug("get screens starts primary bar")
+        bar = [
+            TextBox("first", padding=4),
+            Sep(**sep_params),
+            MultiScreenGroupBox(screen=PRIMARY_SCREEN),
+            # Prompt(**prompt_params),
+            # TaskList2(**tasklist_params),
+            Sep(**sep_params),
+            WindowName(**windowname_params),
+            Sep(**sep_params),
+            # Mpd(**default_params()),
+            Sep(**sep_params),
+            Spotify(**default_params()),
+            Sep(**sep_params),
+            UnitStatus(**default_params()),
+            # Visualiser(**default_params()),
+            Sep(**sep_params),
+            # Syncthing(
+            #    api_key=system.passstore("/syncthing/threadripper0/apikey", False),
+            #    **default_params()
+            # ),
+            CalClock(timezone=localtimezone, **clock_params),
+            Sep(**sep_params),
+            WindowCount(
+                text_format="\uf2d2{num}", show_zero=True, **default_params()
+            ),
+            Sep(**sep_params),
+            CurrentLayout(**current_layout_params),
+        ]
+        if system.get_hostconfig("battery"):
+            bar.append(Battery(**batteryicon_params))
+            bar.append(Sep(**sep_params))
+        return bar
+
+    def get_secondary_bar():
+        logger.debug("get screens starts secondary bar")
+        bar = [
+            ScreenNameTextBox("second"),
+            Sep(**sep_params),
+            MultiScreenGroupBox(screen=SECONDARY_SCREEN),
+            Sep(**sep_params),
+            # TaskList2(**tasklist_params),
+            WindowName(**windowname_params),
+            Sep(**sep_params),
+            # OBSStatusWidget(
+            #    "OBS",
+            #    active_text="OBS \uf130",
+            #    active_background="#aa0000",
+            #    inactive_text="OBS \uf130",
+            #    update_interval=5,
+            #    **default_params()
+            # ),
+            Sep(**sep_params),
+            VoiceInputStatusWidget(
+                "mic",
+                active_text="mic \uf130",
+                active_background="#aa0000",
+                inactive_text="mic \uf130",
+                update_interval=5,
+                **default_params()
+            ),
+            Sep(**sep_params),
+            ScreenRecord(
+                "REC",
+                active_text="rec ",
+                inactive_text="rec ",
+                **default_params()
+            ),
+            Sep(**sep_params),
+            # DiscordStatusWidget(
+            #    update_interval=60,
+            #    bot_token=system.passstore("internet/discord/bot_token", False),
+            #    user_id="asyncmind#4110",
+            # ),
+            Sep(**sep_params),
+            # ToggleButton(
+            #    "dunst",
+            #    active_text="<span color='green'>\uf0f3</span>",
+            #    inactive_text="<span color='green'>\uf1f6</span>",
+            #    on_command="dunstctl set-paused false",
+            #    off_command="dunstctl set-paused true",
+            #    # the command 'dunstctl is-paused' prints string "false" in stdout how to set exit status 1, make it a oneliner
+            #    check_state_command="dunstctl is-paused | grep -q false",
+            # ),
+            Sep(**sep_params),
+            # ToggleButton(
+            #    "aeternity_miner",
+            #    active_text="Æ ",
+            #    inactive_text="Æ ",
+            #    on_command="systemctl --user --no-pager start aeternity-miner.service > /dev/null",
+            #    off_command="systemctl --user --no-pager stop aeternity-miner.service >/dev/null",
+            #    check_state_command="systemctl --user --quiet is-active aeternity-miner.service",
+            # ),
+            Sep(**sep_params),
+            # ToggleButton(
+            #    "sound_effects",
+            #    active_text="\uf0f3",
+            #    inactive_text="\uf1f6",
+            # ),
+            Sep(**sep_params),
+            TextBox("\U0001F50A", **default_params()),
+            # Volume(update_interval=1, **default_params()),
+            # Sep(**sep_params),
+            # ExchangeRate(
+            #    amount=170,
+            #    from_currency="AUD",
+            #    to_currency="XMR",
+            #    update_interval=60,
+            # ),
+            Sep(**sep_params),
+            # BitcoinFees(),
+            # Sep(**sep_params),
+            # CryptoTicker(format="1 ₿ = {symbol}{amount:.2f}", currency="AUD"),
+            Sep(**sep_params),
+            WindowCount(
+                text_format="\uf2d2 {num}", show_zero=True, **default_params()
+            ),
+            Sep(**sep_params),
+            CurrentLayout(**current_layout_params),
+            Sep(**sep_params),
+            Systray(**systray_params),
+            Sep(**sep_params),
+            CalClock(timezone=localtimezone, **clock_params),
+        ]
+        logger.debug("get screens started secondary bar")
+        return bar
+
+    def tertiary_bar():
+        logger.debug("get screens starts tertiary bar")
+        return [
+            ScreenNameTextBox("third"),
+            Sep(**sep_params),
+            MultiScreenGroupBox(screen=TERTIARY_SCREEN),
+            # Sep(**sep_params),
+            ##TaskList2(**tasklist_params),
+            WindowName(**windowname_params),
+            Sep(**sep_params),
+            WindowCount(
+                text_format="\uf2d2 {num}", show_zero=True, **default_params()
+            ),
+            Sep(**sep_params),
+            CurrentLayout(**current_layout_params),
+            CalClock(timezone=localtimezone, **clock_params),
+        ]
+
+    def quaternary_bar():
+        return [
+            ScreenNameTextBox("fourth"),
+            Sep(**sep_params),
+            MultiScreenGroupBox(screen=TERTIARY_SCREEN),
+            # Sep(**sep_params),
+            ##TaskList2(**tasklist_params),
+            WindowName(**windowname_params),
+            Sep(**sep_params),
+            WindowCount(
+                text_format="\uf2d2 {num}", show_zero=True, **default_params()
+            ),
+            Sep(**sep_params),
+            CurrentLayout(**current_layout_params),
+            CalClock(timezone=localtimezone, **clock_params),
+        ]
 
     clock_text = default_params()
     wclock_params = default_params(padding=2, format="%a %H:%M")
@@ -366,7 +382,7 @@ def get_screens(num_monitors, groups):
             "UTC",
             "Asia/Kolkata",
             "Asia/Riyadh",
-            "Asia/Ho_Chi_Minh",
+            # "Asia/Ho_Chi_Minh",
             "Africa/Lagos",
             "US/Eastern",
             "US/Pacific",
@@ -379,7 +395,9 @@ def get_screens(num_monitors, groups):
                 continue
             widgets.append(
                 TextBox(
-                    "<span font='Proggy'>%s</span>:" % timezone, **clock_text
+                    # "<span font='Proggy' font_size=9>%s</span>:" % timezone,
+                    timezone,
+                    **clock_text
                 )
             )
             widgets.append(Clock(timezone=timezone, **wclock_params))
@@ -399,25 +417,25 @@ def get_screens(num_monitors, groups):
     screens = dict()
     if num_monitors == 1:
         screens[PRIMARY_SCREEN] = Screen(
-            Bar(secondary_bar, **default_params()),
-            bottom=Bar(make_clock_bar() + monitoring_bar, **default_params(fontsize=9)),
+            Bar(get_secondary_bar(), **default_params()),
+            # bottom=Bar(
+            #    make_clock_bar() + get_monitoring_bar(),
+            #    **default_params(fontsize=9)
+            # ),
         )
     else:
         screens[PRIMARY_SCREEN] = Screen(
-            Bar(primary_bar, **default_params()),
-            bottom=Bar(make_clock_bar(), **default_params()),
+            Bar(get_primary_bar(), **default_params()),
         )
         screens[SECONDARY_SCREEN] = Screen(
-            Bar(secondary_bar, **default_params()),
+            Bar(get_secondary_bar(), **default_params()),
             bottom=Bar(make_clock_bar() + monitoring_bar, **default_params()),
         )
         screens[TERTIARY_SCREEN] = Screen(
-            Bar(tertiary_bar, **default_params()),
-            bottom=Bar(make_clock_bar(), **default_params()),
+            Bar(get_tertiary_bar(), **default_params()),
         )
         screens[QUATERNARY_SCREEN] = Screen(
             Bar(quaternary_bar, **default_params()),
-            bottom=Bar(make_clock_bar(), **default_params()),
         )
     screens = [screens[y] for y in sorted(screens.keys())]
     logger.error("Screens: %s ", screens)
