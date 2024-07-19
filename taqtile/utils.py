@@ -19,7 +19,6 @@ def send_notification0(title, message):
     q_send_notification(
         title,
         str(message),
-        timeout=1000,
         id_=QTILE_NOTIFICATION_ID,
     )
 

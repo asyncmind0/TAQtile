@@ -1,3 +1,4 @@
+import re
 import glob
 import six
 import logging
@@ -22,16 +23,15 @@ from taqtile.system import (
     get_current_window,
     get_current_group,
     get_windows_map,
-    group_by_name,
 )
 from time import sleep
 from threading import Thread
-from libqtile.command import lazy
+from libqtile.lazy import lazy
 from libqtile.utils import send_notification
 
 import logging
 
-logger = logging.getLogger(__name__)
+from libqtile.log_utils import logger
 
 
 # terminal1 = "urxvtc -title term1 -e /home/steven/bin/tmx_outer term1"
@@ -42,7 +42,7 @@ def get_terminal_command(
     terminal_font=current_theme.get("terminal_font", None),
     terminal_fontsize=current_theme.get("terminal_fontsize", None),
 ):
-    return f'st -f "{terminal_font}:pixelsize={terminal_fontsize}" -t "{title}" -c {window_class} '
+    return f'/usr/sbin/st -f "{terminal_font}:pixelsize={terminal_fontsize}" -t "{title}" -c {window_class} '
 
 
 # _terminal = "alacritty -t {0} "
@@ -50,13 +50,16 @@ def get_terminal_command(
 
 
 def terminal_tmux(level, session):
-    return "systemd-run --user {0} -e {1} -w {2} -c {3} {4} {5}".format(
-        get_terminal_command(title=session),
-        expanduser("~/.local/bin/tmux.py"),
-        expanduser("~/.tmux/configs/default.yml"),
-        expanduser("~/.tmux/outer.conf"),
-        level,
-        session,
+    return (
+        # "/usr/sbin/systemd-run --user {0} -e {1} -w {2} -c {3} {4} {5}".format(
+        "{0} -e {1} -w {2} -c {3} {4} {5}".format(
+            get_terminal_command(title=session),
+            expanduser("~/.tmux/tmux.py"),
+            expanduser("~/.tmux/configs/default.yml"),
+            expanduser("~/.tmux/outer.conf"),
+            level,
+            session,
+        )
     )
 
 
@@ -193,7 +196,8 @@ class SwitchToWindowGroup(object):
                         cmds.append(cmd)
             for cmd in cmds:
                 logger.info("Spawn %s", cmd)
-                qtile.spawn(f"systemd-run --user {cmd}")
+                qtile.spawn(cmd)
+                # qtile.spawn(f"systemd-run --user {cmd}")
         except Exception as e:
             logger.exception("wierd")
         return False
@@ -387,7 +391,7 @@ class Terminal:
         )
 
     def get_match(self):
-        return Match(title=[self.name])
+        return Match(title=re.compile(self.name))
 
     def get_group(self):
         return Group(

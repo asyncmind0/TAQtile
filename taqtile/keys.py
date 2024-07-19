@@ -4,7 +4,7 @@ from os.path import expanduser
 from subprocess import check_output
 
 from libqtile import extension
-from libqtile.command import lazy
+from libqtile.lazy import lazy
 from libqtile.config import Key as QKey
 
 from taqtile.clip import dmenu_xclip
@@ -17,6 +17,8 @@ from taqtile.dmenu import (
     switch_pulse_outputs,
     switch_pulse_inputs,
     set_volume,
+    dmenu_move_to_group,
+    dmenu_window_actions,
 )
 from taqtile.extensions import (
     Surf,
@@ -47,20 +49,23 @@ from taqtile.log import logger
 from taqtile.screens import PRIMARY_SCREEN, SECONDARY_SCREEN
 from taqtile.system import get_hostconfig, show_process_stats
 from taqtile.themes import current_theme, dmenu_cmd_args
+from taqtile.themes import default_params
 from taqtile.sounds import play_effect, change_sink_volume, volume_mute
 from libqtile import hook
 from taqtile.utils import send_notification
-#from taqtile.popups.powermenu import show_power_menu
-#from taqtile.popups.keyboard import show_keyboard
+
+# from taqtile.popups.powermenu import show_power_menu
+# from taqtile.popups.keyboard import show_keyboard
 
 
 re_vol = re.compile(r"\[(\d?\d?\d?)%\]")
 re_touchpad = re.compile(r".*TouchpadOff\s*= 1", re.DOTALL)
-win_list = []
+win_map = {}
 
 
 def toggle_stick_win(qtile):
-    global win_list
+    win_list = win_map.setdefault(
+        qtile.current_group.screen.index, [])
     if qtile.current_window in win_list:
         win_list.remove(qtile.current_window)
         send_notification("Window Stuck", f"{qtile.current_window.name}")
@@ -68,38 +73,58 @@ def toggle_stick_win(qtile):
         win_list.append(qtile.current_window)
         send_notification("Window UnStuck", f"{qtile.current_window.name}")
 
+
 def stick_win(qtile):
-    global win_list
+    win_list = win_map.setdefault(
+        qtile.current_group.screen.index, [])
     win_list.append(qtile.current_window)
     send_notification("Window Stuck", f"{qtile.current_window.name}")
 
 
 def unstick_win(qtile):
-    global win_list
+    win_list = win_map.setdefault(
+        qtile.current_group.screen.index, [])
     try:
         win_list.remove(qtile.current_window)
     except ValueError:
-       logger.exception("error")
+        logger.exception("error")
     send_notification("Window UnStuck", f"{qtile.current_window.name}")
+
 
 @hook.subscribe.client_focus
 def client_focus(client):
-    for w in win_list:
-        try:
-            w.bring_to_front()
-        except ValueError:
-            pass
+    from libqtile import qtile
+    for wg, win_list in win_map.items():
+        for w in win_list:
+            if not w:
+                continue
+            try:
+                if wg != qtile.current_group.screen.index:
+                    logger.info(
+                        f"group: {w.group.screen.index} != {qtile.current_group.screen.index}")
+                    continue
+                w.bring_to_front()
+            except ValueError:
+                pass
+
+
 @hook.subscribe.setgroup
-def move_win():
+def setgroup():
     from libqtile import qtile
 
-    for w in win_list:
-        if not w:continue
-        try:
-            w.togroup(qtile.current_group.name)
-            w.focus()
-        except ValueError:
-            pass
+    for wg, win_list in win_map.items():
+        for w in win_list:
+            if not w:
+                continue
+            try:
+                if wg != qtile.current_group.screen.index:
+                    logger.info(
+                        f"group: {w.group.screen.index} != {qtile.current_group.screen.index}")
+                    continue
+                w.togroup(qtile.current_group.name)
+                w.focus()
+            except ValueError:
+                pass
 
 
 class Key(QKey):
@@ -197,8 +222,8 @@ def get_keys(mod, num_groups, num_monitors):
         ([mod], "l", lazy.group.next_window()),
         ([mod], "comma", lazy.layout.client_to_next()),
         ([mod], "period", lazy.layout.client_to_previous()),
-        ([mod, "shift"], "comma", lazy.function(move_to_prev_group)),
-        ([mod, "shift"], "period", lazy.function(move_to_next_group)),
+        ([mod, "shift"], "comma", lazy.function(move_to_next_group)),
+        ([mod, "shift"], "period", lazy.function(move_to_prev_group)),
         (
             [mod, "shift"],
             "space",
@@ -236,19 +261,19 @@ def get_keys(mod, num_groups, num_monitors):
         (
             [mod, "shift"],
             "comma",
-            lazy.function(MoveToOtherScreenGroup(prev=True)),
+            lazy.function(MoveToOtherScreenGroup(prev=False)),
         ),
         (
             [mod, "shift"],
             "period",
-            lazy.function(MoveToOtherScreenGroup(prev=False)),
+            lazy.function(MoveToOtherScreenGroup(prev=True)),
         ),
         # Toggle between split and unsplit sides of stack.
         # Split = all windows displayed
         # Unsplit = 1 window displayed, like Max layout, but still with
         # multiple stack panes
         ([mod, "shift"], "Return", lazy.layout.toggle_split()),
-        #(["shift", mod], "q", lazy.shutdown()),
+        (["shift", mod], "q", lazy.shutdown()),
         (
             [mod, "control"],
             "q",
@@ -336,7 +361,7 @@ def get_keys(mod, num_groups, num_monitors):
         # Switch groups
         ([], "F1", lazy.function(SwitchToScreenGroup("work"))),
         ([], "F2", lazy.function(SwitchToScreenGroup("home"))),
-        ([], "F3", lazy.function(SwitchToScreenGroup("audio"))),
+        # ([], "F3", lazy.function(SwitchToScreenGroup("audio"))),
         ([], "F4", lazy.function(SwitchToScreenGroup("crypto"))),
         ([], "F6", lazy.function(SwitchToScreenGroup("slack"))),
         ([mod], "F6", lazy.function(list_bluetooth)),
@@ -406,17 +431,19 @@ def get_keys(mod, num_groups, num_monitors):
                     all_groups=False,
                     dmenu_prompt="windows:",
                     dmenu_ignorecase=True,
-                    **current_theme,
+                    **default_params(),
                 )
             ),
         ),
-        ([mod, "shift"], "k", lazy.function(dmenu_kubectl)),
-        ([mod, "shift"], "f", lazy.function(float_to_front)),
         ([mod], "o", lazy.function(toggle_stick_win), "stick win"),
         ([mod, "shift"], "o", lazy.function(unstick_win), "unstick win"),
         ([mod, "shift"], "e", lazy.spawn("dmenumoji")),
-        #([mod, "shift"], "q", lazy.function(show_power_menu)),
-        #([mod, "shift"], "k", lazy.function(show_keyboard))
+        # ([mod, "shift"], "q", lazy.function(show_power_menu)),
+        # ([mod, "shift"], "k", lazy.function(show_keyboard))
+        # ([mod, "shift"], "q", lazy.function(show_power_menu)),
+        # ([mod, "shift"], "k", lazy.function(show_keyboard)),
+        ([mod, "shift"], "g", lazy.function(dmenu_move_to_group)),
+        ([mod], "x", lazy.function(dmenu_window_actions)),
     ]
 
     laptop_keys = [
@@ -493,7 +520,7 @@ def get_keys(mod, num_groups, num_monitors):
                 Surf(
                     dmenu_ignorecase=True,
                     item_format="* {window}",
-                    **current_theme,
+                    **default_params(),
                 )
             ),
         ),

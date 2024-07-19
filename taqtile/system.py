@@ -90,28 +90,21 @@ default_config = {
     "brightness_up": "xbacklight -inc 10",
     "brightness_down": "xbacklight -dec 10",
     "autostart-once": {
-        # "grafana-bison": None,
-        "dropbox": None,
-        # "slack": None,
-        #'blueman-applet': None,
-        #'discord': None,
-        #'parcellite': None,
-        "insync start": None,
+        # "insync start": None,
         "feh --bg-scale ~/.wallpaper": None,
-        "whatsapp-web-desktop": dict(
-            process_filter="whatsapp",
-            window_regex=re.compile(r".*whatsapp.*", re.I),
-        ),
+        # "whatsapp-web-desktop": dict(
+        #    process_filter="whatsapp",
+        #    window_regex=re.compile(r".*whatsapp.*", re.I),
+        # ),
         'nvidia-settings -a "[gpu:0]/GpuPowerMizerMode=1"': None,
-        "discord": None,
-        "electrum": None,
-        "bitcoin-qt": None,
-        "pavucontrol-qt": None,
+        # "discord": None,
+        # "pavucontrol-qt": None,
         "qpwgraph": None,
+        "localconnect": None,
         # "kdeconnect-app": None,
         # "pasystray": None,
-        "antimicrox --tray": None,
-        "monero-wallet-gui": None,
+        # "antimicrox --tray": None,
+        # "monero-wallet-gui": None,
     },
 }
 
@@ -143,10 +136,10 @@ platform_specific = {
     "threadripper0": {"battery": False},
     "doombox": {
         "battery": False,
-    "autostart-once": {
-        #"/usr/sbin/brave --profile-directory=home": None
-        }}
-        
+        "autostart-once": {
+            # "/usr/sbin/brave --profile-directory=home": None
+        },
+    },
 }
 
 
@@ -232,7 +225,8 @@ def execute_once(
         # spawn the process using a shell command with subprocess.Popen
         logger.debug("Starting: %s", cmd)
         try:
-            qtile.cmd_spawn(f"systemd-run --user {process}")
+            # qtile.spawn(f"systemd-run --user {process}")
+            qtile.spawn(process)
             logger.info("Started: %s: %s", cmd, pid)
         except Exception as e:
             logger.exception("Error running %s", cmd)
@@ -297,6 +291,7 @@ def show_process_stats(qtile):
     """
     logger.info(message)
     send_notification("stats", message)
+
 
 def group_by_name(groups, name):
     for group in groups:

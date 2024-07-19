@@ -31,7 +31,10 @@ class Bar(QBar):
             self.background = self.focused_background
         else:
             self.background = self.default_background
-        self._configure(self.qtile, self.screen, reconfigure=True)
+        try:
+            self._configure(self.qtile, self.screen, reconfigure=True)
+        except Exception as e:
+            logger.error(f"Error configuring Bar {self}")
         self.draw()
 
 

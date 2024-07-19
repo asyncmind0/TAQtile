@@ -19,15 +19,15 @@ default_theme = dict(
     padding=1,
     margin=0,
     linewidth=4,
-    fontsize=34,
+    fontsize=14,
     terminal_font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
-    terminal_fontsize=34,  #
+    terminal_fontsize=18,  #
     font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
     # font="Inconsolata", font="Hack", # font="ProggySquareTTSZ", #
     # font="pango:monospace",
     # font="Terminus",
     borderwidth=1,
-    bar_height=42,
+    bar_height=20,
     dmenu_lines=30,  #
     # dmenu_command="dmenu -z 1500 -c",
     dmenu_font="Hack-34",

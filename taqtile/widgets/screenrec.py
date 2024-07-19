@@ -1,4 +1,4 @@
-from taqtile.widgets.togglebtn import ToggleButton
+from taqtile.widgets.buttons import ToggleButton
 from os.path import expanduser
 import subprocess
 from datetime import datetime

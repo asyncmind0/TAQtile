@@ -1,6 +1,7 @@
 import os
 import logging
 import re
+from libqtile.lazy import lazy
 from datetime import datetime
 from functools import lru_cache
 from getpass import getuser
@@ -35,6 +36,7 @@ from taqtile import sounds
 from taqtile.extra import (
     check_restart,
 )
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -60,12 +62,15 @@ class WindowList(QWindowList):
 
     def __init__(self, **config):
         config["markup"] = True
+        config["dmenu_command"] = "rofi -dmenu"
         super().__init__(**config)
+        self.last_call = None
 
     def _configure(self, qtile):
         super()._configure(qtile)
         # insert as second item in the list
         # self.configured_command.insert(1, "-markup")
+        self.configured_command.insert(1, "-multi-select")
         if self.show_icons:
             self.configured_command.insert(1, "-show-icons")
             self.configured_command.insert(2, "-icon-theme")
@@ -82,31 +87,37 @@ class WindowList(QWindowList):
         return f" {key}\0icon\x1f{icon}"
 
     def run(self):
-        self.list_windows()
-        window_list = []
-        for key, win in self.item_to_win.items():
-            created = win.window.get_property(
-                "QTILE_CREATED", type="ATOM", unpack=int
-            )
-            if created:
-                created = created[0]
-            window_list.append((created, self.format_item(win, key)))
-        prompt = self.configured_command[
-            self.configured_command.index("-p") + 1
-        ]
-        self.configured_command[
-            self.configured_command.index("-p") + 1
-        ] = "[%s]:" % (len(window_list))
-        sounds.play_effect("window_list")
-        out = Dmenu.run(
-            self,
-            items=[
-                x[-1]
-                for x in sorted(window_list, key=lambda x: x[0], reverse=True)
-            ],
-        )
-
+        if self.last_call and (abs(int(self.last_call - time.time())) < 1):
+            logger.error(f"last call quit {self.last_call}")
+            return
+        logger.error(f"last call execute {self.last_call}")
         try:
+            self.list_windows()
+            window_list = []
+            for key, win in self.item_to_win.items():
+                created = win.window.get_property(
+                    "QTILE_CREATED", type="ATOM", unpack=int
+                )
+                if created:
+                    created = created[0]
+                window_list.append((created, self.format_item(win, key)))
+            prompt = self.configured_command[
+                self.configured_command.index("-p") + 1
+            ]
+            self.configured_command[
+                self.configured_command.index("-p") + 1
+            ] = "[%s]:" % (len(window_list))
+            sounds.play_effect("window_list")
+            out = Dmenu.run(
+                self,
+                items=[
+                    x[-1]
+                    for x in sorted(
+                        window_list, key=lambda x: x[0], reverse=True
+                    )
+                ],
+            )
+
             sout = [x.strip() for x in out.split("\n") if x.strip()]
             if len(sout) > 1:
                 out = Dmenu.run(
@@ -123,29 +134,30 @@ class WindowList(QWindowList):
             else:
                 return
 
+            try:
+                win = self.item_to_win[sout]
+            except KeyError:
+                # The selected window got closed while the menu was open?
+                logger.warning("no window found %s" % sout)
+                return
+            logger.debug(
+                f"window found {win} {win.group}: {self.qtile.current_group}"
+            )
+
+            if self.qtile.current_group.name != win.group.name:
+                screen = self.qtile.current_screen
+                screen.set_group(win.group)
+            bring_to_top(self.qtile, win)
+            # win.bring_to_front()
+            # win.group.focus(win, force=True)
+            # win.cmd_focus()
         except AttributeError:
             # out is not a string (for example it's a Popen object returned
             # by super(WindowList, self).run() when there are no menu items to
             # list
             return
-
-        try:
-            win = self.item_to_win[sout]
-        except KeyError:
-            # The selected window got closed while the menu was open?
-            logger.warning("no window found %s" % sout)
-            return
-        logger.debug(
-            f"window found {win} {win.group}: {self.qtile.current_group}"
-        )
-
-        if self.qtile.current_group.name != win.group.name:
-            screen = self.qtile.current_screen
-            screen.set_group(win.group)
-        bring_to_top(self.qtile, win)
-        # win.bring_to_front()
-        # win.group.focus(win, force=True)
-        # win.cmd_focus()
+        finally:
+            self.last_call = time.time()
 
 
 @lru_cache()
@@ -265,6 +277,7 @@ class History(Dmenu):
 
 class SessionActions(Dmenu):
     actions = {
+        "quit": "quit",
         "lock": "gnome-screensaver-command --lock ;;",
         "logout": "loginctl terminate-user %s" % getuser(),
         "shutdown": 'gksu "shutdown -h now" & ;;',
@@ -276,11 +289,14 @@ class SessionActions(Dmenu):
 
     def run(self):
         out = super().run(items=self.actions.keys()).strip()
-        action  = self.actions[out]
+        action = self.actions[out]
         logger.error("selected: %s:%s", out, action)
         if callable(action):
             action(self.qtile)
         else:
+            logger.debug("selected: %s:%s", out, self.actions[out])
+            if out == "quit":
+                return lazy.shutdown()
             self.qtile.spawn(action)
 
 
@@ -301,6 +317,7 @@ class BroTab(Dmenu):
     _tabs = None
 
     def __init__(self, **config):
+        config["dmenu_command"] = "rofi -dmenu"
         Dmenu.__init__(self, **config)
         self.add_defaults(WindowList.defaults)
 
@@ -340,11 +357,10 @@ class BroTab(Dmenu):
 class DmenuRunRecent(DmenuRun):
     defaults = [
         ("dbname", "dbname", "the sqlite db to store history."),
-        ("dmenu_command", "dmenu", "the dmenu command to be launched"),
     ]
     qtile = None
     dbname = "qtile_run"
-    dmenu_command = "dmenu"
+    dmenu_command = "rofi -dmenu"
 
     def __init__(self, **config):
         super().__init__(**config)
@@ -380,7 +396,8 @@ class DmenuRunRecent(DmenuRun):
         #    stdin=None,  # preexec_fn=os.setpgrp
         # )
         return Popen(
-            ["systemd-run", "--user"] + selected.split(),
+            # ["systemd-run", "--user"] +
+            selected.split(),
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             stdin=subprocess.PIPE,
@@ -391,11 +408,11 @@ class DmenuRunRecent(DmenuRun):
 class PassMenu(DmenuRun):
     defaults = [
         ("dbname", "dbname", "the sqlite db to store history."),
-        ("dmenu_command", "dmenu", "the dmenu command to be launched"),
+        ("dmenu_command", "rofi -dmenu", "the dmenu command to be launched"),
     ]
     dmenu_prompt = "pass"
     dbname = "pass_menu"
-    dmenu_command = "dmenu"
+    dmenu_command = "rofi -dmenu"
 
     def run(self):
         try:
@@ -512,10 +529,10 @@ class WindowGroupList(Dmenu):
                 item = self.match_item(win)
                 self.item_to_win[item] = win
                 id += 1
+        return self.item_to_win.keys()
 
     def run(self, items=None):
-        self.list_windows()
-        items = [x for x in self.item_to_win.keys()] + [
+        items = [x for x in self.list_windows()] + [
             x for x in self.recent_runner.list([])
         ]
         out = super().run(items=list(filter(lambda x: x, items)) or [])

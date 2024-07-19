@@ -14,12 +14,13 @@ class _MultiScreenGroupBox(widget.GroupBox):
         width, height = self.drawer.max_layout_size(
             [self.get_label(i.name) for i in groups], self.font, self.fontsize
         )
-        return (
-            width
-            + self.padding_x * 2
-            + self.margin_x * 2
-            + self.borderwidth * 2
-        )
+        return width  # + self.padding_x + self.margin_x + self.borderwidth
+        # return (
+        #    width
+        #    + self.padding_x * 2
+        #    + self.margin_x * 2
+        #    + self.borderwidth * 2
+        # )
 
     def _get_label(self, group):
         return self.namemap.get(group)
@@ -49,10 +50,10 @@ class _MultiScreenGroupBox(widget.GroupBox):
 class MultiScreenGroupBox(_MultiScreenGroupBox):
     def __init__(self, **config):
         groupbox_params = default_params(
-            padding=2,
             urgent_alert_method="text",
             rounded=False,
-            border_focus="#FFFFFF",
+            highlight_method="block",
+            # border_focus="#FFFFFF",
             is_line=False,
             center_aligned=True,
             hide_unused=True,
@@ -61,7 +62,3 @@ class MultiScreenGroupBox(_MultiScreenGroupBox):
         groupbox_params.update(config)
 
         super().__init__(**groupbox_params)
-
-
-class __MultiScreenGroupBox(widget.GroupBox):
-    pass

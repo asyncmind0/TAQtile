@@ -26,6 +26,7 @@ from typing import List
 from libqtile.group import _Group
 from libqtile.lazy import lazy
 from libqtile.widget import base
+from taqtile.sounds import change_sink_volume, volume_mute
 
 
 class Spotify(base.ThreadPoolText):
@@ -52,6 +53,8 @@ class Spotify(base.ThreadPoolText):
             {
                 "Button3": self.go_to_spotify,
                 "Button1": self.toggle_music,
+                "Button4": self.increase_volume,
+                "Button5": self.decrease_volume,
             }
         )
 
@@ -76,7 +79,7 @@ class Spotify(base.ThreadPoolText):
         """
         # spawn spotify if not already running
         if not self._is_proc_running("spotify"):
-            self.qtile.spawn("systemd-run --user spotify", shell=True)
+            self.qtile.spawn("spotify", shell=True)
             return
 
         all_groups: List[_Group] = self.qtile.groups
@@ -104,6 +107,12 @@ class Spotify(base.ThreadPoolText):
         vars["album"] = self.album
 
         return self.format.format(**vars)
+
+    def increase_volume(self):
+        change_sink_volume(self.qtile, 0.01)
+
+    def decrease_volume(self):
+        change_sink_volume(self.qtile, -0.01)
 
     def toggle_music(self):
         run(

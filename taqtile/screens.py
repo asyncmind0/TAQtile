@@ -1,4 +1,5 @@
 import logging
+from os.path import expanduser
 from subprocess import check_output
 
 from libqtile.config import Screen
@@ -17,8 +18,8 @@ from libqtile.widget import (
     # PulseVolume as Volume,
     WindowCount,
     CPU,
-    Spacer,
     Mpd2 as Mpd,
+    GenPollCommand,
 )
 
 from qtile_extras.widget import (
@@ -26,25 +27,28 @@ from qtile_extras.widget import (
     #    Visualiser,
     #    Syncthing,
 )
+from qtile_extras.popup.toolkit import PopupWidget
+from taqtile.widgets.extended_clock import extended_clock
 
 from taqtile import system
-from taqtile.themes import current_theme, default_params
+from taqtile.themes import default_params
 from taqtile.widgets import CalClock, Clock, TextBox
 from taqtile.widgets.spotify import Spotify
 from taqtile.widgets.notify import Notify
-from taqtile.widgets.bar import Bar
+from taqtile.widgets.bar import Bar, Spacer
 from taqtile.widgets.windowname import WindowName
 from taqtile.widgets.multiscreengroupbox import MultiScreenGroupBox
 from taqtile.widgets.gpu import GPU
-from taqtile.widgets.exchange import ExchangeRate, BitcoinFees
+from taqtile.widgets.exchange import ExchangeRate
 
-from taqtile.widgets.togglebtn import ToggleButton
+from taqtile.widgets.buttons import ToggleButton,CloseButton
 
 # from taqtile.widgets.discordstatus import DiscordStatusWidget
 from taqtile.widgets.screenrec import ScreenRecord
 
 from taqtile.widgets.live import VoiceInputStatusWidget
 from taqtile.widgets.obscontrol import OBSStatusWidget
+from taqtile.widgets.windowcleaner import WindowCleaner
 
 
 # from widgets.bankbalance import BankBalance
@@ -55,9 +59,9 @@ from taqtile.widgets.obscontrol import OBSStatusWidget
 
 logger = logging.getLogger("taqtile")
 
-PRIMARY_SCREEN = system.get_screen(0)
+PRIMARY_SCREEN = system.get_screen(2)
 SECONDARY_SCREEN = system.get_screen(1)
-TERTIARY_SCREEN = system.get_screen(2)
+TERTIARY_SCREEN = system.get_screen(0)
 QUATERNARY_SCREEN = system.get_screen(3)
 
 try:
@@ -80,18 +84,17 @@ def get_screens(num_monitors, groups):
     tasklist_params = default_params(
         selected=("[", "]"),
         rounded=False,
-        border=current_theme["border_focus"],
+        # border=current_theme["border_focus"],
         icon_size=0,
         padding=0,
         padding_y=0,
         margin=0,
-        foreground=current_theme["foreground"],
     )
 
     # prompt_params = default_params()
     current_layout_params = default_params(name="default")
     windowname_params = default_params(padding=4)
-    systray_params = default_params(icon_size=16)
+    systray_params = default_params(icon_size=windowname_params["fontsize"])
     clock_params = default_params(
         padding=2,
         format="%Y-%m-%d %a %H:%M",
@@ -145,7 +148,7 @@ def get_screens(num_monitors, groups):
 
     def get_monitoring_bar():
         logger.debug("get screens starts monitoring bar")
-        return [
+        bar = [
             Spacer(**default_params()),
             # ThreadedPacman(**pacman_params),
             Sep(**sep_params),
@@ -176,12 +179,12 @@ def get_screens(num_monitors, groups):
                 )
             ),
             Sep(**sep_params),
-            GPU(
-                **default_params(
-                    font="Fontawesome",
-                    format="\uf108 {gpu_util:05.1f}GHz {mem_used_per:05.1f}%",
-                )
-            ),
+            # GPU(
+            #    **default_params(
+            #        font="Fontawesome",
+            #        format="\uf108 {gpu_util:05.1f}GHz {mem_used_per:05.1f}%",
+            #    )
+            # ),
             Sep(**sep_params),
             TextBox(
                 "c",
@@ -210,6 +213,8 @@ def get_screens(num_monitors, groups):
             ),
             NetGraph(**netgraph_params),
         ]
+        logger.debug("get screens starts monitoring bar")
+        return bar
 
     def get_primary_bar():
         logger.debug("get screens starts primary bar")
@@ -217,6 +222,8 @@ def get_screens(num_monitors, groups):
             TextBox("first", padding=4),
             Sep(**sep_params),
             MultiScreenGroupBox(screen=PRIMARY_SCREEN),
+            Sep(**sep_params),
+            CloseButton(),
             # Prompt(**prompt_params),
             # TaskList2(**tasklist_params),
             Sep(**sep_params),
@@ -253,17 +260,32 @@ def get_screens(num_monitors, groups):
             Sep(**sep_params),
             MultiScreenGroupBox(screen=SECONDARY_SCREEN),
             Sep(**sep_params),
+            CloseButton(),
+            Sep(**sep_params),
             # TaskList2(**tasklist_params),
             WindowName(**windowname_params),
             Sep(**sep_params),
-            # OBSStatusWidget(
-            #    "OBS",
-            #    active_text="OBS \uf130",
-            #    active_background="#aa0000",
-            #    inactive_text="OBS \uf130",
-            #    update_interval=5,
-            #    **default_params()
-            # ),
+            OBSStatusWidget(
+                "OBS",
+                active_text="OBS \uf130",
+                active_background="#aa0000",
+                inactive_text="OBS \uf130",
+                update_interval=5,
+                **default_params()
+            ),
+            ToggleButton(
+                "display",
+                active_text="<span color='green'>🖵</span>",
+                inactive_text="🖵",
+                on_command=expanduser("~/.bin/screenoff.sh"),
+            ),
+            Sep(**sep_params),
+            ToggleButton(
+                "lnd",
+                active_text="<span color='green'>🗲</span>",
+                inactive_text="🗲",
+                check_state_command="lncli --lnddir=/var/lib/lnd/ state|jq -e '.state==\"SERVER_ACTIVE\"'",
+            ),
             Sep(**sep_params),
             VoiceInputStatusWidget(
                 "mic",
@@ -287,6 +309,16 @@ def get_screens(num_monitors, groups):
             #    user_id="asyncmind#4110",
             # ),
             Sep(**sep_params),
+            ToggleButton(
+                "dnd",
+                active_text="<span color='green'>\uf0f3</span>",
+                inactive_text="<span color='red'>\uf1f6</span>",
+                on_command=expanduser("~/.bin/dnd_off"),
+                off_command=expanduser("~/.bin/dnd_on"),
+                # the command 'dunstctl is-paused' prints string "false" in stdout how to set exit status 1, make it a oneliner
+                check_state_command=expanduser("~/.bin/dnd_state"),
+            ),
+            Sep(**sep_params),
             # ToggleButton(
             #    "dunst",
             #    active_text="<span color='green'>\uf0f3</span>",
@@ -297,14 +329,14 @@ def get_screens(num_monitors, groups):
             #    check_state_command="dunstctl is-paused | grep -q false",
             # ),
             Sep(**sep_params),
-            # ToggleButton(
-            #    "aeternity_miner",
-            #    active_text="Æ ",
-            #    inactive_text="Æ ",
-            #    on_command="systemctl --user --no-pager start aeternity-miner.service > /dev/null",
-            #    off_command="systemctl --user --no-pager stop aeternity-miner.service >/dev/null",
-            #    check_state_command="systemctl --user --quiet is-active aeternity-miner.service",
-            # ),
+            ToggleButton(
+                "aeternity_miner",
+                active_text="ae ",
+                inactive_text="Æ ",
+                on_command="systemctl --user --no-pager start aeternity-miner.service > /dev/null",
+                off_command="systemctl --user --no-pager stop aeternity-miner.service >/dev/null",
+                check_state_command="systemctl --user --quiet is-active aeternity-miner.service",
+            ),
             Sep(**sep_params),
             # ToggleButton(
             #    "sound_effects",
@@ -324,7 +356,7 @@ def get_screens(num_monitors, groups):
             Sep(**sep_params),
             # BitcoinFees(),
             # Sep(**sep_params),
-            # CryptoTicker(format="1 ₿ = {symbol}{amount:.2f}", currency="AUD"),
+            CryptoTicker(format="1₿={symbol}{amount:.2f}", currency="AUD"),
             Sep(**sep_params),
             WindowCount(
                 text_format="\uf2d2 {num}", show_zero=True, **default_params()
@@ -339,12 +371,15 @@ def get_screens(num_monitors, groups):
         logger.debug("get screens started secondary bar")
         return bar
 
-    def tertiary_bar():
+    def get_tertiary_bar():
         logger.debug("get screens starts tertiary bar")
         return [
             ScreenNameTextBox("third"),
             Sep(**sep_params),
             MultiScreenGroupBox(screen=TERTIARY_SCREEN),
+            Sep(**sep_params),
+            CloseButton(),
+            Sep(**sep_params),
             # Sep(**sep_params),
             ##TaskList2(**tasklist_params),
             WindowName(**windowname_params),
@@ -357,7 +392,7 @@ def get_screens(num_monitors, groups):
             CalClock(timezone=localtimezone, **clock_params),
         ]
 
-    def quaternary_bar():
+    def get_quaternary_bar():
         return [
             ScreenNameTextBox("fourth"),
             Sep(**sep_params),
@@ -376,6 +411,25 @@ def get_screens(num_monitors, groups):
 
     clock_text = default_params()
     wclock_params = default_params(padding=2, format="%a %H:%M")
+
+    def make_cryptos_bar():
+        currencies = [
+            "BTC",
+            "AE",
+            "XMR",
+            "ZEC",
+        ]
+        widgets = []
+        for currency in currencies:
+            widgets.append(
+                TextBox(
+                    "<span font='Proggy'>%s</span>:" % currency, **clock_text
+                )
+            )
+            widgets.append(
+                Sep(**sep_params),
+            )
+        return widgets
 
     def make_clock_bar():
         timezones = [
@@ -429,14 +483,20 @@ def get_screens(num_monitors, groups):
         )
         screens[SECONDARY_SCREEN] = Screen(
             Bar(get_secondary_bar(), **default_params()),
-            bottom=Bar(make_clock_bar() + monitoring_bar, **default_params()),
+            bottom=Bar(
+                make_clock_bar() + get_monitoring_bar(), **default_params()
+            ),
         )
         screens[TERTIARY_SCREEN] = Screen(
             Bar(get_tertiary_bar(), **default_params()),
         )
         screens[QUATERNARY_SCREEN] = Screen(
-            Bar(quaternary_bar, **default_params()),
+            Bar(get_quaternary_bar(), **default_params()),
         )
+        # screens[QUATERNARY_SCREEN] = Screen(
+        #    Bar(quaternary_bar, **default_params()),
+        #    bottom=Bar(make_clock_bar(), **default_params()),
+        # )
     screens = [screens[y] for y in sorted(screens.keys())]
     logger.error("Screens: %s ", screens)
     return screens

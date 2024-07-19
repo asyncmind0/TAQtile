@@ -2,7 +2,7 @@ import logging
 
 import pulsectl
 
-from taqtile.widgets.togglebtn import ToggleButton
+from taqtile.widgets.buttons import ToggleButton
 from libqtile import hook
 from pprint import pformat
 from libqtile import qtile
@@ -47,5 +47,8 @@ class VoiceInputStatusWidget(ToggleButton):
         return found
 
     def check_state(self):
-        self.active = self._check_state()
+        try:
+            self.active = self._check_state()
+        except Exception as e:
+            logger.exception("Error checking voice input state ")
         return super().check_state()

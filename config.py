@@ -3,7 +3,7 @@ import logging
 from os.path import expanduser
 
 from libqtile import layout
-from libqtile.command import lazy
+from libqtile.lazy import lazy
 from libqtile.config import Drag, Match
 
 from taqtile.extra import Terminal, terminal
@@ -76,9 +76,7 @@ mouse = [
     # Click([mod], "Button2", lazy.window.bring_to_front())
 ]
 
-float_windows = [
-    "buddy_list",
-]
+float_windows = ["buddy_list", "antimicrox"]
 follow_mouse_focus = False  # pylint: noqa, flake8: noqa
 bring_front_click = True
 cursor_warp = False
@@ -136,26 +134,15 @@ Terminal(
     dgroups=dgroups_app_rules,
     screen=PRIMARY_SCREEN,
 )
-
 Terminal(
-    "jupyter-bison",
-    [[mod], "XF86Launch5"],
+    "audio",
+    "F3",
     groups=groups,
     keys=keys,
     dgroups=dgroups_app_rules,
-    screen=SECONDARY_SCREEN,
-    spawn="jupyter-bison",
+    screen=PRIMARY_SCREEN,
 )
 
-Terminal(
-    "jupyter-zebra",
-    [[mod], "F11"],
-    groups=groups,
-    keys=keys,
-    dgroups=dgroups_app_rules,
-    screen=SECONDARY_SCREEN,
-    spawn="jupyter-zebra",
-)
 Terminal(
     "htop",
     [
