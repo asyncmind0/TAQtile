@@ -1,6 +1,8 @@
 import logging
+from os import path
 from os.path import expanduser
 from subprocess import check_output
+from libqtile.command import lazy
 
 from libqtile.config import Screen
 from libqtile.widget import (
@@ -31,6 +33,8 @@ from qtile_extras.popup.toolkit import PopupWidget
 from taqtile.widgets.extended_clock import extended_clock
 
 from taqtile import system
+from taqtile.themes import current_theme, default_params
+from taqtile.widgets import CalClock, Clock, TextBox, ImageBtn
 from taqtile.themes import default_params
 from taqtile.widgets import CalClock, Clock, TextBox
 from taqtile.widgets.spotify import Spotify
@@ -39,7 +43,12 @@ from taqtile.widgets.bar import Bar, Spacer
 from taqtile.widgets.windowname import WindowName
 from taqtile.widgets.multiscreengroupbox import MultiScreenGroupBox
 from taqtile.widgets.gpu import GPU
-from taqtile.widgets.exchange import ExchangeRate
+from taqtile.widgets.exchange import ExchangeRate, BitcoinFees
+from taqtile.extensions import (
+    WindowList,
+    Surf,
+    DmenuRunRecent,
+)
 
 from taqtile.widgets.buttons import ToggleButton,CloseButton
 
@@ -436,13 +445,18 @@ def get_screens(num_monitors, groups):
             "UTC",
             "Asia/Kolkata",
             "Asia/Riyadh",
-            # "Asia/Ho_Chi_Minh",
-            "Africa/Lagos",
-            "US/Eastern",
-            "US/Pacific",
-            "US/Central",
-            "Europe/London",
         ]
+        if False:  # TODO
+            timezones.extend(
+                [
+                    "Asia/Ho_Chi_Minh",
+                    "Africa/Lagos",
+                    "US/Eastern",
+                    "US/Pacific",
+                    "US/Central",
+                    "Europe/London",
+                ]
+            )
         widgets = []
         for timezone in timezones:
             if timezone == localtimezone:
@@ -467,15 +481,76 @@ def get_screens(num_monitors, groups):
         )
         return widgets
 
+    if system.get_hostconfig("battery"):
+        secondary_bar.append(Battery(**batteryicon_params))
+        secondary_bar.append(Sep(**sep_params))
     # clock_bar.size = 0
     screens = dict()
     if num_monitors == 1:
         screens[PRIMARY_SCREEN] = Screen(
             Bar(get_secondary_bar(), **default_params()),
-            # bottom=Bar(
-            #    make_clock_bar() + get_monitoring_bar(),
-            #    **default_params(fontsize=9)
-            # ),
+            bottom=Bar(make_clock_bar() + monitoring_bar, **default_params()),
+            left=Bar(
+                [
+                    ImageBtn(
+                        filename="/usr/share/icons/hicolor/scalable/apps/qutebrowser.svg",
+                        mouse_callbacks={
+                            "Button1": lazy.run_extension(
+                                Surf(
+                                    dmenu_ignorecase=True,
+                                    item_format="* {window}",
+                                    **current_theme,
+                                )
+                            ),
+                            "Button3": lazy.spawn("home"),
+                        },
+                    ),
+                    ImageBtn(
+                        filename="/usr/share/icons/breeze-dark/actions/24/window.svg",
+                        mouse_callbacks={
+                            "Button1": lazy.run_extension(
+                                WindowList(
+                                    item_format="{window}",
+                                    all_groups=True,
+                                    dmenu_prompt="windows:",
+                                    dmenu_ignorecase=True,
+                                    dmenu_font=current_theme["font"],
+                                    **current_theme,
+                                )
+                            ),
+                            "Button3": lazy.spawn("gsimplecal prev_month"),
+                        },
+                    ),
+                    ImageBtn(
+                        filename="/usr/share/icons/hicolor/scalable/apps/onboard.svg",
+                        mouse_callbacks={
+                            "Button1": lazy.spawn("onboard"),
+                            "Button3": lazy.spawn("gsimplecal prev_month"),
+                        },
+                    ),
+                    ImageBtn(
+                        filename="/usr/share/icons/breeze-dark/preferences/32/krunner.svg",
+                        mouse_callbacks={
+                            "Button1": lazy.run_extension(
+                                DmenuRunRecent(**current_theme)
+                            ),
+                            "Button3": lazy.run_extension(
+                                DmenuRunRecent(**current_theme)
+                            ),
+                        },
+                    ),
+                    ToggleButton(
+                        "screen_rotation",
+                        active_text="rot ",
+                        inactive_text="rot ",
+                        on_command=f"/usr/sbin/touch {path.expanduser('~/.rotate-on')}",
+                        off_command=f"rm -f {path.expanduser('~/.rotate-on')}",
+                        check_state_command=f"ls {path.expanduser('~/.rotate-on')}",
+                    ),
+                ],
+                **default_params(bar_height=80, bar_length=80),
+            ),
+>>>>>>> 4230ce1e72dfad2b8bf59fde13f8e667b7107174
         )
     else:
         screens[PRIMARY_SCREEN] = Screen(

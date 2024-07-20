@@ -13,7 +13,6 @@ from taqtile.dmenu import (
     dmenu_org,
     list_bluetooth,
     dmenu_pushbullet,
-    dmenu_kubectl,
     switch_pulse_outputs,
     switch_pulse_inputs,
     set_volume,
@@ -64,8 +63,7 @@ win_map = {}
 
 
 def toggle_stick_win(qtile):
-    win_list = win_map.setdefault(
-        qtile.current_group.screen.index, [])
+    win_list = win_map.setdefault(qtile.current_group.screen.index, [])
     if qtile.current_window in win_list:
         win_list.remove(qtile.current_window)
         send_notification("Window Stuck", f"{qtile.current_window.name}")
@@ -75,15 +73,13 @@ def toggle_stick_win(qtile):
 
 
 def stick_win(qtile):
-    win_list = win_map.setdefault(
-        qtile.current_group.screen.index, [])
+    win_list = win_map.setdefault(qtile.current_group.screen.index, [])
     win_list.append(qtile.current_window)
     send_notification("Window Stuck", f"{qtile.current_window.name}")
 
 
 def unstick_win(qtile):
-    win_list = win_map.setdefault(
-        qtile.current_group.screen.index, [])
+    win_list = win_map.setdefault(qtile.current_group.screen.index, [])
     try:
         win_list.remove(qtile.current_window)
     except ValueError:
@@ -94,6 +90,7 @@ def unstick_win(qtile):
 @hook.subscribe.client_focus
 def client_focus(client):
     from libqtile import qtile
+
     for wg, win_list in win_map.items():
         for w in win_list:
             if not w:
@@ -101,7 +98,8 @@ def client_focus(client):
             try:
                 if wg != qtile.current_group.screen.index:
                     logger.info(
-                        f"group: {w.group.screen.index} != {qtile.current_group.screen.index}")
+                        f"group: {w.group.screen.index} != {qtile.current_group.screen.index}"
+                    )
                     continue
                 w.bring_to_front()
             except ValueError:
@@ -119,7 +117,8 @@ def setgroup():
             try:
                 if wg != qtile.current_group.screen.index:
                     logger.info(
-                        f"group: {w.group.screen.index} != {qtile.current_group.screen.index}")
+                        f"group: {w.group.screen.index} != {qtile.current_group.screen.index}"
+                    )
                     continue
                 w.togroup(qtile.current_group.name)
                 w.focus()
@@ -435,11 +434,12 @@ def get_keys(mod, num_groups, num_monitors):
                 )
             ),
         ),
+        ([mod, "shift"], "f", lazy.function(float_to_front)),
         ([mod], "o", lazy.function(toggle_stick_win), "stick win"),
         ([mod, "shift"], "o", lazy.function(unstick_win), "unstick win"),
         ([mod, "shift"], "e", lazy.spawn("dmenumoji")),
         # ([mod, "shift"], "q", lazy.function(show_power_menu)),
-        # ([mod, "shift"], "k", lazy.function(show_keyboard))
+        # ([mod, "shift"], "k", lazy.function(show_keyboard)),
         # ([mod, "shift"], "q", lazy.function(show_power_menu)),
         # ([mod, "shift"], "k", lazy.function(show_keyboard)),
         ([mod, "shift"], "g", lazy.function(dmenu_move_to_group)),

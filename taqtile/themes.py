@@ -19,7 +19,7 @@ default_theme = dict(
     padding=1,
     margin=0,
     linewidth=4,
-    fontsize=14,
+    fontsize=28,
     terminal_font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
     terminal_fontsize=18,  #
     font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
@@ -34,7 +34,12 @@ default_theme = dict(
     foreground_urgent="#ffffff",
     background_urgent="#ff007f",
 )
-
+tablet_theme = dict(
+    terminal_fontsize=34,  #
+    bar_height=44,
+    dmenu_lines=10,  #
+    dmenu_command="dmenu -z 1500 -c",
+)
 # generate a rofi theme matching qtile colors below
 star_trek_blue = dict(
     # padding=1,

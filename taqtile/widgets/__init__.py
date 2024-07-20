@@ -6,6 +6,7 @@ from pytz import timezone
 from taqtile.log import logger
 from taqtile.system import execute_once
 from taqtile.themes import default_params
+from taqtile.widgets.imagebtn import ImageBtn
 
 
 # class ThreadedPacman(widget.Pacman):

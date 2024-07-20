@@ -63,3 +63,4 @@ xorg-xclipboard
 xorg-xev
 xorg-xinit
 zsh
+python-pywal

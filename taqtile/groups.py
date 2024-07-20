@@ -107,6 +107,14 @@ def get_dgroups():
             static=True,
             break_on_match=True,
         ),
+        Rule(
+            Match(
+                wm_class="onboard",
+            ),
+            # float=True,
+            static=True,
+            break_on_match=True,
+        ),
     ]
 
 

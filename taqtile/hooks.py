@@ -26,6 +26,7 @@ prev_state = hdmi_connected()
 # @hook.subscribe.screen_change
 def restart_on_randr(qtile, ev):
     logger.error("Screen change: %s", ev.__dict__)
+    return
     global event_cntr, prev_timestamp
     cur_timestamp = ev.timestamp
     num_mons = get_num_monitors()
