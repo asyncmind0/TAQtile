@@ -192,6 +192,7 @@ def get_num_monitors():
         return len(displays)
     except Exception:
         logging.exception("failed to get number of monitors")
+        return 1
 
 
 def hdmi_connected():
