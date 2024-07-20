@@ -2,7 +2,7 @@ import logging
 from os import path
 from os.path import expanduser
 from subprocess import check_output
-from libqtile.command import lazy
+from libqtile.lazy import lazy
 
 from libqtile.config import Screen
 from libqtile.widget import (
@@ -34,7 +34,7 @@ from taqtile.widgets.extended_clock import extended_clock
 
 from taqtile import system
 from taqtile.themes import current_theme, default_params
-from taqtile.widgets import CalClock, Clock, TextBox, ImageBtn
+from taqtile.widgets import CalClock, Clock, TextBox, Button
 from taqtile.themes import default_params
 from taqtile.widgets import CalClock, Clock, TextBox
 from taqtile.widgets.spotify import Spotify
@@ -492,7 +492,7 @@ def get_screens(num_monitors, groups):
             bottom=Bar(make_clock_bar() + monitoring_bar, **default_params()),
             left=Bar(
                 [
-                    ImageBtn(
+                    Button(
                         filename="/usr/share/icons/hicolor/scalable/apps/qutebrowser.svg",
                         mouse_callbacks={
                             "Button1": lazy.run_extension(
@@ -505,7 +505,7 @@ def get_screens(num_monitors, groups):
                             "Button3": lazy.spawn("home"),
                         },
                     ),
-                    ImageBtn(
+                    Button(
                         filename="/usr/share/icons/breeze-dark/actions/24/window.svg",
                         mouse_callbacks={
                             "Button1": lazy.run_extension(
@@ -521,14 +521,14 @@ def get_screens(num_monitors, groups):
                             "Button3": lazy.spawn("gsimplecal prev_month"),
                         },
                     ),
-                    ImageBtn(
+                    Button(
                         filename="/usr/share/icons/hicolor/scalable/apps/onboard.svg",
                         mouse_callbacks={
                             "Button1": lazy.spawn("onboard"),
                             "Button3": lazy.spawn("gsimplecal prev_month"),
                         },
                     ),
-                    ImageBtn(
+                    Button(
                         filename="/usr/share/icons/breeze-dark/preferences/32/krunner.svg",
                         mouse_callbacks={
                             "Button1": lazy.run_extension(
@@ -550,7 +550,6 @@ def get_screens(num_monitors, groups):
                 ],
                 **default_params(bar_height=80, bar_length=80),
             ),
->>>>>>> 4230ce1e72dfad2b8bf59fde13f8e667b7107174
         )
     else:
         screens[PRIMARY_SCREEN] = Screen(
