@@ -6,6 +6,7 @@ pydub
 simpleaudio
 #guppy3
 multitimer
-git+https://github.com/elParaguayo/qtile-extras.git
+#git+https://github.com/elParaguayo/qtile-extras.git
+qtile_extras
 tzupdate
 websocket-client==1.6.2

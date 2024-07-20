@@ -37,7 +37,7 @@ class GPU(base.ThreadPoolText):
     """
 
     defaults = [
-        ("update_interval", 1.0, "Update interval for the GPU widget"),
+        ("update_interval", 5.0, "Update interval for the GPU widget"),
         (
             "format",
             "GPU {gpu_util}GHz {mem_used_per}%",
@@ -53,7 +53,7 @@ class GPU(base.ThreadPoolText):
         try:
             return self.format.format(**self.get_stats())
         except Exception:
-            return 'err'
+            return "err"
 
     def get_stats(self):
         # based on https://github.com/alwynmathew/nvidia-smi-python/blob/master/gpu_stat.py
@@ -74,14 +74,14 @@ class GPU(base.ThreadPoolText):
         d["time"] = time.time()
         d["gpu_util"] = "na"
         d["msg"] = "GPU status: Unavail \n"
-        d['mem_used_per'] = 0
+        d["mem_used_per"] = 0
 
         cmd = ["nvidia-smi", "-q", "-x"]
         try:
             cmd_out = subprocess.check_output(cmd)
         except:
             return d
-            
+
         gpu = xml.etree.ElementTree.fromstring(cmd_out).find("gpu")
 
         util = gpu.find("utilization")

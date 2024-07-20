@@ -5,7 +5,7 @@ from qtile_extras.popup.toolkit import (
     PopupText,
     PopupGridLayout
 )
-from libqtile.command import lazy
+from libqtile.lazy import lazy
 
 keys = [
     ["Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12"],

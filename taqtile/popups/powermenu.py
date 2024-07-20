@@ -4,7 +4,7 @@ from qtile_extras.popup.toolkit import (
     PopupImage,
     PopupText,
 )
-from libqtile.command import lazy
+from libqtile.lazy import lazy
 
 
 def show_power_menu(qtile):

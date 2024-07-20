@@ -1,17 +1,11 @@
-from __future__ import print_function
-import re
-
+import signal
 import logging
 import os
-from datetime import datetime, timedelta
 from random import randint
 from subprocess import check_output
 
-import multitimer
-import psutil
 from libqtile import hook
 from libqtile.utils import send_notification
-
 from taqtile.system import (
     get_hostconfig,
     get_num_monitors,
@@ -27,38 +21,6 @@ logger = logging.getLogger(__name__)
 num_monitors = get_num_monitors()
 prev_timestamp = 0
 prev_state = hdmi_connected()
-
-
-NOAUTOCLOSE = []
-REAP_INCLUDE_PATTERNS = []
-
-
-def close_old_windows():
-    from libqtile import qtile
-
-    logger.debug("checking for windows to reap")
-
-    for key, win in qtile.windows_map.items():
-        proc = psutil.Process(win.get_pid())
-        created = datetime.fromtimestamp(proc.create_time())
-        try:
-            if win.get_wm_class() != "qutebrowser":
-                continue
-            if (datetime.now() - created) > timedelta(days=1):
-                for pattern in REAP_INCLUDE_PATTERNS:
-                    if not re.match(pattern, win.name):
-                        continue
-                if key not in NOAUTOCLOSE:
-                    logger.error(
-                        f"Old window found marked for kill: {key}:{win.name} {win.get_wm_class()}{(datetime.now() - created) > timedelta(days=1)}"
-                    )
-        except AttributeError:
-            pass
-        except:
-            logger.exception("Error reaping windows")
-
-
-WINDOW_REAPER_THREAD = multitimer.MultiTimer(60, close_old_windows)
 
 
 # @hook.subscribe.screen_change
@@ -86,25 +48,29 @@ def dialogs(window):
 
 @hook.subscribe.startup
 def startup():
-    global WINDOW_REAPER_THREAD
-    reaper_config = get_hostconfig("window-reaper")
-    if reaper_config:
-        WINDOW_REAPER_THREAD.start()
     # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
     # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
     commands = get_hostconfig("autostart-once") or {}
     num_mons = get_num_monitors()
     logger.debug("Num MONS:%s", num_mons)
-    for command, kwargs in commands.items():
-        logger.debug("executing command %s", kwargs)
-        try:
-            execute_once(command, **(kwargs if kwargs else {}))
-        except Exception as e:
-            logger.exception("error in startup hook")
-            send_notification("Qtile startup apps errored.", "")
+    # for command, kwargs in commands.items():
+    #    logger.debug("executing command %s", kwargs)
+    #    try:
+    #        execute_once(command, **(kwargs if kwargs else {}))
+    #    except Exception as e:
+    #        logger.exception("error in startup hook")
+    #        # send_notification("Qtile startup apps errored.", "")
+    from libqtile import qtile
+
+    qtile.togroup("home")
 
 
-@hook.subscribe.startup
+@hook.subscribe.shutdown
+def shutdown():
+    pass
+
+
+# @hook.subscribe.startup
 def dbus_register():
     try:
         import subprocess
@@ -150,16 +116,15 @@ def trigger_dgroups(client):
     try:
         if client.name and "brave" in client.name.lower():
             pid = client.window.get_net_wm_pid()
-            logger.info(f"brave pid: {pid}")
             client.window.set_property(
                 "QTILE_PROFILE",
                 "TEST",
                 type="UTF8_STRING",
                 format=8,
             )
-        from libqtile import qtile
+            from libqtile import qtile
 
-        # qtile.dgroups._add(client)
+            qtile.dgroups._add(client)
     except:
         logger.exception("Error in trigger_dgroups")
 

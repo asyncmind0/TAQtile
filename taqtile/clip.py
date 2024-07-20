@@ -98,21 +98,6 @@ def copy_xclip(text, primary=False):
 def dmenu_xclip(qtile, args):
     try:
         obs_pause_recording()
-        dmenu = local["dmenu"]
-        echo = local["echo"]
-        xclip = local["xclip"]
-
-        history = []
-        logger.info(history_file)
-
-        if os.path.isfile(history_file):
-            with open(history_file, "r") as qfile:
-                history = qfile.readlines()
-
-        history = reversed(
-            [x.split(" ", 1) for x in history if x and x.strip()]
-        )
-        clips = [y.strip() for y in [x[1] for x in history] if y]
         clipmenu = local["clipmenu"]
         clipmenu("-c", "-i", "-p", "Clipmenu")
     finally:

@@ -1,5 +1,4 @@
 from libqtile.widget import WindowName as QWindowName
-from taqtile.themes import current_theme, default_params
 
 from taqtile.log import logger
 from libqtile import bar, hook, pangocffi

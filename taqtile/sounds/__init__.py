@@ -8,7 +8,7 @@ import numpy as np
 import simpleaudio as sa
 from scipy.signal import butter, lfilter
 from libqtile.hook import subscribe
-from taqtile.widgets.togglebtn import requires_toggle_button_active
+from taqtile.widgets.buttons import requires_toggle_button_active
 from subprocess import check_output
 
 import pulsectl
@@ -204,6 +204,7 @@ def context_switch_sound(duration=15, volume=-30):
     play(context_switch_wave)
 
 
+@requires_toggle_button_active("sound_effects")
 def play_effect(effect):
     threading.Thread(target=thud, args=()).start()
 
@@ -230,7 +231,7 @@ def change_sink_volume(qtile, increment):
     with pulsectl.Pulse("volume-adjustment") as pulse:
         sinks = pulse.sink_list()
         new_volumes = [
-            max(min(sink.volume.value_flat + increment, 1.0), 0.0)
+            max(min(sink.volume.value_flat + increment, 1.53), 0.0)
             for sink in sinks
         ]
         for sink, new_volume in zip(sinks, new_volumes):
@@ -239,9 +240,9 @@ def change_sink_volume(qtile, increment):
         # current_volume = mixer.getvolume()[0]  # get the current volume
         # new_volume = max(min(current_volume + int(increment * 100), 100), 0)
         # mixer.setvolume(new_volume)  # set the volume
+        current_volume = get_current_volume()
         send_notification(
-            "Volume",
-            str(get_current_volume()),
+            "Volume", str(current_volume), value=current_volume
         )
         play_effect("volume_dial")
 

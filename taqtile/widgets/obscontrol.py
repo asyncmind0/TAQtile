@@ -2,7 +2,7 @@ import logging
 
 from libqtile import hook, qtile
 
-from taqtile.widgets.togglebtn import ToggleButton
+from taqtile.widgets.buttons import ToggleButton
 import websocket
 
 logger = logging.getLogger(__name__)
@@ -99,12 +99,14 @@ def change_group_obs_hook():
 
 class OBSStatusWidget(ToggleButton):
     def execute(self):
+        return
         if self.active:
             logger.info("Starting recording %s" % obs_start_record())
         else:
             logger.info("Stoped recording %s" % obs_stop_record())
 
     def check_state(self):
+        return False
         try:
             self.active = obs_get_recording_state()
         except Exception:

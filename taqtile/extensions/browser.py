@@ -20,7 +20,6 @@ from taqtile.system import (
     get_current_screen,
     get_current_group,
     get_redis,
-    group_by_name,
 )
 import logging
 from taqtile.widgets.obscontrol import obs_pause_recording, obs_resume_recording

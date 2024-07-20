@@ -5,7 +5,7 @@ import re
 import shlex
 from os.path import isdir, join, pathsep, dirname
 
-from plumbum.cmd import dmenu, pactl, recordmydesktop
+from plumbum.cmd import dmenu, pactl, recordmydesktop, pgrep, rofi
 
 from taqtile.log import logger
 from taqtile.recent_runner import RecentRunner
@@ -18,21 +18,81 @@ from taqtile.system import (
     get_windows_map,
     get_current_screen,
     get_current_group,
+    get_current_window,
 )
 from taqtile.extra import terminal
 from taqtile.log import logger
+from libqtile.lazy import lazy
+
+import time
 
 
+def debounce(s):
+    """Decorator ensures function that can only be called once every `s` seconds."""
+
+    def decorate(f):
+        t = None
+
+        def wrapped(*args, **kwargs):
+            nonlocal t
+            t_ = time.time()
+            if t is None or t_ - t >= s:
+                result = f(*args, **kwargs)
+                t = time.time()
+                return result
+
+        return wrapped
+
+    return decorate
+
+
+def _dmenu_show(title, items, dmenu_args):
+    if not pgrep("dmenu", retcode=None):
+        try:
+            return (dmenu["-p", "%s " % title] << "\n".join(items))(
+                *dmenu_args
+            ).strip()
+        except Exception as e:
+            logger.exception("error running dmenu")
+
+
+def _rofi_show(title, items, dmenu_args):
+    if not pgrep("rofi", retcode=None):
+        try:
+            return (rofi["-p", "%s " % title] << "\n".join(items))(
+                *dmenu_args
+            ).strip()
+        except Exception as e:
+            logger.exception("error running dmenu")
+
+
+@debounce(2)
 def dmenu_show(title, items):
     items = list(items)
     dmenu_args = shlex.split(dmenu_cmd_args(dmenu_lines=min(30, len(items))))
     logger.info("DMENU: %s", dmenu_args)
-    try:
-        return (dmenu["-c", "-i", "-p", "%s " % title] << "\n".join(items))(
-            *dmenu_args
-        ).strip()
-    except Exception as e:
-        logger.exception("error running dmenu")
+    _dmenu_show(title, items, dmenu_args)
+    # _rofi_show(title, items, dmenu_args)
+
+
+def dmenu_window_actions(qtile):
+    current_window = get_current_window(qtile)
+    ACTIONS = {
+        "to_group": dmenu_move_to_group,
+        "kill": lambda q: current_window.kill(),
+        "float": lambda q: q.cmd_toggle_floating(current_window),
+        "resize": lambda q: q.cmd_resize_floating(current_window),
+        "move": lambda q: q.cmd_move_floating(current_window),
+    }
+
+    action = dmenu_show("Window Actions", ACTIONS.keys())
+    if action:
+        ACTIONS[action](qtile)
+
+
+def dmenu_move_to_group(qtile):
+    group = dmenu_show("Groups", [f"{g.name}" for g in qtile.groups])
+    get_current_window(qtile).togroup(group)
 
 
 def dmenu_org(qtile):
@@ -275,3 +335,7 @@ def record_window(qtile):
 
 def powermenu(qtile):
     option = dmenu_show("Powemenu:", ["quit", "restart", "shutdown"])
+
+
+def list_surf(qtile):
+    recent = RecentRunner("qtile_surf")
