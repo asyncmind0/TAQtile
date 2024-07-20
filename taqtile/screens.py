@@ -1,5 +1,7 @@
 import logging
+from os import path
 from subprocess import check_output
+from libqtile.command import lazy
 
 from libqtile.config import Screen
 from libqtile.widget import (
@@ -29,7 +31,7 @@ from qtile_extras.widget import (
 
 from taqtile import system
 from taqtile.themes import current_theme, default_params
-from taqtile.widgets import CalClock, Clock, TextBox
+from taqtile.widgets import CalClock, Clock, TextBox, ImageBtn
 from taqtile.widgets.spotify import Spotify
 from taqtile.widgets.notify import Notify
 from taqtile.widgets.bar import Bar
@@ -37,6 +39,11 @@ from taqtile.widgets.windowname import WindowName
 from taqtile.widgets.multiscreengroupbox import MultiScreenGroupBox
 from taqtile.widgets.gpu import GPU
 from taqtile.widgets.exchange import ExchangeRate, BitcoinFees
+from taqtile.extensions import (
+    WindowList,
+    Surf,
+    DmenuRunRecent,
+)
 
 from taqtile.widgets.togglebtn import ToggleButton
 
@@ -60,11 +67,11 @@ SECONDARY_SCREEN = system.get_screen(1)
 TERTIARY_SCREEN = system.get_screen(2)
 QUATERNARY_SCREEN = system.get_screen(3)
 
-try:
-    localtimezone = check_output(["tzupdate", "-p", "-s", "5"]).decode().strip()
-except:
-    logger.exception("Failed to automatically set timezone")
-    localtimezone = "Australia/Sydney"
+# try:
+#    localtimezone = check_output(["tzupdate", "-p", "-s", "5"]).decode().strip()
+# except:
+#    logger.exception("Failed to automatically set timezone")
+localtimezone = "Australia/Sydney"
 
 
 class ScreenNameTextBox(TextBox):
@@ -154,7 +161,7 @@ def get_screens(num_monitors, groups):
         DF(
             format="\uf0a0 {uf}{m} {r:.0f}%",
             visible_on_warn=False,
-            **default_params()
+            **default_params(),
         ),
         # Sep(**sep_params),
         # BankBalance(account='credit', **default_params()),
@@ -184,8 +191,8 @@ def get_screens(num_monitors, groups):
             "c",
             **default_params(
                 foreground=cpugraph_params["graph_color"],
-                **graph_label_defaults
-            )
+                **graph_label_defaults,
+            ),
         ),
         CPUGraph(**cpugraph_params),
         # Image(filename="/usr/share/icons/oxygen/16x16/devices/media-flash-memory-stick.png"),
@@ -193,8 +200,8 @@ def get_screens(num_monitors, groups):
             "m",
             **default_params(
                 foreground=memgraph_params["graph_color"],
-                **graph_label_defaults
-            )
+                **graph_label_defaults,
+            ),
         ),
         MemoryGraph(**memgraph_params),
         # Image(filename="/usr/share/icons/oxygen/16x16/devices/network-wired.png"),
@@ -202,8 +209,8 @@ def get_screens(num_monitors, groups):
             "n",
             **default_params(
                 foreground=netgraph_params["graph_color"],
-                **graph_label_defaults
-            )
+                **graph_label_defaults,
+            ),
         ),
         NetGraph(**netgraph_params),
     ]
@@ -235,9 +242,6 @@ def get_screens(num_monitors, groups):
         Sep(**sep_params),
         CurrentLayout(**current_layout_params),
     ]
-    if system.get_hostconfig("battery"):
-        primary_bar.append(Battery(**batteryicon_params))
-        primary_bar.append(Sep(**sep_params))
 
     secondary_bar = [
         ScreenNameTextBox("second"),
@@ -253,7 +257,7 @@ def get_screens(num_monitors, groups):
             active_background="#aa0000",
             inactive_text="OBS \uf130",
             update_interval=5,
-            **default_params()
+            **default_params(),
         ),
         Sep(**sep_params),
         VoiceInputStatusWidget(
@@ -262,14 +266,14 @@ def get_screens(num_monitors, groups):
             active_background="#aa0000",
             inactive_text="mic \uf130",
             update_interval=5,
-            **default_params()
+            **default_params(),
         ),
         Sep(**sep_params),
         ScreenRecord(
             "REC",
             active_text="rec ",
             inactive_text="rec ",
-            **default_params()
+            **default_params(),
         ),
         Sep(**sep_params),
         # DiscordStatusWidget(
@@ -366,13 +370,18 @@ def get_screens(num_monitors, groups):
             "UTC",
             "Asia/Kolkata",
             "Asia/Riyadh",
-            "Asia/Ho_Chi_Minh",
-            "Africa/Lagos",
-            "US/Eastern",
-            "US/Pacific",
-            "US/Central",
-            "Europe/London",
         ]
+        if False:  # TODO
+            timezones.extend(
+                [
+                    "Asia/Ho_Chi_Minh",
+                    "Africa/Lagos",
+                    "US/Eastern",
+                    "US/Pacific",
+                    "US/Central",
+                    "Europe/London",
+                ]
+            )
         widgets = []
         for timezone in timezones:
             if timezone == localtimezone:
@@ -395,12 +404,75 @@ def get_screens(num_monitors, groups):
         )
         return widgets
 
+    if system.get_hostconfig("battery"):
+        secondary_bar.append(Battery(**batteryicon_params))
+        secondary_bar.append(Sep(**sep_params))
     # clock_bar.size = 0
     screens = dict()
     if num_monitors == 1:
         screens[PRIMARY_SCREEN] = Screen(
             Bar(secondary_bar, **default_params()),
             bottom=Bar(make_clock_bar() + monitoring_bar, **default_params()),
+            left=Bar(
+                [
+                    ImageBtn(
+                        filename="/usr/share/icons/hicolor/scalable/apps/qutebrowser.svg",
+                        mouse_callbacks={
+                            "Button1": lazy.run_extension(
+                                Surf(
+                                    dmenu_ignorecase=True,
+                                    item_format="* {window}",
+                                    **current_theme,
+                                )
+                            ),
+                            "Button3": lazy.spawn("home"),
+                        },
+                    ),
+                    ImageBtn(
+                        filename="/usr/share/icons/breeze-dark/actions/24/window.svg",
+                        mouse_callbacks={
+                            "Button1": lazy.run_extension(
+                                WindowList(
+                                    item_format="{window}",
+                                    all_groups=True,
+                                    dmenu_prompt="windows:",
+                                    dmenu_ignorecase=True,
+                                    dmenu_font=current_theme["font"],
+                                    **current_theme,
+                                )
+                            ),
+                            "Button3": lazy.spawn("gsimplecal prev_month"),
+                        },
+                    ),
+                    ImageBtn(
+                        filename="/usr/share/icons/hicolor/scalable/apps/onboard.svg",
+                        mouse_callbacks={
+                            "Button1": lazy.spawn("onboard"),
+                            "Button3": lazy.spawn("gsimplecal prev_month"),
+                        },
+                    ),
+                    ImageBtn(
+                        filename="/usr/share/icons/breeze-dark/preferences/32/krunner.svg",
+                        mouse_callbacks={
+                            "Button1": lazy.run_extension(
+                                DmenuRunRecent(**current_theme)
+                            ),
+                            "Button3": lazy.run_extension(
+                                DmenuRunRecent(**current_theme)
+                            ),
+                        },
+                    ),
+                    ToggleButton(
+                        "screen_rotation",
+                        active_text="rot ",
+                        inactive_text="rot ",
+                        on_command=f"/usr/sbin/touch {path.expanduser('~/.rotate-on')}",
+                        off_command=f"rm -f {path.expanduser('~/.rotate-on')}",
+                        check_state_command=f"ls {path.expanduser('~/.rotate-on')}",
+                    ),
+                ],
+                **default_params(bar_height=80, bar_length=80),
+            ),
         )
     else:
         screens[PRIMARY_SCREEN] = Screen(

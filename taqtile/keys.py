@@ -13,7 +13,6 @@ from taqtile.dmenu import (
     dmenu_org,
     list_bluetooth,
     dmenu_pushbullet,
-    dmenu_kubectl,
     switch_pulse_outputs,
     switch_pulse_inputs,
     set_volume,
@@ -50,8 +49,9 @@ from taqtile.themes import current_theme, dmenu_cmd_args
 from taqtile.sounds import play_effect, change_sink_volume, volume_mute
 from libqtile import hook
 from taqtile.utils import send_notification
-#from taqtile.popups.powermenu import show_power_menu
-#from taqtile.popups.keyboard import show_keyboard
+
+# from taqtile.popups.powermenu import show_power_menu
+# from taqtile.popups.keyboard import show_keyboard
 
 
 re_vol = re.compile(r"\[(\d?\d?\d?)%\]")
@@ -68,6 +68,7 @@ def toggle_stick_win(qtile):
         win_list.append(qtile.current_window)
         send_notification("Window UnStuck", f"{qtile.current_window.name}")
 
+
 def stick_win(qtile):
     global win_list
     win_list.append(qtile.current_window)
@@ -79,8 +80,9 @@ def unstick_win(qtile):
     try:
         win_list.remove(qtile.current_window)
     except ValueError:
-       logger.exception("error")
+        logger.exception("error")
     send_notification("Window UnStuck", f"{qtile.current_window.name}")
+
 
 @hook.subscribe.client_focus
 def client_focus(client):
@@ -89,12 +91,15 @@ def client_focus(client):
             w.bring_to_front()
         except ValueError:
             pass
+
+
 @hook.subscribe.setgroup
 def move_win():
     from libqtile import qtile
 
     for w in win_list:
-        if not w:continue
+        if not w:
+            continue
         try:
             w.togroup(qtile.current_group.name)
             w.focus()
@@ -248,7 +253,7 @@ def get_keys(mod, num_groups, num_monitors):
         # Unsplit = 1 window displayed, like Max layout, but still with
         # multiple stack panes
         ([mod, "shift"], "Return", lazy.layout.toggle_split()),
-        #(["shift", mod], "q", lazy.shutdown()),
+        # (["shift", mod], "q", lazy.shutdown()),
         (
             [mod, "control"],
             "q",
@@ -412,13 +417,12 @@ def get_keys(mod, num_groups, num_monitors):
                 )
             ),
         ),
-        ([mod, "shift"], "k", lazy.function(dmenu_kubectl)),
         ([mod, "shift"], "f", lazy.function(float_to_front)),
         ([mod], "o", lazy.function(toggle_stick_win), "stick win"),
         ([mod, "shift"], "o", lazy.function(unstick_win), "unstick win"),
         ([mod, "shift"], "e", lazy.spawn("dmenumoji")),
-        ([mod, "shift"], "q", lazy.function(show_power_menu)),
-        ([mod, "shift"], "k", lazy.function(show_keyboard))
+        # ([mod, "shift"], "q", lazy.function(show_power_menu)),
+        # ([mod, "shift"], "k", lazy.function(show_keyboard)),
     ]
 
     laptop_keys = [

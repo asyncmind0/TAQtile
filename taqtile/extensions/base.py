@@ -29,7 +29,6 @@ from taqtile.system import (
     get_current_group,
     get_redis,
 )
-from taqtile.groups import Rule, Match
 from taqtile.widgets.obscontrol import obs_pause_recording, obs_resume_recording
 from taqtile import sounds
 
@@ -62,7 +61,11 @@ class WindowList(QWindowList):
     def _configure(self, qtile):
         super()._configure(qtile)
         # insert as second item in the list
-        # self.configured_command.insert(1, "-markup")
+        self.configured_command.insert(1, "-normal-window")
+        self.configured_command.insert(2, "-me-select-entry")
+        self.configured_command.insert(3, "")
+        self.configured_command.insert(4, "-me-accept-entry")
+        self.configured_command.insert(5, "MousePrimary")
         if self.show_icons:
             self.configured_command.insert(1, "-show-icons")
             self.configured_command.insert(2, "-icon-theme")

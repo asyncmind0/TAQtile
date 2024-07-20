@@ -5,16 +5,16 @@ default_theme = dict(
     padding=1,
     margin=0,
     linewidth=4,
-    fontsize=14,
+    fontsize=28,
     terminal_font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
-    terminal_fontsize=16,  #
+    terminal_fontsize=34,  #
     font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
     # font="Inconsolata", font="Hack", # font="ProggySquareTTSZ", #
     # font="pango:monospace",
     # font="Terminus",
     borderwidth=1,
-    bar_height=24,
-    dmenu_lines=30,  #
+    bar_height=44,
+    dmenu_lines=10,  #
     dmenu_command="dmenu -z 1500 -c",
     foreground_urgent="#ffffff",
     background_urgent="#ff007f",

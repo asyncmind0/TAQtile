@@ -143,10 +143,12 @@ platform_specific = {
     "threadripper0": {"battery": False},
     "doombox": {
         "battery": False,
-    "autostart-once": {
-        "/usr/sbin/brave --profile-directory=home": None
-        }}
-        
+        "autostart-once": {"/usr/sbin/brave --profile-directory=home": None},
+    },
+    "surface0": {
+        "battery": "BAT1",
+        "laptop": True,
+    },
 }
 
 
@@ -297,6 +299,7 @@ def show_process_stats(qtile):
     """
     logger.info(message)
     send_notification("stats", message)
+
 
 def group_by_name(groups, name):
     for group in groups:

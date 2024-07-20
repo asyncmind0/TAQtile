@@ -96,18 +96,23 @@ class Surf(WindowGroupList):
         )
 
     def spawn(self, sout):
+        sout = sout.strip()
         if sout.startswith("clipboard:"):
             sout = sout.split("clipboard:")[-1]
 
         url = ""
-        if sout.startswith("http"):
-            url = sout.strip()
-        elif sout:
+        for tld in [".com", ".org"]:
+            if sout.endswith(tld) and not sout.startswith("http:"):
+                url = "https://" + sout
+                break
+        else:
             gg = "gg "
             if sout.startswith(gg):
                 sout = sout.split(gg)[-1]
                 url = "https://www.google.com/search?q='%s'&ie=utf-8&oe=utf-8"
             else:
-                url = "https://duckduckgo.com/?t=ffab&q=%s&ia=web"
+                url = (
+                    "https://duckduckgo.com/?t=ffab&q=%s&ia=web&kae=d&ks=l&kw=s"
+                )
             url = url % quote_plus(sout)
-        self.qtile.spawn(f"systemd-run --user browser.py {url}")
+        self.qtile.spawn(f"systemd-run --user surf {url}")

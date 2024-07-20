@@ -64,6 +64,7 @@ WINDOW_REAPER_THREAD = multitimer.MultiTimer(60, close_old_windows)
 # @hook.subscribe.screen_change
 def restart_on_randr(qtile, ev):
     logger.error("Screen change: %s", ev.__dict__)
+    return
     global event_cntr, prev_timestamp
     cur_timestamp = ev.timestamp
     num_mons = get_num_monitors()
@@ -86,7 +87,9 @@ def dialogs(window):
 @hook.subscribe.startup
 def startup():
     global WINDOW_REAPER_THREAD
-    WINDOW_REAPER_THREAD.start()
+    reaper_config = get_hostconfig("window-reaper")
+    if reaper_config:
+        WINDOW_REAPER_THREAD.start()
     # http://stackoverflow.com/questions/6442428/how-to-use-popen-to-run-backgroud-process-and-avoid-zombie
     # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
     commands = get_hostconfig("autostart-once") or {}
@@ -193,7 +196,7 @@ def set_group(client):
             ]:
                 continue
             if rule and rule.matches(client):
-                logger.info(f"Matched {rule} {client}", rule, client)
+                logger.info(f"Matched {rule} {client}")
                 if rule.group:
                     logger.error("to group %s", rule.group)
                     client.togroup(rule.group)

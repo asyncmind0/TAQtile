@@ -61,6 +61,7 @@ class ToggleButton(GenPollText):
             ) as process:
                 # Wait for the command to complete and get the return code
                 return_code = process.wait()
+            logger.debug(f"check state {self.name}:{return_code}")
             if return_code == 0:
                 self.active = True
             else:
@@ -77,17 +78,34 @@ class ToggleButton(GenPollText):
 
     def button_press(self, x, y, button):
         global TOGGLE_BUTTON_STATES
-        if button == 1:  # Left mouse button
+        logger.debug(
+            f"{self.name}:button_press :{repr(button)} active: {self.active}"
+        )
+        if int(button) == 1 or True:  # Left mouse button
             self.active = not self.active
             TOGGLE_BUTTON_STATES[self.name] = self.active
-            self.execute()
+            try:
+                self.execute()
+            except:
+                logger.exception(
+                    f"{self.name} excuted: {TOGGLE_BUTTON_STATES} active: {self.active}"
+                )
         self.update_text()
 
     def execute(self):
+        logger.debug(f"execut active :{self.active}")
         if self.active:
-            self.qtile.spawn(self.on_command)
+            logger.debug(f"on_command :{self.on_command}")
+            if isinstance(self.on_command, str):
+                self.qtile.spawn(self.on_command)
+            else:
+                self.on_command()
         else:
-            self.qtile.spawn(self.off_command)
+            logger.debug(f"off_command :{self.off_command}")
+            if isinstance(self.off_command, str):
+                self.qtile.spawn(self.off_command)
+            else:
+                self.off_command()
 
     def update_text(self):
         self.text = self.active_text if self.active else self.inactive_text

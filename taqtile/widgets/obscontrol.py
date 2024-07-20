@@ -26,10 +26,10 @@ def initialize_obs_client(func):
             return func(qtile.OBS_CLIENT, *args, **kwargs)
         except NameError:
             logger.error("obs integration failed")
-        except (
-            websocket._exceptions.WebSocketConnectionClosedException,
-            BrokenPipeError,
-        ):
+        except Exception:
+            #    websocket._exceptions.WebSocketConnectionClosedException,
+            #    BrokenPipeError,
+            # ):
             logger.error("obs webbsocket failed reconnecting")
             qtile.OBS_CLIENT = None
         except obs.error.OBSSDKRequestError as e:
