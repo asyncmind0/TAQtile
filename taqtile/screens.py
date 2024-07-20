@@ -378,6 +378,9 @@ def get_screens(num_monitors, groups):
             CalClock(timezone=localtimezone, **clock_params),
         ]
         logger.debug("get screens started secondary bar")
+        if system.get_hostconfig("battery"):
+            bar.append(Battery(**batteryicon_params))
+            bar.append(Sep(**sep_params))
         return bar
 
     def get_tertiary_bar():
@@ -481,9 +484,6 @@ def get_screens(num_monitors, groups):
         )
         return widgets
 
-    if system.get_hostconfig("battery"):
-        secondary_bar.append(Battery(**batteryicon_params))
-        secondary_bar.append(Sep(**sep_params))
     # clock_bar.size = 0
     screens = dict()
     if num_monitors == 1:
