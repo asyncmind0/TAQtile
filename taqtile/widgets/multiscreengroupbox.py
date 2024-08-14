@@ -57,7 +57,9 @@ class MultiScreenGroupBox(_MultiScreenGroupBox):
             is_line=False,
             center_aligned=True,
             hide_unused=True,
-            spacing=1,
+            spacing=4,
+            padding_x=2,
+            borderwidth=1,
         )
         groupbox_params.update(config)
 

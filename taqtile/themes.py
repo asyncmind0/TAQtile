@@ -19,7 +19,7 @@ default_theme = dict(
     padding=1,
     margin=0,
     linewidth=4,
-    fontsize=28,
+    fontsize=16,
     terminal_font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
     terminal_fontsize=18,  #
     font="Hack:lcdfilter=lcddefault:hintstyle=hintfull:hinting=true:rgba=rgb:antialias=true:autohint=false",
@@ -27,7 +27,7 @@ default_theme = dict(
     # font="pango:monospace",
     # font="Terminus",
     borderwidth=1,
-    bar_height=20,
+    bar_height=24,
     dmenu_lines=30,  #
     # dmenu_command="dmenu -z 1500 -c",
     dmenu_font="Hack-34",
@@ -35,6 +35,7 @@ default_theme = dict(
     background_urgent="#ff007f",
 )
 tablet_theme = dict(
+    fontsize=28,
     terminal_fontsize=34,  #
     bar_height=44,
     dmenu_lines=10,  #
